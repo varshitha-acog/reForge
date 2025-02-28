@@ -9,6 +9,7 @@
   <title>Home &mdash; reForge 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=b7a6b9b3" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
@@ -79,8 +80,8 @@
 <blockquote>
 <div><p>The reForge source code is hosted on GitLab at: <a class="reference external" href="https://github.com/DanYev/reforge">https://github.com/DanYev/reforge</a></p>
 </div></blockquote>
-<p>The reForge Python package provides a comprehensive suite of utilities designed for high‐performance
-simulation, analysis, and data processing workflows. It features optimized mathematical routines,
+<p>The reForge Python package provides a comprehensive suite of utilities designed for MD
+simulations, analysis, and data processing workflows. It features optimized mathematical routines,
 GPU‐accelerated computations, and a variety of helper tools to streamline file I/O and data manipulation.
 Developed to support advanced research projects in simulation and analysis, reForge is available for
 public use under the GNU V3 License.</p>
@@ -89,21 +90,17 @@ public use under the GNU V3 License.</p>
 <h2>What’s in reForge?<a class="headerlink" href="#what-s-in-reforge" title="Link to this heading"></a></h2>
 <p>In a nutshell, the key components of reForge are:</p>
 <ul class="simple">
+<li><p><strong>Python package for Molecular Dynamics:</strong>
+Easy to use workflows for set-up, multiple MD runs and analysis of large biomolecular systems.</p></li>
 <li><p><strong>Optimized Mathematical Routines:</strong>
 High-performance functions written in Cython and CUDA for computing Hessian matrices, perturbation
 matrices, and other advanced mathematical operations.</p></li>
-<li><p><strong>GPU-Based Simulation Utilities:</strong>
+<li><p><strong>GPU-Based Analysis Utilities:</strong>
 Tools that leverage GPU acceleration for simulation and analysis tasks, significantly reducing
 computation times.</p></li>
-<li><p><strong>File I/O and Data Processing Helpers:</strong>
-Functions for reading and writing various data formats (e.g., CSV, NPY, XVG) and for managing
-file systems efficiently.</p></li>
 <li><p><strong>Profiling Tools:</strong>
 Decorators and utilities for memory and time profiling to ensure optimal performance during
 computations.</p></li>
-<li><p><strong>Support for Molecular Dynamics and Diffraction Analysis:</strong>
-Specialized algorithms and workflows tailored to the simulation of x-ray diffraction under the Born
-approximation and related applications.</p></li>
 </ul>
 </section>
 <section id="for-new-users">
@@ -151,6 +148,7 @@ packages such as Cython, NumPy, CuPy, GROMACS, OpenMM, Vermouth and MDAnalysis.<
 <li class="toctree-l2"><a class="reference internal" href="why.html#need-to-simulate-a-large-biomolecular-complex-or-many">Need to simulate a large biomolecular complex? Or many?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="why.html#python-based">Python-based</a></li>
 <li class="toctree-l2"><a class="reference internal" href="why.html#accelerated-c-and-cuda-routines">Accelerated C- and CUDA routines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="why.html#tools-to-develop-your-own-models">Tools to develop your own models</a></li>
 <li class="toctree-l2"><a class="reference internal" href="why.html#for-new-users">For new users</a></li>
 <li class="toctree-l2"><a class="reference internal" href="why.html#acknowledgements">Acknowledgements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="why.html#indices-and-tables">Indices and Tables</a></li>
