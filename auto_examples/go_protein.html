@@ -126,8 +126,13 @@ into separate chains and moves Proteins and RNA/DNA to their respective director
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">mdsys</span><span class="o">.</span><span class="n">split_chains</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Coarse-grain the proteins using martinize2 by Martini</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">mdsys</span><span class="o">.</span><span class="n">martinize_proteins_go</span><span class="p">(</span><span class="n">go_eps</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">go_low</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">go_up</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="s2">&quot;backbone&quot;</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Results:&quot;</span><span class="p">,</span> <span class="mi">42</span><span class="p">)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  <span class="c1"># Optional: Sphinx Gallery captures figures automatically</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="c1"># Coarse-grain the proteins using martinize2 by Martini</span>
+<span class="c1"># mdsys.martinize_proteins_go(go_eps=10.0, go_low=0.3, go_up=1.0, p=&quot;backbone&quot;, pf=500, append=False)</span>
 <span class="c1"># Let&#39;s take a look at generated files:</span>
 
 <span class="c1"># # 4. Solvate and add ions.</span>
