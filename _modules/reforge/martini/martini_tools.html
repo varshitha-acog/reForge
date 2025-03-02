@@ -1,0 +1,353 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>reforge.martini.martini_tools &mdash; reForge 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=b7a6b9b3" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            reForge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../why.html">Why use reForge?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">reForge API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">reForge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">reforge.martini.martini_tools</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for reforge.martini.martini_tools</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module for Martini simulation tools.</span>
+
+<span class="sd">This module provides tools for preparing Martini simulations, such as topology file generation,</span>
+<span class="sd">linking itp files, processing PDB files with GROMACS, and running various martinize2 routines.</span>
+<span class="sd">Note that this module is intended for internal use.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">MDAnalysis</span><span class="w"> </span><span class="kn">import</span> <span class="n">Universe</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">MDAnalysis.analysis.dssp</span><span class="w"> </span><span class="kn">import</span> <span class="n">translate</span><span class="p">,</span> <span class="n">DSSP</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">reforge</span><span class="w"> </span><span class="kn">import</span> <span class="n">cli</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">reforge.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">cd</span><span class="p">,</span> <span class="n">logger</span>
+
+
+<div class="viewcode-block" id="dssp">
+<a class="viewcode-back" href="../../../reforge.martini.html#reforge.martini.martini_tools.dssp">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">dssp</span><span class="p">(</span><span class="n">in_file</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the DSSP secondary structure for the given PDB file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    in_file : str</span>
+<span class="sd">        Path to the PDB file.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        Secondary structure string with &#39;-&#39; replaced by &#39;C&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Doing DSSP&quot;</span><span class="p">)</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">Universe</span><span class="p">(</span><span class="n">in_file</span><span class="p">)</span>
+    <span class="n">run</span> <span class="o">=</span> <span class="n">DSSP</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+    <span class="n">mean_secondary_structure</span> <span class="o">=</span> <span class="n">translate</span><span class="p">(</span><span class="n">run</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">dssp_ndarray</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">ss</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mean_secondary_structure</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ss</span></div>
+
+
+
+<div class="viewcode-block" id="append_to">
+<a class="viewcode-back" href="../../../reforge.martini.html#reforge.martini.martini_tools.append_to">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">append_to</span><span class="p">(</span><span class="n">in_file</span><span class="p">,</span> <span class="n">out_file</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Append the contents of in_file (excluding the first line) to out_file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    in_file : str</span>
+<span class="sd">        Path to the source file.</span>
+<span class="sd">    out_file : str</span>
+<span class="sd">        Path to the destination file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">in_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dest</span><span class="p">:</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span></div>
+
+
+
+<div class="viewcode-block" id="fix_go_map">
+<a class="viewcode-back" href="../../../reforge.martini.html#reforge.martini.martini_tools.fix_go_map">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fix_go_map</span><span class="p">(</span><span class="n">wdir</span><span class="p">,</span> <span class="n">in_map</span><span class="p">,</span> <span class="n">out_map</span><span class="o">=</span><span class="s2">&quot;go.map&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fix the Go-map file by removing the last column from lines that start with &#39;R &#39;.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    wdir : str</span>
+<span class="sd">        Working directory.</span>
+<span class="sd">    in_map : str</span>
+<span class="sd">        Input map filename.</span>
+<span class="sd">    out_map : str, optional</span>
+<span class="sd">        Output map filename. Default is &quot;go.map&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">wdir</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">in_map</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">in_file</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_map</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out_file</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">in_file</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;R &quot;</span><span class="p">):</span>
+                    <span class="n">new_line</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">out_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">new_line</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">bdir</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="martinize_go">
+<a class="viewcode-back" href="../../../reforge.martini.html#reforge.martini.martini_tools.martinize_go">[docs]</a>
+<span class="nd">@cli</span><span class="o">.</span><span class="n">from_wdir</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">martinize_go</span><span class="p">(</span><span class="n">wdir</span><span class="p">,</span> <span class="n">topdir</span><span class="p">,</span> <span class="n">aapdb</span><span class="p">,</span> <span class="n">cgpdb</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;protein&quot;</span><span class="p">,</span> <span class="n">go_eps</span><span class="o">=</span><span class="mf">9.414</span><span class="p">,</span>
+                 <span class="n">go_low</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">go_up</span><span class="o">=</span><span class="mf">1.1</span><span class="p">,</span> <span class="n">go_res_dist</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                 <span class="n">go_write_file</span><span class="o">=</span><span class="s2">&quot;map/contacts.map&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run virtual site-based GoMartini via martinize2.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    wdir : str</span>
+<span class="sd">        Working directory.</span>
+<span class="sd">    topdir : str</span>
+<span class="sd">        Topology directory.</span>
+<span class="sd">    aapdb : str</span>
+<span class="sd">        Input all-atom PDB file.</span>
+<span class="sd">    cgpdb : str</span>
+<span class="sd">        Coarse-grained PDB file.</span>
+<span class="sd">    name : str, optional</span>
+<span class="sd">        Protein name. Default is &quot;protein&quot;.</span>
+<span class="sd">    go_eps : float, optional</span>
+<span class="sd">        Strength of the Go-model bias. Default is 9.414.</span>
+<span class="sd">    go_low : float, optional</span>
+<span class="sd">        Lower distance cutoff (nm). Default is 0.3.</span>
+<span class="sd">    go_up : float, optional</span>
+<span class="sd">        Upper distance cutoff (nm). Default is 1.1.</span>
+<span class="sd">    go_res_dist : int, optional</span>
+<span class="sd">        Minimum residue distance below which contacts are removed. Default is 3.</span>
+<span class="sd">    go_write_file : str, optional</span>
+<span class="sd">        Output file for Go-map. Default is &quot;map/contacts.map&quot;.</span>
+<span class="sd">    **kwargs :</span>
+<span class="sd">        Additional keyword arguments.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="n">aapdb</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">cgpdb</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;go&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="s2">&quot;protein.top&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;cys&quot;</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;p&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;pf&quot;</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;sep&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;resid&quot;</span><span class="p">,</span> <span class="s2">&quot;input&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;ff&quot;</span><span class="p">,</span> <span class="s2">&quot;martini3001&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;maxwarn&quot;</span><span class="p">,</span> <span class="s2">&quot;1000&quot;</span><span class="p">)</span>
+    <span class="n">ss</span> <span class="o">=</span> <span class="n">dssp</span><span class="p">(</span><span class="n">aapdb</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">cd</span><span class="p">(</span><span class="n">wdir</span><span class="p">):</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;-name </span><span class="si">{}</span><span class="s2"> -go-eps </span><span class="si">{}</span><span class="s2"> -go-low </span><span class="si">{}</span><span class="s2"> -go-up </span><span class="si">{}</span><span class="s2"> -go-res-dis </span><span class="si">{}</span><span class="s2"> &quot;</span>
+                <span class="s2">&quot;-go-write-file </span><span class="si">{}</span><span class="s2"> -ss </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">name</span><span class="p">,</span> <span class="n">go_eps</span><span class="p">,</span> <span class="n">go_low</span><span class="p">,</span> <span class="n">go_up</span><span class="p">,</span> <span class="n">go_res_dist</span><span class="p">,</span> <span class="n">go_write_file</span><span class="p">,</span> <span class="n">ss</span><span class="p">)</span>
+        <span class="n">cli</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;martinize2&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">append_to</span><span class="p">(</span><span class="s2">&quot;go_atomtypes.itp&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">topdir</span><span class="p">,</span> <span class="s2">&quot;go_atomtypes.itp&quot;</span><span class="p">))</span>
+        <span class="n">append_to</span><span class="p">(</span><span class="s2">&quot;go_nbparams.itp&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">topdir</span><span class="p">,</span> <span class="s2">&quot;go_nbparams.itp&quot;</span><span class="p">))</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.itp&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">topdir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.itp&quot;</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="martinize_en">
+<a class="viewcode-back" href="../../../reforge.martini.html#reforge.martini.martini_tools.martinize_en">[docs]</a>
+<span class="nd">@cli</span><span class="o">.</span><span class="n">from_wdir</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">martinize_en</span><span class="p">(</span><span class="n">wdir</span><span class="p">,</span> <span class="n">aapdb</span><span class="p">,</span> <span class="n">cgpdb</span><span class="p">,</span> <span class="n">ef</span><span class="o">=</span><span class="mi">700</span><span class="p">,</span> <span class="n">el</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">eu</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run protein elastic network generation via martinize2.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    wdir : str</span>
+<span class="sd">        Working directory.</span>
+<span class="sd">    aapdb : str</span>
+<span class="sd">        Input all-atom PDB file.</span>
+<span class="sd">    cgpdb : str</span>
+<span class="sd">        Coarse-grained PDB file.</span>
+<span class="sd">    ef : float, optional</span>
+<span class="sd">        Force constant. Default is 700.</span>
+<span class="sd">    el : float, optional</span>
+<span class="sd">        Lower cutoff. Default is 0.0.</span>
+<span class="sd">    eu : float, optional</span>
+<span class="sd">        Upper cutoff. Default is 0.9.</span>
+<span class="sd">    **kwargs :</span>
+<span class="sd">        Additional keyword arguments.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="n">aapdb</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">cgpdb</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="s2">&quot;protein.top&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;cys&quot;</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;p&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;pf&quot;</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;sep&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;resid&quot;</span><span class="p">,</span> <span class="s2">&quot;input&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;ff&quot;</span><span class="p">,</span> <span class="s2">&quot;martini3001&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;maxwarn&quot;</span><span class="p">,</span> <span class="s2">&quot;1000&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;elastic&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">ss</span> <span class="o">=</span> <span class="n">dssp</span><span class="p">(</span><span class="n">aapdb</span><span class="p">)</span>
+    <span class="n">line</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;-ef </span><span class="si">{}</span><span class="s2"> -el </span><span class="si">{}</span><span class="s2"> -eu </span><span class="si">{}</span><span class="s2"> -ss </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ef</span><span class="p">,</span> <span class="n">el</span><span class="p">,</span> <span class="n">eu</span><span class="p">,</span> <span class="n">ss</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">cd</span><span class="p">(</span><span class="n">wdir</span><span class="p">):</span>
+        <span class="n">cli</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;martinize2&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="martinize_nucleotide">
+<a class="viewcode-back" href="../../../reforge.martini.html#reforge.martini.martini_tools.martinize_nucleotide">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">martinize_nucleotide</span><span class="p">(</span><span class="n">wdir</span><span class="p">,</span> <span class="n">aapdb</span><span class="p">,</span> <span class="n">cgpdb</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run nucleotide coarse-graining using martinize_nucleotides.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    wdir : str</span>
+<span class="sd">        Working directory.</span>
+<span class="sd">    aapdb : str</span>
+<span class="sd">        Input all-atom PDB file.</span>
+<span class="sd">    cgpdb : str</span>
+<span class="sd">        Coarse-grained PDB file.</span>
+<span class="sd">    **kwargs :</span>
+<span class="sd">        Additional parameters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="n">aapdb</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">cgpdb</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;sys&quot;</span><span class="p">,</span> <span class="s2">&quot;RNA&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;ss&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="s2">&quot;topol.top&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;p&quot;</span><span class="p">,</span> <span class="s2">&quot;bb&quot;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;pf&quot;</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">cd</span><span class="p">(</span><span class="n">wdir</span><span class="p">):</span>
+        <span class="n">script</span> <span class="o">=</span> <span class="s2">&quot;reforge.martini.martinize_nucleotides&quot;</span>
+        <span class="n">cli</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;python3 -m&quot;</span><span class="p">,</span> <span class="n">script</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="martinize_rna">
+<a class="viewcode-back" href="../../../reforge.martini.html#reforge.martini.martini_tools.martinize_rna">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">martinize_rna</span><span class="p">(</span><span class="n">wdir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run RNA coarse-graining using martinize_rna.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    wdir : str</span>
+<span class="sd">        Working directory.</span>
+<span class="sd">    **kwargs :</span>
+<span class="sd">        Additional parameters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">cd</span><span class="p">(</span><span class="n">wdir</span><span class="p">):</span>
+        <span class="n">script</span> <span class="o">=</span> <span class="s2">&quot;reforge.martini.martinize_rna&quot;</span>
+        <span class="n">cli</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;python3 -m&quot;</span><span class="p">,</span> <span class="n">script</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="insert_membrane">
+<a class="viewcode-back" href="../../../reforge.martini.html#reforge.martini.martini_tools.insert_membrane">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">insert_membrane</span><span class="p">(</span><span class="n">wdir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Insert a membrane using the insane tool.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    wdir : str</span>
+<span class="sd">        Working directory.</span>
+<span class="sd">    **kwargs :</span>
+<span class="sd">        Additional parameters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">cd</span><span class="p">(</span><span class="n">wdir</span><span class="p">):</span>
+        <span class="n">script</span> <span class="o">=</span> <span class="s2">&quot;reforge.martini.insane&quot;</span>
+        <span class="n">cli</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;python3 -m&quot;</span><span class="p">,</span> <span class="n">script</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Danis Yangaliev.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

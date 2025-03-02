@@ -1,0 +1,232 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>reforge.forge.cgmap &mdash; reForge 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=b7a6b9b3" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            reForge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../why.html">Why use reForge?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">reForge API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">reForge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">reforge.forge.cgmap</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for reforge.forge.cgmap</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;CG mapping tools</span>
+
+<span class="sd">Description:</span>
+<span class="sd">    Provides functions to map atomistic PDB data to a coarse-grained (CG)</span>
+<span class="sd">    representation.</span>
+
+<span class="sd">Author: DY</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<div class="viewcode-block" id="move_o3">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.cgmap.move_o3">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">move_o3</span><span class="p">(</span><span class="n">system</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Move each O3&#39; atom to the next residue. Needed for some CG nucleic</span>
+<span class="sd">    force fields due to the phosphate group mapping.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        system: A system object containing chains and residues.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">system</span><span class="o">.</span><span class="n">chains</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">residue</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chain</span><span class="p">):</span>
+            <span class="n">atoms</span> <span class="o">=</span> <span class="n">residue</span><span class="o">.</span><span class="n">atoms</span>
+            <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;O3&#39;&quot;</span><span class="p">:</span>
+                    <span class="n">atoms</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">o3atom</span> <span class="o">=</span> <span class="n">atom</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">o3atom</span><span class="o">.</span><span class="n">resname</span> <span class="o">=</span> <span class="n">residue</span><span class="o">.</span><span class="n">resname</span>
+                        <span class="n">o3atom</span><span class="o">.</span><span class="n">resid</span> <span class="o">=</span> <span class="n">residue</span><span class="o">.</span><span class="n">resid</span>
+                        <span class="n">atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o3atom</span><span class="p">)</span>
+                        <span class="n">o3atom</span> <span class="o">=</span> <span class="n">atom</span>
+                    <span class="k">break</span></div>
+
+
+
+<div class="viewcode-block" id="map_residue">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.cgmap.map_residue">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">map_residue</span><span class="p">(</span><span class="n">residue</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">atid</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Map an atomistic residue to a coarse-grained (CG) residue.</span>
+
+<span class="sd">    For each bead defined in the mapping dictionary, this function creates a new bead atom.</span>
+<span class="sd">    The bead&#39;s coordinates are determined by averaging the coordinates of the atoms in the</span>
+<span class="sd">    original residue that match the bead&#39;s atom names.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        residue: The original residue object.</span>
+<span class="sd">        mapping (dict): Dictionary with bead names as keys and lists of atom names as values.</span>
+<span class="sd">        atid (int): Starting atom id to assign to new beads.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: List of new bead atoms representing the coarse-grained residue.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cgresidue</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">dummy_atom</span> <span class="o">=</span> <span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">bname</span><span class="p">,</span> <span class="n">anames</span> <span class="ow">in</span> <span class="n">mapping</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">bead</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">dummy_atom</span><span class="p">)</span>
+        <span class="n">bead</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">bname</span>
+        <span class="n">bead</span><span class="o">.</span><span class="n">atid</span> <span class="o">=</span> <span class="n">atid</span>
+        <span class="n">atid</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">atoms</span> <span class="o">=</span> <span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">mask</span><span class="p">(</span><span class="n">anames</span><span class="p">)</span>
+        <span class="n">bvec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">atoms</span><span class="o">.</span><span class="n">vecs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">bead</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">bead</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">bead</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">bvec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bvec</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">bvec</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">bead</span><span class="o">.</span><span class="n">vec</span> <span class="o">=</span> <span class="n">bvec</span>
+        <span class="n">bead</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="s2">&quot;Z&quot;</span> <span class="k">if</span> <span class="n">bname</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;S&quot;</span>
+        <span class="n">cgresidue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bead</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cgresidue</span></div>
+
+
+
+<div class="viewcode-block" id="map_chain">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.cgmap.map_chain">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">map_chain</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="n">ff</span><span class="p">,</span> <span class="n">atid</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Map a chain of atomistic residues to a coarse-grained (CG) representation.</span>
+
+<span class="sd">    For each residue in the chain, the function retrieves the corresponding bead mapping</span>
+<span class="sd">    from the force field (ff) based on the residue&#39;s name. For the first residue, the mapping</span>
+<span class="sd">    for &quot;BB1&quot; is removed. Each residue is then converted to its CG representation using the</span>
+<span class="sd">    map_residue function, and the resulting beads are collected into a single list.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        chain: List of residue objects.</span>
+<span class="sd">        ff: Force field object that contains a &#39;mapping&#39; dictionary keyed by residue name.</span>
+<span class="sd">        atid (int): Starting atom id for new beads (default is 1).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: List of coarse-grained bead atoms representing the entire chain.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cgchain</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">residue</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chain</span><span class="p">):</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="n">ff</span><span class="o">.</span><span class="n">mapping</span><span class="p">[</span><span class="n">residue</span><span class="o">.</span><span class="n">resname</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">mapping</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">del</span> <span class="n">mapping</span><span class="p">[</span><span class="s2">&quot;BB1&quot;</span><span class="p">]</span>
+        <span class="n">cgresidue</span> <span class="o">=</span> <span class="n">map_residue</span><span class="p">(</span><span class="n">residue</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">atid</span><span class="p">)</span>
+        <span class="n">cgchain</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">cgresidue</span><span class="p">)</span>
+        <span class="n">atid</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mapping</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cgchain</span></div>
+
+
+
+<div class="viewcode-block" id="map_model">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.cgmap.map_model">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">map_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">ff</span><span class="p">,</span> <span class="n">atid</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Map a model of atomistic residues to a coarse-grained (CG) representation.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        model: Iterable of chains (each a list of residue objects).</span>
+<span class="sd">        ff: Force field object containing a &#39;mapping&#39; dictionary keyed by residue name.</span>
+<span class="sd">        atid (int): Starting atom id for new beads (default is 1).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: List of coarse-grained bead atoms representing the entire model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cgmodel</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">model</span><span class="p">:</span>
+        <span class="n">cgchain</span> <span class="o">=</span> <span class="n">map_chain</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="n">ff</span><span class="p">,</span> <span class="n">atid</span><span class="p">)</span>
+        <span class="n">cgmodel</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">cgchain</span><span class="p">)</span>
+        <span class="n">atid</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cgchain</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cgmodel</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Danis Yangaliev.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

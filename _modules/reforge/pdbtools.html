@@ -1,0 +1,1053 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>reforge.pdbtools &mdash; reForge 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b7a6b9b3" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            reForge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../why.html">Why use reForge?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">reForge API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">reForge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">reforge.pdbtools</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for reforge.pdbtools</h1><div class="highlight"><pre>
+<span></span><span class="c1"># pylint: disable=too-many-lines, too-many-instance-attributes, too-many-arguments, too-many-locals, missing-function-docstring, too-many-public-methods, unnecessary-lambda-assignment, unspecified-encoding, broad-exception-caught, undefined-variable, invalid-name, import-outside-toplevel, f-string-without-interpolation, too-few-public-methods, unused-import</span>
+
+<span class="sd">&quot;&quot;&quot;Classes and functions for parsing and manipulating PDB atoms</span>
+
+<span class="sd">Description:</span>
+<span class="sd">    This module provides utilities for parsing, manipulating, and writing PDB files.</span>
+<span class="sd">    It defines classes for representing individual atoms (Atom), groups of atoms (AtomList),</span>
+<span class="sd">    as well as hierarchical representations of residues, chains, models, and entire systems.</span>
+<span class="sd">    In addition, helper functions are provided to read and write PDB files and GROMACS index</span>
+<span class="sd">    (NDX) files, and to perform common operations such as sorting and cleaning PDB files.</span>
+
+<span class="sd">Usage:</span>
+<span class="sd">    from pdbtools import pdb2system, pdb2atomlist, sort_pdb, clean_pdb</span>
+<span class="sd">    system = pdb2system(&quot;input.pdb&quot;)</span>
+<span class="sd">    atoms = pdb2atomlist(&quot;input.pdb&quot;)</span>
+
+<span class="sd">Requirements:</span>
+<span class="sd">    - Python 3.x</span>
+<span class="sd">    - pathlib and typing (standard library)</span>
+<span class="sd">    - pdbfixer and OpenMM (for cleaning PDB files, optional)</span>
+<span class="sd">    </span>
+<span class="sd">Author: DY</span>
+<span class="sd">Date: 2025-02-27</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
+
+<span class="c1">###################################</span>
+<span class="c1">## Classes and Functions ##</span>
+<span class="c1">###################################</span>
+
+<div class="viewcode-block" id="Atom">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.Atom">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Atom</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents an ATOM or HETATM record from a PDB file.</span>
+<span class="sd">    </span>
+<span class="sd">    This class intentionally contains many attributes to capture all fields from a PDB record.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=too-many-instance-attributes, too-many-arguments</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">record</span><span class="p">,</span>
+        <span class="n">atid</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">,</span>
+        <span class="n">alt_loc</span><span class="p">,</span>
+        <span class="n">resname</span><span class="p">,</span>
+        <span class="n">chid</span><span class="p">,</span>
+        <span class="n">resid</span><span class="p">,</span>
+        <span class="n">icode</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">,</span>
+        <span class="n">z</span><span class="p">,</span>
+        <span class="n">occupancy</span><span class="p">,</span>
+        <span class="n">bfactor</span><span class="p">,</span>
+        <span class="n">segid</span><span class="p">,</span>
+        <span class="n">element</span><span class="p">,</span>
+        <span class="n">charge</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">record</span> <span class="o">=</span> <span class="n">record</span>  <span class="c1"># &quot;ATOM&quot; or &quot;HETATM&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atid</span> <span class="o">=</span> <span class="n">atid</span>      <span class="c1"># Atom serial number</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>      <span class="c1"># Atom name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alt_loc</span> <span class="o">=</span> <span class="n">alt_loc</span>  <span class="c1"># Alternate location indicator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resname</span> <span class="o">=</span> <span class="n">resname</span>  <span class="c1"># Residue name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chid</span> <span class="o">=</span> <span class="n">chid</span>      <span class="c1"># Chain identifier</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resid</span> <span class="o">=</span> <span class="n">resid</span>    <span class="c1"># Residue sequence number</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">icode</span> <span class="o">=</span> <span class="n">icode</span>    <span class="c1"># Insertion code</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>            <span class="c1"># x coordinate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>            <span class="c1"># y coordinate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">z</span>            <span class="c1"># z coordinate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">occupancy</span> <span class="o">=</span> <span class="n">occupancy</span>  <span class="c1"># Occupancy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bfactor</span> <span class="o">=</span> <span class="n">bfactor</span>      <span class="c1"># Temperature factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">segid</span> <span class="o">=</span> <span class="n">segid</span>          <span class="c1"># Segment identifier</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="n">element</span>      <span class="c1"># Element symbol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="n">charge</span>        <span class="c1"># Charge on the atom</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vec</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Atom.from_pdb_line">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.Atom.from_pdb_line">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_pdb_line</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse a PDB line and return an Atom instance.&quot;&quot;&quot;</span>
+        <span class="n">record</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">atid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">11</span><span class="p">])</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">16</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">alt_loc</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">16</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">resname</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">17</span><span class="p">:</span><span class="mi">20</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">chid</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">21</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">resid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">22</span><span class="p">:</span><span class="mi">26</span><span class="p">])</span>
+        <span class="n">icode</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">26</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">30</span><span class="p">:</span><span class="mi">38</span><span class="p">])</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">38</span><span class="p">:</span><span class="mi">46</span><span class="p">])</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">46</span><span class="p">:</span><span class="mi">54</span><span class="p">])</span>
+        <span class="n">occupancy_str</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">54</span><span class="p">:</span><span class="mi">60</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">occupancy</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">occupancy_str</span><span class="p">)</span> <span class="k">if</span> <span class="n">occupancy_str</span> <span class="k">else</span> <span class="mf">0.0</span>
+        <span class="n">bfactor_str</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">60</span><span class="p">:</span><span class="mi">66</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">bfactor</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">bfactor_str</span><span class="p">)</span> <span class="k">if</span> <span class="n">bfactor_str</span> <span class="k">else</span> <span class="mf">0.0</span>
+        <span class="n">segid</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">72</span><span class="p">:</span><span class="mi">76</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">element</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">76</span><span class="p">:</span><span class="mi">78</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">charge</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">78</span><span class="p">:</span><span class="mi">80</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">atid</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">alt_loc</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">chid</span><span class="p">,</span> <span class="n">resid</span><span class="p">,</span> <span class="n">icode</span><span class="p">,</span>
+                   <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">occupancy</span><span class="p">,</span> <span class="n">bfactor</span><span class="p">,</span> <span class="n">segid</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">charge</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;&lt;Atom </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}{}</span><span class="s2"> seg:</span><span class="si">{}</span><span class="s2"> &quot;</span>
+                <span class="s2">&quot;(</span><span class="si">{:.3f}</span><span class="s2">, </span><span class="si">{:.3f}</span><span class="s2">, </span><span class="si">{:.3f}</span><span class="s2">)&gt;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">record</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">resname</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">chid</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">resid</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">segid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Atom.to_pdb_line">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.Atom.to_pdb_line">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_pdb_line</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Format the Atom as a fixed-width PDB line.&quot;&quot;&quot;</span>
+        <span class="n">name_string</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">:</span><span class="s2">^4</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">name_string</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">record</span><span class="si">:</span><span class="s2">&lt;6</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">atid</span><span class="si">:</span><span class="s2">&gt;5</span><span class="si">}</span><span class="s2"> &quot;</span>
+            <span class="o">+</span> <span class="n">name_string</span> <span class="o">+</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">alt_loc</span><span class="si">:</span><span class="s2">1</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">resname</span><span class="si">:</span><span class="s2">&gt;3</span><span class="si">}</span><span class="s2"> &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">chid</span><span class="si">:</span><span class="s2">1</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">resid</span><span class="si">:</span><span class="s2">&gt;4</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">icode</span><span class="si">:</span><span class="s2">1</span><span class="si">}</span><span class="s2">   &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="si">:</span><span class="s2">&gt;8.3f</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="si">:</span><span class="s2">&gt;8.3f</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="si">:</span><span class="s2">&gt;8.3f</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">occupancy</span><span class="si">:</span><span class="s2">&gt;6.2f</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bfactor</span><span class="si">:</span><span class="s2">&gt;6.2f</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;&#39;</span><span class="si">:</span><span class="s2">6</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">segid</span><span class="si">:</span><span class="s2">&gt;4</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">element</span><span class="si">:</span><span class="s2">&gt;2</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="si">:</span><span class="s2">&gt;2</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">line</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="AtomList">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.AtomList">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AtomList</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A list of Atom objects with convenient attribute access.&quot;&quot;&quot;</span>
+    <span class="c1"># Disable warning about lambda assignment</span>
+    <span class="n">key_funcs</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;record&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">atom</span><span class="p">:</span> <span class="n">atom</span><span class="o">.</span><span class="n">record</span><span class="p">,</span>
+        <span class="s2">&quot;atid&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">atom</span><span class="p">:</span> <span class="n">atom</span><span class="o">.</span><span class="n">atid</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">atom</span><span class="p">:</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="s2">&quot;alt_loc&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">atom</span><span class="p">:</span> <span class="n">atom</span><span class="o">.</span><span class="n">alt_loc</span><span class="p">,</span>
+        <span class="s2">&quot;resname&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">atom</span><span class="p">:</span> <span class="n">atom</span><span class="o">.</span><span class="n">resname</span><span class="p">,</span>
+        <span class="s2">&quot;chid&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">atom</span><span class="p">:</span> <span class="n">atom</span><span class="o">.</span><span class="n">chid</span><span class="p">,</span>
+        <span class="s2">&quot;resid&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">atom</span><span class="p">:</span> <span class="n">atom</span><span class="o">.</span><span class="n">resid</span><span class="p">,</span>
+        <span class="s2">&quot;icode&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">atom</span><span class="p">:</span> <span class="n">atom</span><span class="o">.</span><span class="n">icode</span><span class="p">,</span>
+        <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">atom</span><span class="p">:</span> <span class="n">atom</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">atom</span><span class="p">:</span> <span class="n">atom</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+        <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">atom</span><span class="p">:</span> <span class="n">atom</span><span class="o">.</span><span class="n">z</span><span class="p">,</span>
+        <span class="s2">&quot;occupancy&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">atom</span><span class="p">:</span> <span class="n">atom</span><span class="o">.</span><span class="n">occupancy</span><span class="p">,</span>
+        <span class="s2">&quot;bfactor&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">atom</span><span class="p">:</span> <span class="n">atom</span><span class="o">.</span><span class="n">bfactor</span><span class="p">,</span>
+        <span class="s2">&quot;segid&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">atom</span><span class="p">:</span> <span class="n">atom</span><span class="o">.</span><span class="n">segid</span><span class="p">,</span>
+        <span class="s2">&quot;element&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">atom</span><span class="p">:</span> <span class="n">atom</span><span class="o">.</span><span class="n">element</span><span class="p">,</span>
+        <span class="s2">&quot;charge&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">atom</span><span class="p">:</span> <span class="n">atom</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">AtomList</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">records</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">record</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@records</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">records</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_records</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_records</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length mismatch for records.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">rec</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">new_records</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">record</span> <span class="o">=</span> <span class="n">rec</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">atids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">atid</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@atids</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">atids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_atids</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_atids</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length mismatch for atids.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">aid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">new_atids</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">atid</span> <span class="o">=</span> <span class="n">aid</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@names</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_names</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_names</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length mismatch for names.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">new_names</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">alt_locs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">alt_loc</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@alt_locs</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">alt_locs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_alt_locs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_alt_locs</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length mismatch for alt_locs.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">alt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">new_alt_locs</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">alt_loc</span> <span class="o">=</span> <span class="n">alt</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resnames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">resname</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@resnames</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resnames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_resnames</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_resnames</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length mismatch for resnames.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">rn</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">new_resnames</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">resname</span> <span class="o">=</span> <span class="n">rn</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">chids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">chid</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@chids</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">chids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_chids</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_chids</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length mismatch for chids.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">new_chids</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">chid</span> <span class="o">=</span> <span class="n">cid</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">resid</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@resids</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_resids</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_resids</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length mismatch for resids.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">rid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">new_resids</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">resid</span> <span class="o">=</span> <span class="n">rid</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">icodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">icode</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@icodes</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">icodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_icodes</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_icodes</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length mismatch for icodes.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">code</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">new_icodes</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">icode</span> <span class="o">=</span> <span class="n">code</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">xs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">x</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@xs</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">xs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_xs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_xs</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length mismatch for x coordinates.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x_val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">new_xs</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x_val</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">vec</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">y</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@ys</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_ys</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_ys</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length mismatch for y coordinates.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">y_val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">new_ys</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y_val</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">vec</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">z</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@zs</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_zs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_zs</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length mismatch for z coordinates.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">z_val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">new_zs</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">z_val</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">vec</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">occupancies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">occupancy</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@occupancies</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">occupancies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_occ</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_occ</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length mismatch for occupancies.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">occ</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">new_occ</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">occupancy</span> <span class="o">=</span> <span class="n">occ</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bfactors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">bfactor</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@bfactors</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bfactors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_bfactors</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_bfactors</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length mismatch for bfactors.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">bf</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">new_bfactors</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">bfactor</span> <span class="o">=</span> <span class="n">bf</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">segids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">segid</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@segids</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">segids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_segids</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_segids</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length mismatch for segids.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">seg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">new_segids</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">segid</span> <span class="o">=</span> <span class="n">seg</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">elements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">element</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@elements</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">elements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_elements</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_elements</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length mismatch for elements.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">elem</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">new_elements</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="n">elem</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">charges</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">charge</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@charges</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">charges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_charges</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_charges</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length mismatch for charges.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">new_charges</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="n">ch</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">vecs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">vec</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@vecs</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">vecs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_vecs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_vecs</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length mismatch for vectors.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">nvec</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">new_vecs</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">vec</span> <span class="o">=</span> <span class="n">nvec</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">chains</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Group atoms by chain identifier and return an AtomListCollection.&quot;&quot;&quot;</span>
+        <span class="n">new_chain</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">()</span>
+        <span class="n">chains</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">chid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">chid</span> <span class="o">!=</span> <span class="n">chid</span><span class="p">:</span>
+                <span class="n">chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_chain</span><span class="p">)</span>
+                <span class="n">new_chain</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">()</span>
+                <span class="n">chid</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">chid</span>
+            <span class="n">new_chain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new_chain</span><span class="p">:</span>
+            <span class="n">chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_chain</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">AtomListCollection</span><span class="p">(</span><span class="n">chains</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">residues</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Group atoms by residue and return an AtomListCollection.&quot;&quot;&quot;</span>
+        <span class="n">new_residue</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">()</span>
+        <span class="n">residues</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">resid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">resid</span> <span class="o">!=</span> <span class="n">resid</span><span class="p">:</span>
+                <span class="n">residues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_residue</span><span class="p">)</span>
+                <span class="n">new_residue</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">()</span>
+                <span class="n">resid</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">resid</span>
+            <span class="n">new_residue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new_residue</span><span class="p">:</span>
+            <span class="n">residues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_residue</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">AtomListCollection</span><span class="p">(</span><span class="n">residues</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AtomList.renum">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.AtomList.renum">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">renum</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Renumber atom IDs starting from 0.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="AtomList.sort">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.AtomList.sort">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sort</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sort the AtomList in place.&quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">chain_sort_uld</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">isdigit</span><span class="p">(),</span> <span class="n">x</span><span class="o">.</span><span class="n">islower</span><span class="p">(),</span> <span class="n">x</span><span class="o">.</span><span class="n">isupper</span><span class="p">(),</span> <span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">atom</span><span class="p">:</span> <span class="p">(</span><span class="n">chain_sort_uld</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">chid</span><span class="p">),</span> <span class="n">atom</span><span class="o">.</span><span class="n">resid</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">icode</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">atid</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="n">reverse</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AtomList.mask">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.AtomList.mask">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_vals</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new AtomList with atoms matching the given mask.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mask_vals</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">mask_vals</span> <span class="o">=</span> <span class="p">{</span><span class="n">mask_vals</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_funcs</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid mode &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mode</span><span class="p">))</span>
+        <span class="n">mask_vals</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">mask_vals</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">AtomList</span><span class="p">([</span><span class="n">atom</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_funcs</span><span class="p">[</span><span class="n">mode</span><span class="p">](</span><span class="n">atom</span><span class="p">)</span> <span class="ow">in</span> <span class="n">mask_vals</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="AtomList.mask_out">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.AtomList.mask_out">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mask_out</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_vals</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new AtomList with atoms not matching the given mask.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mask_vals</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">mask_vals</span> <span class="o">=</span> <span class="p">{</span><span class="n">mask_vals</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_funcs</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid mode &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mode</span><span class="p">))</span>
+        <span class="n">mask_vals</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">mask_vals</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">AtomList</span><span class="p">([</span><span class="n">atom</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_funcs</span><span class="p">[</span><span class="n">mode</span><span class="p">](</span><span class="n">atom</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mask_vals</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="AtomList.renumber">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.AtomList.renumber">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">renumber</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Renumber atoms starting from 1.&quot;&quot;&quot;</span>
+        <span class="n">new_atids</span> <span class="o">=</span> <span class="p">[</span><span class="n">atid</span> <span class="o">%</span> <span class="mi">99999</span> <span class="k">for</span> <span class="n">atid</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atids</span> <span class="o">=</span> <span class="n">new_atids</span></div>
+
+
+<div class="viewcode-block" id="AtomList.remove_atoms">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.AtomList.remove_atoms">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms_to_remove</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove specified atoms from the AtomList.&quot;&quot;&quot;</span>
+        <span class="n">removal_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">atoms_to_remove</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">removal_set</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AtomList.read_pdb">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.AtomList.read_pdb">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_pdb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_pdb</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read a PDB file and populate the AtomList.&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">in_pdb</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file</span><span class="p">:</span>
+                <span class="n">record_type</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">record_type</span> <span class="o">==</span> <span class="s2">&quot;MODEL&quot;</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">current_model</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">14</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                        <span class="n">current_model</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">elif</span> <span class="n">record_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;ATOM&quot;</span><span class="p">,</span> <span class="s2">&quot;HETATM&quot;</span><span class="p">):</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">atom</span> <span class="o">=</span> <span class="n">Atom</span><span class="o">.</span><span class="n">from_pdb_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error parsing line: </span><span class="si">{}</span><span class="s2"> -&gt; </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">e</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="n">record_type</span> <span class="o">==</span> <span class="s2">&quot;ENDMDL&quot;</span><span class="p">:</span>
+                    <span class="n">current_model</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="AtomList.write_pdb">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.AtomList.write_pdb">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_pdb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out_pdb</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the AtomList to a PDB file.&quot;&quot;&quot;</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;a&quot;</span> <span class="k">if</span> <span class="n">append</span> <span class="k">else</span> <span class="s2">&quot;w&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_pdb</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">to_pdb_line</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AtomList.write_ndx">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.AtomList.write_ndx">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_ndx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="s2">&quot;[ group ]&quot;</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">wrap</span><span class="o">=</span><span class="mi">15</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the atom IDs to a GROMACS .ndx file.&quot;&quot;&quot;</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;a&quot;</span> <span class="k">if</span> <span class="n">append</span> <span class="k">else</span> <span class="s2">&quot;w&quot;</span>
+        <span class="n">atids</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">atid</span><span class="p">)</span> <span class="k">for</span> <span class="n">atid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atids</span><span class="p">]</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">header</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">wrap</span><span class="p">):</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">atids</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">wrap</span><span class="p">])</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="AtomListCollection">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.AtomListCollection">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AtomListCollection</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A collection of AtomList objects.&quot;&quot;&quot;</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">records</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">alist</span><span class="o">.</span><span class="n">records</span> <span class="k">for</span> <span class="n">alist</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">atids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">alist</span><span class="o">.</span><span class="n">atids</span> <span class="k">for</span> <span class="n">alist</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">alist</span><span class="o">.</span><span class="n">names</span> <span class="k">for</span> <span class="n">alist</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">alt_locs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">alist</span><span class="o">.</span><span class="n">alt_locs</span> <span class="k">for</span> <span class="n">alist</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resnames</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">alist</span><span class="o">.</span><span class="n">resnames</span> <span class="k">for</span> <span class="n">alist</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">chids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">alist</span><span class="o">.</span><span class="n">chids</span> <span class="k">for</span> <span class="n">alist</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">alist</span><span class="o">.</span><span class="n">resids</span> <span class="k">for</span> <span class="n">alist</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">icodes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">alist</span><span class="o">.</span><span class="n">icodes</span> <span class="k">for</span> <span class="n">alist</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">xs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">alist</span><span class="o">.</span><span class="n">xs</span> <span class="k">for</span> <span class="n">alist</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">alist</span><span class="o">.</span><span class="n">ys</span> <span class="k">for</span> <span class="n">alist</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">alist</span><span class="o">.</span><span class="n">zs</span> <span class="k">for</span> <span class="n">alist</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">occupancies</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">alist</span><span class="o">.</span><span class="n">occupancies</span> <span class="k">for</span> <span class="n">alist</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bfactors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">alist</span><span class="o">.</span><span class="n">bfactors</span> <span class="k">for</span> <span class="n">alist</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">segids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">alist</span><span class="o">.</span><span class="n">segids</span> <span class="k">for</span> <span class="n">alist</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">elements</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">alist</span><span class="o">.</span><span class="n">elements</span> <span class="k">for</span> <span class="n">alist</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">charges</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">alist</span><span class="o">.</span><span class="n">charges</span> <span class="k">for</span> <span class="n">alist</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">vecs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">alist</span><span class="o">.</span><span class="n">vecs</span> <span class="k">for</span> <span class="n">alist</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="Residue">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.Residue">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Residue</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a residue containing Atom objects.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resid</span><span class="p">,</span> <span class="n">icode</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resname</span> <span class="o">=</span> <span class="n">resname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resid</span> <span class="o">=</span> <span class="n">resid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">icode</span> <span class="o">=</span> <span class="n">icode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_atoms</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Residue.add_atom">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.Residue.add_atom">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atoms</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_atoms</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;&lt;Residue </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}{}</span><span class="s2"> with </span><span class="si">{}</span><span class="s2"> atom(s)&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">icode</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_atoms</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Chain">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.Chain">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Chain</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a chain containing multiple residues.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chid</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chid</span> <span class="o">=</span> <span class="n">chid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residues</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="Chain.add_atom">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.Chain.add_atom">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">resid</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">icode</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">Residue</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">resname</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">resid</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">icode</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">all_atoms</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">all_atoms</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">AtomList</span><span class="p">(</span><span class="n">all_atoms</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;&lt;Chain </span><span class="si">{}</span><span class="s2"> with </span><span class="si">{}</span><span class="s2"> residue(s)&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chid</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="Model">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.Model">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Model</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a model containing multiple chains.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modid</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modid</span> <span class="o">=</span> <span class="n">modid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chains</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;&lt;Model </span><span class="si">{}</span><span class="s2"> with </span><span class="si">{}</span><span class="s2"> chain(s)&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modid</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">))</span>
+
+<div class="viewcode-block" id="Model.add_atom">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.Model.add_atom">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">):</span>
+        <span class="n">chid</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">chid</span> <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">chid</span> <span class="k">else</span> <span class="s2">&quot; &quot;</span>
+        <span class="k">if</span> <span class="n">chid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">[</span><span class="n">chid</span><span class="p">]</span> <span class="o">=</span> <span class="n">Chain</span><span class="p">(</span><span class="n">chid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">[</span><span class="n">chid</span><span class="p">]</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">all_atoms</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">all_atoms</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">AtomList</span><span class="p">(</span><span class="n">all_atoms</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Model.select_chains">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.Model.select_chains">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">select_chains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chids</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">chain</span> <span class="k">for</span> <span class="n">chid</span><span class="p">,</span> <span class="n">chain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">chid</span> <span class="ow">in</span> <span class="n">chids</span><span class="p">]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="System">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.System">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">System</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents an entire system, potentially with multiple models.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">models</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;&lt;System with </span><span class="si">{}</span><span class="s2"> model(s)&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">))</span>
+
+<div class="viewcode-block" id="System.add_atom">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.System.add_atom">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">modid</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">modid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">modid</span><span class="p">]</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">modid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">modid</span><span class="p">]</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="System.add_atoms">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.System.add_atoms">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">modid</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">modid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">modid</span><span class="p">]</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">modid</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">modid</span><span class="p">]</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">all_atoms</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">all_atoms</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">AtomList</span><span class="p">(</span><span class="n">all_atoms</span><span class="p">)</span>
+
+<div class="viewcode-block" id="System.residues">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.System.residues">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">residues</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">chains</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">chid</span><span class="p">):</span>
+                <span class="k">yield from</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">resid</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">icode</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="System.chains">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.System.chains">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">chains</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">yield from</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">chains</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">chid</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="System.write_pdb">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.System.write_pdb">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_pdb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">sorted_modids</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="n">multiple_models</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sorted_modids</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">modid</span> <span class="ow">in</span> <span class="n">sorted_modids</span><span class="p">:</span>
+                <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">modid</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">multiple_models</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;MODEL     </span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">modid</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">chains</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">chid</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">resid</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">icode</span><span class="p">)):</span>
+                        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+                            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">to_pdb_line</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">multiple_models</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;ENDMDL</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;END</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="PDBParser">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.PDBParser">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PDBParser</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parses a PDB file and builds a System object.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdb_file</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pdb_file</span> <span class="o">=</span> <span class="n">pdb_file</span>
+
+<div class="viewcode-block" id="PDBParser.parse">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.PDBParser.parse">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">system</span> <span class="o">=</span> <span class="n">System</span><span class="p">()</span>
+        <span class="n">current_model</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pdb_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file</span><span class="p">:</span>
+                <span class="n">record_type</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">record_type</span> <span class="o">==</span> <span class="s2">&quot;MODEL&quot;</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">current_model</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">14</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                        <span class="n">current_model</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">elif</span> <span class="n">record_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;ATOM&quot;</span><span class="p">,</span> <span class="s2">&quot;HETATM&quot;</span><span class="p">):</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">atom</span> <span class="o">=</span> <span class="n">Atom</span><span class="o">.</span><span class="n">from_pdb_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                        <span class="n">system</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">modid</span><span class="o">=</span><span class="n">current_model</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error parsing line: </span><span class="si">{}</span><span class="s2"> -&gt; </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">e</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="n">record_type</span> <span class="o">==</span> <span class="s2">&quot;ENDMDL&quot;</span><span class="p">:</span>
+                    <span class="n">current_model</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">system</span></div>
+</div>
+
+
+
+<span class="c1">###################################</span>
+<span class="c1">## Higher Level Functions ##</span>
+<span class="c1">###################################</span>
+
+<div class="viewcode-block" id="pdb2system">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.pdb2system">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">pdb2system</span><span class="p">(</span><span class="n">pdb_path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">System</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse a PDB file into a System object.&quot;&quot;&quot;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">PDBParser</span><span class="p">(</span><span class="n">pdb_path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="pdb2atomlist">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.pdb2atomlist">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">pdb2atomlist</span><span class="p">(</span><span class="n">pdb_path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AtomList</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read a PDB file and return an AtomList of its atoms.&quot;&quot;&quot;</span>
+    <span class="n">atoms</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">()</span>
+    <span class="n">atoms</span><span class="o">.</span><span class="n">read_pdb</span><span class="p">(</span><span class="n">pdb_path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">atoms</span></div>
+
+
+
+<div class="viewcode-block" id="sort_chains_atoms">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.sort_chains_atoms">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">sort_chains_atoms</span><span class="p">(</span><span class="n">atoms</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sort an AtomList and renumber atom IDs.&quot;&quot;&quot;</span>
+    <span class="n">atoms</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="n">new_atids</span> <span class="o">=</span> <span class="p">[</span><span class="n">atid</span> <span class="o">%</span> <span class="mi">99999</span> <span class="k">for</span> <span class="n">atid</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+    <span class="n">atoms</span><span class="o">.</span><span class="n">atids</span> <span class="o">=</span> <span class="n">new_atids</span></div>
+
+
+
+<div class="viewcode-block" id="rename_chains_for_gromacs">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.rename_chains_for_gromacs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">rename_chains_for_gromacs</span><span class="p">(</span><span class="n">atoms</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Rename chains in an AtomList in a predefined order: uppercase, then lowercase, then digits.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">string</span>
+    <span class="n">new_chids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">ascii_uppercase</span> <span class="o">+</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_lowercase</span> <span class="o">+</span> <span class="n">string</span><span class="o">.</span><span class="n">digits</span><span class="p">)</span>
+    <span class="n">curr_chid</span> <span class="o">=</span> <span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">chid</span>
+    <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">chid</span> <span class="o">!=</span> <span class="n">curr_chid</span><span class="p">:</span>
+            <span class="n">curr_chid</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">chid</span>
+            <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">atom</span><span class="o">.</span><span class="n">chid</span> <span class="o">=</span> <span class="n">new_chids</span><span class="p">[</span><span class="n">counter</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="sort_pdb">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.sort_pdb">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">sort_pdb</span><span class="p">(</span><span class="n">in_pdb</span><span class="p">,</span> <span class="n">out_pdb</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sort a PDB file and save the result.&quot;&quot;&quot;</span>
+    <span class="n">atoms</span> <span class="o">=</span> <span class="n">pdb2atomlist</span><span class="p">(</span><span class="n">in_pdb</span><span class="p">)</span>
+    <span class="n">sort_chains_atoms</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span>
+    <span class="n">rename_chains_for_gromacs</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span>
+    <span class="n">atoms</span><span class="o">.</span><span class="n">write_pdb</span><span class="p">(</span><span class="n">out_pdb</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Chains and atoms sorted, renamed and saved to </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">out_pdb</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="clean_pdb">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.clean_pdb">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">clean_pdb</span><span class="p">(</span><span class="n">in_pdb</span><span class="p">,</span> <span class="n">out_pdb</span><span class="p">,</span> <span class="n">add_missing_atoms</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">add_hydrogens</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pH</span><span class="o">=</span><span class="mf">7.0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Clean a PDB file using PDBFixer via OpenMM.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pdbfixer.pdbfixer</span><span class="w"> </span><span class="kn">import</span> <span class="n">PDBFixer</span>  <span class="c1"># pylint: disable=import-outside-toplevel</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">openmm.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">PDBFile</span>         <span class="c1"># pylint: disable=import-outside-toplevel</span>
+    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;PDBFixer or OpenMM not available&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Processing </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_pdb</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+    <span class="n">pdb</span> <span class="o">=</span> <span class="n">PDBFixer</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">in_pdb</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Removing heterogens and checking for missing residues...&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+    <span class="n">pdb</span><span class="o">.</span><span class="n">removeHeterogens</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">pdb</span><span class="o">.</span><span class="n">findMissingResidues</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Replacing non-standard residues...&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+    <span class="n">pdb</span><span class="o">.</span><span class="n">findNonstandardResidues</span><span class="p">()</span>
+    <span class="n">pdb</span><span class="o">.</span><span class="n">replaceNonstandardResidues</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">add_missing_atoms</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Adding missing atoms...&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="n">pdb</span><span class="o">.</span><span class="n">findMissingAtoms</span><span class="p">()</span>
+        <span class="n">pdb</span><span class="o">.</span><span class="n">addMissingAtoms</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">add_hydrogens</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Adding missing hydrogens...&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="n">pdb</span><span class="o">.</span><span class="n">addMissingHydrogens</span><span class="p">(</span><span class="n">pH</span><span class="p">)</span>
+    <span class="n">topology</span> <span class="o">=</span> <span class="n">pdb</span><span class="o">.</span><span class="n">topology</span>
+    <span class="n">positions</span> <span class="o">=</span> <span class="n">pdb</span><span class="o">.</span><span class="n">positions</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_pdb</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+        <span class="n">PDBFile</span><span class="o">.</span><span class="n">writeFile</span><span class="p">(</span><span class="n">topology</span><span class="p">,</span> <span class="n">positions</span><span class="p">,</span> <span class="n">outfile</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Written cleaned PDB to </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">out_pdb</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="rename_chain_in_pdb">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.rename_chain_in_pdb">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">rename_chain_in_pdb</span><span class="p">(</span><span class="n">in_pdb</span><span class="p">,</span> <span class="n">new_chain_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rename all chain identifiers in a PDB file.&quot;&quot;&quot;</span>
+    <span class="n">atoms</span> <span class="o">=</span> <span class="n">pdb2atomlist</span><span class="p">(</span><span class="n">in_pdb</span><span class="p">)</span>
+    <span class="n">atoms</span><span class="o">.</span><span class="n">chids</span> <span class="o">=</span> <span class="p">[</span><span class="n">new_chain_id</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">atoms</span><span class="o">.</span><span class="n">write_pdb</span><span class="p">(</span><span class="n">in_pdb</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="rename_chain_and_histidines_in_pdb">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.rename_chain_and_histidines_in_pdb">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">rename_chain_and_histidines_in_pdb</span><span class="p">(</span><span class="n">in_pdb</span><span class="p">,</span> <span class="n">new_chain_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rename chain identifiers and update histidine names in a PDB file.&quot;&quot;&quot;</span>
+    <span class="n">atoms</span> <span class="o">=</span> <span class="n">pdb2atomlist</span><span class="p">(</span><span class="n">in_pdb</span><span class="p">)</span>
+    <span class="n">atoms</span><span class="o">.</span><span class="n">chids</span> <span class="o">=</span> <span class="p">[</span><span class="n">new_chain_id</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">resname</span> <span class="o">==</span> <span class="s2">&quot;HSD&quot;</span><span class="p">:</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">resname</span> <span class="o">=</span> <span class="s2">&quot;HIS&quot;</span>
+        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">resname</span> <span class="o">==</span> <span class="s2">&quot;HSE&quot;</span><span class="p">:</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">resname</span> <span class="o">=</span> <span class="s2">&quot;HIE&quot;</span>
+    <span class="n">atoms</span><span class="o">.</span><span class="n">write_pdb</span><span class="p">(</span><span class="n">in_pdb</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="write_ndx">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.write_ndx">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_ndx</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">fpath</span><span class="o">=</span><span class="s2">&quot;system.ndx&quot;</span><span class="p">,</span> <span class="n">backbone_atoms</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;CA&quot;</span><span class="p">,</span> <span class="s2">&quot;P&quot;</span><span class="p">,</span> <span class="s2">&quot;C1&#39;&quot;</span><span class="p">)):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write a GROMACS index file based on an AtomList.&quot;&quot;&quot;</span>
+    <span class="c1"># Note: The following uses a test PDB file; adjust as needed.</span>
+    <span class="n">in_pdb</span> <span class="o">=</span> <span class="s2">&quot;test.pdb&quot;</span>
+    <span class="n">atoms</span> <span class="o">=</span> <span class="n">pdb2atomlist</span><span class="p">(</span><span class="n">in_pdb</span><span class="p">)</span>
+    <span class="n">atoms</span><span class="o">.</span><span class="n">write_ndx</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="s2">&quot;[ System ]&quot;</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">wrap</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+    <span class="n">backbone</span> <span class="o">=</span> <span class="n">atoms</span><span class="o">.</span><span class="n">mask</span><span class="p">(</span><span class="n">backbone_atoms</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+    <span class="n">backbone</span><span class="o">.</span><span class="n">write_ndx</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="s2">&quot;[ Backbone ]&quot;</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">wrap</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+    <span class="n">chids</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">atoms</span><span class="o">.</span><span class="n">chids</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">chid</span> <span class="ow">in</span> <span class="n">chids</span><span class="p">:</span>
+        <span class="n">selected_atoms</span> <span class="o">=</span> <span class="n">atoms</span><span class="o">.</span><span class="n">mask</span><span class="p">(</span><span class="n">chid</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;chid&quot;</span><span class="p">)</span>
+        <span class="n">selected_atoms</span><span class="o">.</span><span class="n">write_ndx</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="s2">&quot;[ chain_</span><span class="si">%s</span><span class="s2"> ]&quot;</span> <span class="o">%</span> <span class="n">chid</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">wrap</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Written index file to </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">fpath</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="update_bfactors">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.update_bfactors">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">update_bfactors</span><span class="p">(</span><span class="n">in_pdb</span><span class="p">,</span> <span class="n">out_pdb</span><span class="p">,</span> <span class="n">bfactors</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;(Incomplete) Update the B-factors in a PDB file.</span>
+<span class="sd">    Implementation is missing; please provide definitions for read_b_factors and update_pdb_b_factors.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Undefined variables; implementation needed.</span>
+    <span class="c1"># b_factors = read_b_factors(b_factor_file)</span>
+    <span class="c1"># update_pdb_b_factors(pdb_file, b_factors, output_file)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;update_bfactors: Function not implemented.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="sort_uld">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.sort_uld">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">sort_uld</span><span class="p">(</span><span class="n">alist</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sort a list of characters: uppercase, then lowercase, then digits.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">alist</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">isdigit</span><span class="p">(),</span> <span class="n">x</span><span class="o">.</span><span class="n">islower</span><span class="p">(),</span> <span class="n">x</span><span class="o">.</span><span class="n">isupper</span><span class="p">(),</span> <span class="n">x</span><span class="p">))</span></div>
+
+
+
+<span class="n">AA_CODE_CONVERTER</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="s2">&quot;ALA&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="s2">&quot;CYS&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">:</span> <span class="s2">&quot;ASP&quot;</span><span class="p">,</span> <span class="s2">&quot;E&quot;</span><span class="p">:</span> <span class="s2">&quot;GLU&quot;</span><span class="p">,</span> <span class="s2">&quot;F&quot;</span><span class="p">:</span> <span class="s2">&quot;PHE&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;G&quot;</span><span class="p">:</span> <span class="s2">&quot;GLY&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">:</span> <span class="s2">&quot;HIS&quot;</span><span class="p">,</span> <span class="s2">&quot;I&quot;</span><span class="p">:</span> <span class="s2">&quot;ILE&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">:</span> <span class="s2">&quot;LYS&quot;</span><span class="p">,</span> <span class="s2">&quot;L&quot;</span><span class="p">:</span> <span class="s2">&quot;LEU&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;M&quot;</span><span class="p">:</span> <span class="s2">&quot;MET&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">:</span> <span class="s2">&quot;ASN&quot;</span><span class="p">,</span> <span class="s2">&quot;P&quot;</span><span class="p">:</span> <span class="s2">&quot;PRO&quot;</span><span class="p">,</span> <span class="s2">&quot;Q&quot;</span><span class="p">:</span> <span class="s2">&quot;GLN&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">:</span> <span class="s2">&quot;ARG&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;S&quot;</span><span class="p">:</span> <span class="s2">&quot;SER&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">:</span> <span class="s2">&quot;THR&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">:</span> <span class="s2">&quot;VAL&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">:</span> <span class="s2">&quot;TRP&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="s2">&quot;TYR&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Danis Yangaliev.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

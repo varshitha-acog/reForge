@@ -1,0 +1,695 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>reforge.forge.forcefields &mdash; reForge 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=b7a6b9b3" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            reForge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../why.html">Why use reForge?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">reForge API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">reForge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">reforge.forge.forcefields</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for reforge.forge.forcefields</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Collection of CG force fields</span>
+
+<span class="sd">Description:</span>
+<span class="sd">    This module defines force fields for Martini RNA and nucleic acids.</span>
+<span class="sd">    It provides classes for reading ITP files and organizing force-field parameters</span>
+<span class="sd">    for coarse-grained simulations.</span>
+
+<span class="sd">Author: DY    </span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib.resources</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">reforge</span><span class="w"> </span><span class="kn">import</span> <span class="n">itpio</span>
+
+<span class="c1"># Split each argument into a list of tokens.</span>
+<div class="viewcode-block" id="nsplit">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.forcefields.nsplit">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">nsplit</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span></div>
+
+
+<span class="c1"># List of available force fields</span>
+<span class="n">forcefields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;martini30rna&quot;</span><span class="p">,</span> <span class="s2">&quot;martini31nucleic&quot;</span><span class="p">]</span>
+<span class="n">RNA_SYSTEM</span> <span class="o">=</span> <span class="s2">&quot;test&quot;</span>
+
+
+<span class="c1">###################################</span>
+<span class="c1">## FORCE FIELDS BASE CLASS ##</span>
+<span class="c1">###################################</span>
+
+<div class="viewcode-block" id="NucleicForceField">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.forcefields.NucleicForceField">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NucleicForceField</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for nucleic acid force fields.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="NucleicForceField.read_itp">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.forcefields.NucleicForceField.read_itp">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_itp</span><span class="p">(</span><span class="n">resname</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read an ITP file for a given residue.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resname (str): Residue name.</span>
+<span class="sd">            directory (str): Directory where force field files are stored.</span>
+<span class="sd">            mol (str): Molecule name.</span>
+<span class="sd">            version (str): Version string.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Parsed ITP data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">itpdir</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="s2">&quot;reforge&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;forge&quot;</span> <span class="o">/</span> <span class="s2">&quot;forcefields&quot;</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">itpdir</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mol</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">resname</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">.itp&quot;</span><span class="p">)</span>
+        <span class="n">itp_data</span> <span class="o">=</span> <span class="n">itpio</span><span class="o">.</span><span class="n">read_itp</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">itp_data</span></div>
+
+
+<div class="viewcode-block" id="NucleicForceField.read_itps">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.forcefields.NucleicForceField.read_itps">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_itps</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">ff_type</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read ITP files for nucleobases A, C, G, and U.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            mol (str): Molecule name.</span>
+<span class="sd">            ff_type (str): Force-field type (e.g. &quot;polar&quot;).</span>
+<span class="sd">            version (str): Version string.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: (a_itp, c_itp, g_itp, u_itp)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">a_itp</span> <span class="o">=</span> <span class="n">NucleicForceField</span><span class="o">.</span><span class="n">read_itp</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="n">ff_type</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+        <span class="n">c_itp</span> <span class="o">=</span> <span class="n">NucleicForceField</span><span class="o">.</span><span class="n">read_itp</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="n">ff_type</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+        <span class="n">g_itp</span> <span class="o">=</span> <span class="n">NucleicForceField</span><span class="o">.</span><span class="n">read_itp</span><span class="p">(</span><span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="n">ff_type</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+        <span class="n">u_itp</span> <span class="o">=</span> <span class="n">NucleicForceField</span><span class="o">.</span><span class="n">read_itp</span><span class="p">(</span><span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="n">ff_type</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">a_itp</span><span class="p">,</span> <span class="n">c_itp</span><span class="p">,</span> <span class="n">g_itp</span><span class="p">,</span> <span class="n">u_itp</span></div>
+
+
+<div class="viewcode-block" id="NucleicForceField.itp_to_indata">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.forcefields.NucleicForceField.itp_to_indata">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">itp_to_indata</span><span class="p">(</span><span class="n">itp_data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert ITP data into individual parameter lists.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            itp_data (dict): Parsed ITP file data.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: (sc_bonds, sc_angles, sc_dihs, sc_cons, sc_excls, sc_pairs, sc_vs3s)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sc_bonds</span> <span class="o">=</span> <span class="n">itp_data</span><span class="p">[</span><span class="s2">&quot;bonds&quot;</span><span class="p">]</span>
+        <span class="n">sc_angles</span> <span class="o">=</span> <span class="n">itp_data</span><span class="p">[</span><span class="s2">&quot;angles&quot;</span><span class="p">]</span>
+        <span class="n">sc_dihs</span> <span class="o">=</span> <span class="n">itp_data</span><span class="p">[</span><span class="s2">&quot;dihedrals&quot;</span><span class="p">]</span>
+        <span class="n">sc_cons</span> <span class="o">=</span> <span class="n">itp_data</span><span class="p">[</span><span class="s2">&quot;constraints&quot;</span><span class="p">]</span>
+        <span class="n">sc_excls</span> <span class="o">=</span> <span class="n">itp_data</span><span class="p">[</span><span class="s2">&quot;exclusions&quot;</span><span class="p">]</span>
+        <span class="n">sc_pairs</span> <span class="o">=</span> <span class="n">itp_data</span><span class="p">[</span><span class="s2">&quot;pairs&quot;</span><span class="p">]</span>
+        <span class="n">sc_vs3s</span> <span class="o">=</span> <span class="n">itp_data</span><span class="p">[</span><span class="s2">&quot;virtual_sites3&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">sc_bonds</span><span class="p">,</span> <span class="n">sc_angles</span><span class="p">,</span> <span class="n">sc_dihs</span><span class="p">,</span> <span class="n">sc_cons</span><span class="p">,</span> <span class="n">sc_excls</span><span class="p">,</span> <span class="n">sc_pairs</span><span class="p">,</span> <span class="n">sc_vs3s</span></div>
+
+
+<div class="viewcode-block" id="NucleicForceField.parameters_by_resname">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.forcefields.NucleicForceField.parameters_by_resname">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parameters_by_resname</span><span class="p">(</span><span class="n">resnames</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Obtain parameters for each residue.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resnames (list): List of residue names.</span>
+<span class="sd">            directory (str): Directory containing ITP files.</span>
+<span class="sd">            mol (str): Molecule name.</span>
+<span class="sd">            version (str): Version string.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Mapping of residue name to its parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">resname</span> <span class="ow">in</span> <span class="n">resnames</span><span class="p">:</span>
+            <span class="n">itp_data</span> <span class="o">=</span> <span class="n">NucleicForceField</span><span class="o">.</span><span class="n">read_itp</span><span class="p">(</span><span class="n">resname</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+            <span class="n">param</span> <span class="o">=</span> <span class="n">NucleicForceField</span><span class="o">.</span><span class="n">itp_to_indata</span><span class="p">(</span><span class="n">itp_data</span><span class="p">)</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">resnames</span><span class="p">,</span> <span class="n">params</span><span class="p">))</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the nucleic force field.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            directory (str): Directory with force field files.</span>
+<span class="sd">            mol (str): Molecule name.</span>
+<span class="sd">            version (str): Version string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">directory</span> <span class="o">=</span> <span class="n">directory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">mol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">version</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resdict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters_by_resname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resnames</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elastic_network</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">el_bond_type</span> <span class="o">=</span> <span class="mi">6</span>  <span class="c1"># Elastic network bond type</span>
+
+<div class="viewcode-block" id="NucleicForceField.sc_bonds">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.forcefields.NucleicForceField.sc_bonds">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sc_bonds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resdict</span><span class="p">[</span><span class="n">resname</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="NucleicForceField.sc_angles">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.forcefields.NucleicForceField.sc_angles">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sc_angles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resdict</span><span class="p">[</span><span class="n">resname</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="NucleicForceField.sc_dihs">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.forcefields.NucleicForceField.sc_dihs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sc_dihs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resdict</span><span class="p">[</span><span class="n">resname</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="NucleicForceField.sc_cons">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.forcefields.NucleicForceField.sc_cons">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sc_cons</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resdict</span><span class="p">[</span><span class="n">resname</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="NucleicForceField.sc_excls">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.forcefields.NucleicForceField.sc_excls">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sc_excls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resdict</span><span class="p">[</span><span class="n">resname</span><span class="p">][</span><span class="mi">4</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="NucleicForceField.sc_pairs">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.forcefields.NucleicForceField.sc_pairs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sc_pairs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resdict</span><span class="p">[</span><span class="n">resname</span><span class="p">][</span><span class="mi">5</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="NucleicForceField.sc_vs3s">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.forcefields.NucleicForceField.sc_vs3s">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sc_vs3s</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resdict</span><span class="p">[</span><span class="n">resname</span><span class="p">][</span><span class="mi">6</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="NucleicForceField.sc_blist">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.forcefields.NucleicForceField.sc_blist">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sc_blist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get all bonded parameters for a residue.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            resname (str): Residue name.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: List of bonded parameter lists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sc_bonds</span><span class="p">(</span><span class="n">resname</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sc_angles</span><span class="p">(</span><span class="n">resname</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sc_dihs</span><span class="p">(</span><span class="n">resname</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sc_cons</span><span class="p">(</span><span class="n">resname</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sc_excls</span><span class="p">(</span><span class="n">resname</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sc_pairs</span><span class="p">(</span><span class="n">resname</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sc_vs3s</span><span class="p">(</span><span class="n">resname</span><span class="p">),</span>
+        <span class="p">]</span></div>
+</div>
+
+
+
+<span class="c1">###################################</span>
+<span class="c1">## Martini 3.0 RNA Force Field ##</span>
+<span class="c1">###################################</span>
+
+<div class="viewcode-block" id="Martini30RNA">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.forcefields.Martini30RNA">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Martini30RNA</span><span class="p">(</span><span class="n">NucleicForceField</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Force field for Martini 3.0 RNA.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">resnames</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">]</span>
+
+    <span class="n">bb_mapping</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;BB1&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;P&quot;</span><span class="p">,</span> <span class="s2">&quot;OP1&quot;</span><span class="p">,</span> <span class="s2">&quot;OP2&quot;</span><span class="p">,</span> <span class="s2">&quot;O5&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;O3&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;O1P&quot;</span><span class="p">,</span> <span class="s2">&quot;O2P&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;BB2&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;C5&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;1H5&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;2H5&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;H5&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;H5&#39;&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;C4&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;H4&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;O4&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;C3&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;H3&#39;&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;BB3&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;C1&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;C2&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;O2&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;O4&#39;&quot;</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="n">a_mapping</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;SC1&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;N9&quot;</span><span class="p">,</span> <span class="s2">&quot;C8&quot;</span><span class="p">,</span> <span class="s2">&quot;H8&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;SC2&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;N3&quot;</span><span class="p">,</span> <span class="s2">&quot;C4&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;SC3&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;N1&quot;</span><span class="p">,</span> <span class="s2">&quot;C2&quot;</span><span class="p">,</span> <span class="s2">&quot;H2&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;SC4&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;N6&quot;</span><span class="p">,</span> <span class="s2">&quot;C6&quot;</span><span class="p">,</span> <span class="s2">&quot;H61&quot;</span><span class="p">,</span> <span class="s2">&quot;H62&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;SC5&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;N7&quot;</span><span class="p">,</span> <span class="s2">&quot;C5&quot;</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="n">c_mapping</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;SC1&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;N1&quot;</span><span class="p">,</span> <span class="s2">&quot;C5&quot;</span><span class="p">,</span> <span class="s2">&quot;C6&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;SC2&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;C2&quot;</span><span class="p">,</span> <span class="s2">&quot;O2&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;SC3&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;N3&quot;</span><span class="p">,),</span>
+        <span class="s2">&quot;SC4&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;N4&quot;</span><span class="p">,</span> <span class="s2">&quot;C4&quot;</span><span class="p">,</span> <span class="s2">&quot;H41&quot;</span><span class="p">,</span> <span class="s2">&quot;H42&quot;</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="n">g_mapping</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;SC1&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;C8&quot;</span><span class="p">,</span> <span class="s2">&quot;H8&quot;</span><span class="p">,</span> <span class="s2">&quot;N9&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;SC2&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;C4&quot;</span><span class="p">,</span> <span class="s2">&quot;N3&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;SC3&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;C2&quot;</span><span class="p">,</span> <span class="s2">&quot;N2&quot;</span><span class="p">,</span> <span class="s2">&quot;H21&quot;</span><span class="p">,</span> <span class="s2">&quot;H22&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;SC4&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;N1&quot;</span><span class="p">,),</span>
+        <span class="s2">&quot;SC5&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;C6&quot;</span><span class="p">,</span> <span class="s2">&quot;O6&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;SC6&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;C5&quot;</span><span class="p">,</span> <span class="s2">&quot;N7&quot;</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="n">u_mapping</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;SC1&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;N1&quot;</span><span class="p">,</span> <span class="s2">&quot;C5&quot;</span><span class="p">,</span> <span class="s2">&quot;C6&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;SC2&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;C2&quot;</span><span class="p">,</span> <span class="s2">&quot;O2&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;SC3&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;N3&quot;</span><span class="p">,),</span>
+        <span class="s2">&quot;SC4&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;C4&quot;</span><span class="p">,</span> <span class="s2">&quot;O4&quot;</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="p">{</span><span class="o">**</span><span class="n">bb_mapping</span><span class="p">,</span> <span class="o">**</span><span class="n">a_mapping</span><span class="p">},</span>
+        <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="p">{</span><span class="o">**</span><span class="n">bb_mapping</span><span class="p">,</span> <span class="o">**</span><span class="n">c_mapping</span><span class="p">},</span>
+        <span class="s2">&quot;G&quot;</span><span class="p">:</span> <span class="p">{</span><span class="o">**</span><span class="n">bb_mapping</span><span class="p">,</span> <span class="o">**</span><span class="n">g_mapping</span><span class="p">},</span>
+        <span class="s2">&quot;U&quot;</span><span class="p">:</span> <span class="p">{</span><span class="o">**</span><span class="n">bb_mapping</span><span class="p">,</span> <span class="o">**</span><span class="n">u_mapping</span><span class="p">},</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="o">=</span><span class="s2">&quot;rna_reg&quot;</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="n">RNA_SYSTEM</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;new&quot;</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;martini30rna&quot;</span>
+
+        <span class="c1"># RNA backbone atoms: tuple of (atom id, type, name, charge group, charge, mass)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bb_atoms</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Q1n&quot;</span><span class="p">,</span> <span class="s2">&quot;BB1&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">72</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;C6&quot;</span><span class="p">,</span> <span class="s2">&quot;BB2&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;N2&quot;</span><span class="p">,</span> <span class="s2">&quot;BB3&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bb_bonds</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.350</span><span class="p">,</span> <span class="mi">25000</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;BB1-BB2&quot;</span><span class="p">)],</span>
+            <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.239</span><span class="p">,</span> <span class="mi">25000</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;BB2-BB3&quot;</span><span class="p">)],</span>
+            <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.378</span><span class="p">,</span> <span class="mi">12000</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;BB2-BB1n&quot;</span><span class="p">)],</span>
+            <span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.412</span><span class="p">,</span> <span class="mi">12000</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;BB3-BB1n&quot;</span><span class="p">)],</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bb_angles</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mf">110.0</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;BB1-BB2-BB1n&quot;</span><span class="p">)],</span>
+            <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mf">121.0</span><span class="p">,</span> <span class="mi">180</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;BB2-BB1n-BB2n&quot;</span><span class="p">)],</span>
+            <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mf">143.0</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;BB1-BB2-BB3&quot;</span><span class="p">)],</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bb_dihs</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">25.0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;BB1-BB2-BB1n-BB2n&quot;</span><span class="p">)],</span>
+            <span class="p">[(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">25.0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;BB2p-BB1-BB2-BB1n&quot;</span><span class="p">)],</span>
+            <span class="p">[(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mf">112.0</span><span class="p">,</span> <span class="mf">15.0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;BB2p-BB1-BB2-BB3n&quot;</span><span class="p">)],</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bb_cons</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bb_excls</span> <span class="o">=</span> <span class="p">[[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(),</span> <span class="p">(</span><span class="s2">&quot;BB1-BB3&quot;</span><span class="p">)],</span> <span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(),</span> <span class="p">(</span><span class="s2">&quot;BB3-BB1n&quot;</span><span class="p">)]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bb_pairs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bb_vs3s</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bb_blist</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bb_bonds</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bb_angles</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bb_dihs</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bb_cons</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bb_excls</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bb_pairs</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bb_vs3s</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Side-chain atom definitions for each base.</span>
+        <span class="n">a_atoms</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;TA0&quot;</span><span class="p">,</span> <span class="s2">&quot;SC1&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">45</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;TA1&quot;</span><span class="p">,</span> <span class="s2">&quot;SC2&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;TA2&quot;</span><span class="p">,</span> <span class="s2">&quot;SC3&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">45</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="s2">&quot;TA3&quot;</span><span class="p">,</span> <span class="s2">&quot;SC4&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">45</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="s2">&quot;TA4&quot;</span><span class="p">,</span> <span class="s2">&quot;SC5&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="n">c_atoms</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;TY0&quot;</span><span class="p">,</span> <span class="s2">&quot;SC1&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">37</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;TY1&quot;</span><span class="p">,</span> <span class="s2">&quot;SC2&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">37</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;TY2&quot;</span><span class="p">,</span> <span class="s2">&quot;SC3&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="s2">&quot;TY3&quot;</span><span class="p">,</span> <span class="s2">&quot;SC4&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">37</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="n">g_atoms</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;TG0&quot;</span><span class="p">,</span> <span class="s2">&quot;SC1&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;TG1&quot;</span><span class="p">,</span> <span class="s2">&quot;SC2&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;TG2&quot;</span><span class="p">,</span> <span class="s2">&quot;SC3&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="s2">&quot;TG3&quot;</span><span class="p">,</span> <span class="s2">&quot;SC4&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="s2">&quot;TG4&quot;</span><span class="p">,</span> <span class="s2">&quot;SC5&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;TG5&quot;</span><span class="p">,</span> <span class="s2">&quot;SC6&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="n">u_atoms</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;TU0&quot;</span><span class="p">,</span> <span class="s2">&quot;SC1&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">37</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;TU1&quot;</span><span class="p">,</span> <span class="s2">&quot;SC2&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">37</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;TU2&quot;</span><span class="p">,</span> <span class="s2">&quot;SC3&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="s2">&quot;TU3&quot;</span><span class="p">,</span> <span class="s2">&quot;SC4&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">37</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="n">sc_atoms</span> <span class="o">=</span> <span class="p">(</span><span class="n">a_atoms</span><span class="p">,</span> <span class="n">c_atoms</span><span class="p">,</span> <span class="n">g_atoms</span><span class="p">,</span> <span class="n">u_atoms</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mapdict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resnames</span><span class="p">,</span> <span class="n">sc_atoms</span><span class="p">))</span>
+
+<div class="viewcode-block" id="Martini30RNA.sc_atoms">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.forcefields.Martini30RNA.sc_atoms">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sc_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return side-chain atoms for the given residue.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapdict</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Martini31Nucleic">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.forcefields.Martini31Nucleic">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Martini31Nucleic</span><span class="p">(</span><span class="n">NucleicForceField</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Force field for Martini 3.1 nucleic acids.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bb_mapping</span> <span class="o">=</span> <span class="n">nsplit</span><span class="p">(</span>
+        <span class="s2">&quot;P OP1 OP2 O5&#39; O3&#39; O1P O2P&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;C5&#39; 1H5&#39; 2H5&#39; H5&#39; H5&#39;&#39; C4&#39; H4&#39; O4&#39; C3&#39; H3&#39;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;C1&#39; C2&#39; O2&#39; O4&#39;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="p">{</span><span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="s2">&quot;SC1&quot;</span><span class="p">],</span> <span class="n">nsplit</span><span class="p">(</span><span class="s2">&quot;TA1 TA2 TA3 TA4 TA5 TA6&quot;</span><span class="p">))),</span> <span class="o">**</span><span class="p">{}},</span>
+        <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="p">{</span><span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="s2">&quot;SC1&quot;</span><span class="p">],</span> <span class="n">nsplit</span><span class="p">(</span><span class="s2">&quot;TY1 TY2 TY3 TY4 TY5&quot;</span><span class="p">))),</span> <span class="o">**</span><span class="p">{}},</span>
+        <span class="s2">&quot;G&quot;</span><span class="p">:</span> <span class="p">{</span><span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="s2">&quot;SC1&quot;</span><span class="p">],</span> <span class="n">nsplit</span><span class="p">(</span><span class="s2">&quot;TG1 TG2 TG3 TG4 TG5 TG6 TG7 TG8&quot;</span><span class="p">))),</span> <span class="o">**</span><span class="p">{}},</span>
+        <span class="s2">&quot;U&quot;</span><span class="p">:</span> <span class="p">{</span><span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="s2">&quot;SC1&quot;</span><span class="p">],</span> <span class="n">nsplit</span><span class="p">(</span><span class="s2">&quot;TU1 TU2 TU3 TU4 TU5 TU6 TU7&quot;</span><span class="p">))),</span> <span class="o">**</span><span class="p">{}},</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">directory</span><span class="o">=</span><span class="s2">&quot;rna_pol&quot;</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="n">RNA_SYSTEM</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;new&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;martini31nucleic&quot;</span>
+        <span class="n">charges</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;TDU&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+            <span class="s2">&quot;TA1&quot;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span>
+            <span class="s2">&quot;TA2&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.3</span><span class="p">,</span>
+            <span class="s2">&quot;TA3&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+            <span class="s2">&quot;TA4&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.8</span><span class="p">,</span>
+            <span class="s2">&quot;TA5&quot;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span>
+            <span class="s2">&quot;TA6&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.4</span><span class="p">,</span>
+            <span class="s2">&quot;TY1&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;TY2&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span>
+            <span class="s2">&quot;TY3&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.6</span><span class="p">,</span>
+            <span class="s2">&quot;TY4&quot;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span>
+            <span class="s2">&quot;TY5&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+            <span class="s2">&quot;TG1&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
+            <span class="s2">&quot;TG2&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;TG3&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
+            <span class="s2">&quot;TG4&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.3</span><span class="p">,</span>
+            <span class="s2">&quot;TG5&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span>
+            <span class="s2">&quot;TG6&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.6</span><span class="p">,</span>
+            <span class="s2">&quot;TG7&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
+            <span class="s2">&quot;TG8&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+            <span class="s2">&quot;TU1&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;TU2&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span>
+            <span class="s2">&quot;TU3&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span>
+            <span class="s2">&quot;TU4&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span>
+            <span class="s2">&quot;TU5&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+            <span class="s2">&quot;TU6&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+            <span class="s2">&quot;TU7&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">charges</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="o">*</span> <span class="mf">1.8</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">charges</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bbcharges</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;BB1&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_bbs_angles</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_bbbb_dihedrals</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dna_bb</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;atom&quot;</span><span class="p">:</span> <span class="n">nsplit</span><span class="p">(</span><span class="s2">&quot;Q0 SN0 SC2&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;bond&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;angle&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;dih&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;excl&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;pair&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dna_con</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;bond&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;angle&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;dih&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;excl&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;pair&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">bases</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_connectivity</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rna_bb</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;atom&quot;</span><span class="p">:</span> <span class="n">nsplit</span><span class="p">(</span><span class="s2">&quot;Q1 N4 N6&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;bond&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.349</span><span class="p">,</span> <span class="mi">18000</span><span class="p">),</span>
+                <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.377</span><span class="p">,</span> <span class="mi">12000</span><span class="p">),</span>
+                <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.240</span><span class="p">,</span> <span class="mi">18000</span><span class="p">),</span>
+                <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.412</span><span class="p">,</span> <span class="mi">12000</span><span class="p">),</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;angle&quot;</span><span class="p">:</span> <span class="p">[(</span><span class="mi">10</span><span class="p">,</span> <span class="mf">119.0</span><span class="p">,</span> <span class="mi">27</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mf">118.0</span><span class="p">,</span> <span class="mi">140</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mf">138.0</span><span class="p">,</span> <span class="mi">180</span><span class="p">)],</span>
+            <span class="s2">&quot;dih&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="o">-</span><span class="mi">7</span><span class="p">,</span> <span class="o">-</span><span class="mi">25</span><span class="p">,</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">),</span>
+                <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mf">112.0</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;excl&quot;</span><span class="p">:</span> <span class="p">[(),</span> <span class="p">(),</span> <span class="p">()],</span>
+            <span class="s2">&quot;pair&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rna_con</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;bond&quot;</span><span class="p">:</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)],</span>
+            <span class="s2">&quot;angle&quot;</span><span class="p">:</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)],</span>
+            <span class="s2">&quot;dih&quot;</span><span class="p">:</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)],</span>
+            <span class="s2">&quot;excl&quot;</span><span class="p">:</span> <span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)],</span>
+            <span class="s2">&quot;pair&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="p">}</span>
+
+        <span class="n">a_itp</span><span class="p">,</span> <span class="n">c_itp</span><span class="p">,</span> <span class="n">g_itp</span><span class="p">,</span> <span class="n">u_itp</span> <span class="o">=</span> <span class="n">NucleicForceField</span><span class="o">.</span><span class="n">read_itps</span><span class="p">(</span><span class="n">RNA_SYSTEM</span><span class="p">,</span> <span class="s2">&quot;polar&quot;</span><span class="p">,</span> <span class="s2">&quot;new&quot;</span><span class="p">)</span>
+
+        <span class="n">mapping_a</span> <span class="o">=</span> <span class="n">nsplit</span><span class="p">(</span><span class="s2">&quot;TA1 TA2 TA3 TA4 TA5 TA6&quot;</span><span class="p">)</span>
+        <span class="n">connectivity_a</span><span class="p">,</span> <span class="n">itp_params_a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itp_to_indata</span><span class="p">(</span><span class="n">a_itp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_adenine</span><span class="p">(</span><span class="n">mapping_a</span><span class="p">,</span> <span class="n">connectivity_a</span><span class="p">,</span> <span class="n">itp_params_a</span><span class="p">)</span>
+
+        <span class="n">mapping_c</span> <span class="o">=</span> <span class="n">nsplit</span><span class="p">(</span><span class="s2">&quot;TY1 TY2 TY3 TY4 TY5&quot;</span><span class="p">)</span>
+        <span class="n">connectivity_c</span><span class="p">,</span> <span class="n">itp_params_c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itp_to_indata</span><span class="p">(</span><span class="n">c_itp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_cytosine</span><span class="p">(</span><span class="n">mapping_c</span><span class="p">,</span> <span class="n">connectivity_c</span><span class="p">,</span> <span class="n">itp_params_c</span><span class="p">)</span>
+
+        <span class="n">mapping_g</span> <span class="o">=</span> <span class="n">nsplit</span><span class="p">(</span><span class="s2">&quot;TG1 TG2 TG3 TG4 TG5 TG6 TG7 TG8&quot;</span><span class="p">)</span>
+        <span class="n">connectivity_g</span><span class="p">,</span> <span class="n">itp_params_g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itp_to_indata</span><span class="p">(</span><span class="n">g_itp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_guanine</span><span class="p">(</span><span class="n">mapping_g</span><span class="p">,</span> <span class="n">connectivity_g</span><span class="p">,</span> <span class="n">itp_params_g</span><span class="p">)</span>
+
+        <span class="n">mapping_u</span> <span class="o">=</span> <span class="n">nsplit</span><span class="p">(</span><span class="s2">&quot;TU1 TU2 TU3 TU4 TU5 TU6 TU7&quot;</span><span class="p">)</span>
+        <span class="n">connectivity_u</span><span class="p">,</span> <span class="n">itp_params_u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">itp_to_indata</span><span class="p">(</span><span class="n">u_itp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_uracil</span><span class="p">(</span><span class="n">mapping_u</span><span class="p">,</span> <span class="n">connectivity_u</span><span class="p">,</span> <span class="n">itp_params_u</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Martini31Nucleic.sc_atoms">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.forcefields.Martini31Nucleic.sc_atoms">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sc_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return side-chain atoms for a given residue.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapdict</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span></div>
+</div>
+
+
+    <span class="c1"># The update_* methods are currently commented out.</span>
+    <span class="c1"># They can be implemented if needed.</span>
+    <span class="c1"># def update_adenine(self, mapping, connectivity, itp_params):</span>
+    <span class="c1">#     pass</span>
+    <span class="c1"># def update_cytosine(self, mapping, connectivity, itp_params):</span>
+    <span class="c1">#     pass</span>
+    <span class="c1"># def update_guanine(self, mapping, connectivity, itp_params):</span>
+    <span class="c1">#     pass</span>
+    <span class="c1"># def update_uracil(self, mapping, connectivity, itp_params):</span>
+    <span class="c1">#     pass</span>
+
+
+    <span class="c1"># def update_adenine(self, mapping, connectivity, itp_params):</span>
+    <span class="c1">#     parameters = mapping + itp_params</span>
+    <span class="c1">#     self.bases.update({&quot;A&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;A&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;RA3&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;RA3&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;RA5&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;RA5&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;2MA&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;2MA&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;DMA&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;DMA&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;SPA&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;SPA&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;RAP&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;RAP&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;6MA&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;6MA&quot;: connectivity})</span>
+
+    <span class="c1"># def update_cytosine(self, mapping, connectivity, itp_params):</span>
+    <span class="c1">#     parameters = mapping + itp_params</span>
+    <span class="c1">#     self.bases.update({&quot;C&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;C&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;RC3&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;RC3&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;RC5&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;RC5&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;MRC&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;MRC&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;5MC&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;5MC&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;NMC&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;NMC&quot;: connectivity})</span>
+
+    <span class="c1"># def update_guanine(self, mapping, connectivity, itp_params):</span>
+    <span class="c1">#     parameters = mapping + itp_params</span>
+    <span class="c1">#     self.bases.update({&quot;G&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;G&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;RG3&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;RG3&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;RG5&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;RG5&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;MRG&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;MRG&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;1MG&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;1MG&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;2MG&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;2MG&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;7MG&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;7MG&quot;: connectivity})</span>
+
+    <span class="c1"># def update_uracil(self, mapping, connectivity, itp_params):</span>
+    <span class="c1">#     parameters = mapping + itp_params</span>
+    <span class="c1">#     self.bases.update({&quot;U&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;U&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;RU3&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;RU3&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;RU5&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;RU5&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;MRU&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;MRU&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;DHU&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;DHU&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;PSU&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;PSU&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;3MP&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;3MP&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;3MU&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;3MU&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;4SU&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;4SU&quot;: connectivity})</span>
+    <span class="c1">#     self.bases.update({&quot;5MU&quot;: parameters})</span>
+    <span class="c1">#     self.base_connectivity.update({&quot;5MU&quot;: connectivity})</span>
+
+    <span class="c1"># @staticmethod</span>
+    <span class="c1"># def update_non_standard_mapping(mapping):</span>
+    <span class="c1">#     mapping.update({&quot;RA3&quot;:mapping[&quot;A&quot;],</span>
+    <span class="c1">#                     &quot;RA5&quot;:mapping[&quot;A&quot;],</span>
+    <span class="c1">#                     &quot;2MA&quot;:mapping[&quot;A&quot;],</span>
+    <span class="c1">#                     &quot;6MA&quot;:mapping[&quot;A&quot;],</span>
+    <span class="c1">#                     &quot;RAP&quot;:mapping[&quot;A&quot;],</span>
+    <span class="c1">#                     &quot;DMA&quot;:mapping[&quot;A&quot;],</span>
+    <span class="c1">#                     &quot;DHA&quot;:mapping[&quot;A&quot;],</span>
+    <span class="c1">#                     &quot;SPA&quot;:mapping[&quot;A&quot;],</span>
+    <span class="c1">#                     &quot;RC3&quot;:mapping[&quot;C&quot;],</span>
+    <span class="c1">#                     &quot;RC5&quot;:mapping[&quot;C&quot;],</span>
+    <span class="c1">#                     &quot;5MC&quot;:mapping[&quot;C&quot;],</span>
+    <span class="c1">#                     &quot;3MP&quot;:mapping[&quot;C&quot;],</span>
+    <span class="c1">#                     &quot;MRC&quot;:mapping[&quot;C&quot;],</span>
+    <span class="c1">#                     &quot;NMC&quot;:mapping[&quot;C&quot;],</span>
+    <span class="c1">#                     &quot;RG3&quot;:mapping[&quot;G&quot;],</span>
+    <span class="c1">#                     &quot;RG5&quot;:mapping[&quot;G&quot;],</span>
+    <span class="c1">#                     &quot;1MG&quot;:mapping[&quot;G&quot;],</span>
+    <span class="c1">#                     &quot;2MG&quot;:mapping[&quot;G&quot;],</span>
+    <span class="c1">#                     &quot;7MG&quot;:mapping[&quot;G&quot;],</span>
+    <span class="c1">#                     &quot;MRG&quot;:mapping[&quot;G&quot;],</span>
+    <span class="c1">#                     &quot;RU3&quot;:mapping[&quot;U&quot;],</span>
+    <span class="c1">#                     &quot;RU5&quot;:mapping[&quot;U&quot;],</span>
+    <span class="c1">#                     &quot;4SU&quot;:mapping[&quot;U&quot;],</span>
+    <span class="c1">#                     &quot;DHU&quot;:mapping[&quot;U&quot;],</span>
+    <span class="c1">#                     &quot;PSU&quot;:mapping[&quot;U&quot;],</span>
+    <span class="c1">#                     &quot;5MU&quot;:mapping[&quot;U&quot;],</span>
+    <span class="c1">#                     &quot;3MU&quot;:mapping[&quot;U&quot;],</span>
+    <span class="c1">#                     &quot;3MP&quot;:mapping[&quot;U&quot;],</span>
+    <span class="c1">#                     &quot;MRU&quot;:mapping[&quot;U&quot;],</span>
+    <span class="c1">#     })</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Danis Yangaliev.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

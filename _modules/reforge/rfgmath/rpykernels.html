@@ -1,0 +1,416 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>reforge.rfgmath.rpykernels &mdash; reForge 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=b7a6b9b3" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            reForge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../why.html">Why use reForge?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">reForge API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">reForge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">reforge.rfgmath.rpykernels</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for reforge.rfgmath.rpykernels</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;CUDA kernels for CuPy</span>
+
+<span class="sd">Description:</span>
+<span class="sd">    This module contains CUDA kernel versions of internal routines for performing optimized mathematical</span>
+<span class="sd">    operations. It includes functions for calculating position-position Hessian matrices and perturbation</span>
+<span class="sd">    matrices derived from coordinate and covariance data, accelerated using CUDA. The computations are</span>
+<span class="sd">    implemented as CUDA kernels and are intended for internal use within the reForge workflow.</span>
+
+<span class="sd">Usage Example:</span>
+<span class="sd">    &gt;&gt;&gt; import cupy as cp</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; from rcmath_cuda import calculate_hessian_cuda, hessian_cuda, perturbation_matrix_cuda, td_perturbation_matrix_cuda</span>
+<span class="sd">    &gt;&gt;&gt; n = 10</span>
+<span class="sd">    &gt;&gt;&gt; # Create random coordinate data on the GPU:</span>
+<span class="sd">    &gt;&gt;&gt; x = cp.asarray(np.random.rand(n))</span>
+<span class="sd">    &gt;&gt;&gt; y = cp.asarray(np.random.rand(n))</span>
+<span class="sd">    &gt;&gt;&gt; z = cp.asarray(np.random.rand(n))</span>
+<span class="sd">    &gt;&gt;&gt; hess = calculate_hessian_cuda(n, x, y, z, 1.2, 1000.0, 0)</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; # Alternatively, if the coordinates are stored in an (n x 3) array:</span>
+<span class="sd">    &gt;&gt;&gt; vec = cp.asarray(np.random.rand(n, 3))</span>
+<span class="sd">    &gt;&gt;&gt; hess2 = hessian_cuda(vec, 1.2, 1000.0, 0)</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; # Compute a perturbation matrix from a covariance matrix:</span>
+<span class="sd">    &gt;&gt;&gt; cov = cp.asarray(np.random.rand(3*n, 3*n))</span>
+<span class="sd">    &gt;&gt;&gt; pert = perturbation_matrix_cuda(cov)</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; # Compute a block-wise perturbation matrix:</span>
+<span class="sd">    &gt;&gt;&gt; td_pert = td_perturbation_matrix_cuda(cov)</span>
+
+<span class="sd">Requirements:</span>
+<span class="sd">    - Python 3.x</span>
+<span class="sd">    - NumPy</span>
+<span class="sd">    - CuPy</span>
+<span class="sd">    - reForge utilities (timeit, memprofit)</span>
+
+<span class="sd">Author: Your Name</span>
+<span class="sd">Date: YYYY-MM-DD</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">cupy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">ceil</span>
+
+
+<span class="c1"># ---------------------------------------------------------------------</span>
+<span class="c1"># CUDA Kernel for calculating Hessian from a coordinate matrix.</span>
+<span class="c1"># (Each residue’s coordinates are stored consecutively in a (n x 3) array.)</span>
+<span class="c1"># ---------------------------------------------------------------------</span>
+<span class="n">hessian_kernel_code</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">extern &quot;C&quot; __global__</span>
+<span class="s2">void hessian_kernel(const int n, const double cutoff, const double spring_constant, const int dd,</span>
+<span class="s2">                    const double *vec, double *hessian, const int hessian_size)</span>
+<span class="s2">{</span>
+<span class="s2">    int i = blockIdx.x * blockDim.x + threadIdx.x;</span>
+<span class="s2">    int j = blockIdx.y * blockDim.y + threadIdx.y;</span>
+<span class="s2">    if(i &lt; n &amp;&amp; j &lt; n &amp;&amp; i != j) {</span>
+<span class="s2">         double dx = vec[i*3 + 0] - vec[j*3 + 0];</span>
+<span class="s2">         double dy = vec[i*3 + 1] - vec[j*3 + 1];</span>
+<span class="s2">         double dz = vec[i*3 + 2] - vec[j*3 + 2];</span>
+<span class="s2">         double r = sqrt(dx*dx + dy*dy + dz*dz);</span>
+<span class="s2">         if(r &lt; cutoff) {</span>
+<span class="s2">             double invr = 1.0 / r;</span>
+<span class="s2">             double gamma = spring_constant * pow(invr, 2 + dd);</span>
+<span class="s2">             int base_i = 3 * i;</span>
+<span class="s2">             int base_j = 3 * j;</span>
+<span class="s2">             atomicAdd(&amp;hessian[(base_i + 0) * hessian_size + (base_i + 0)], gamma * dx * dx);</span>
+<span class="s2">             atomicAdd(&amp;hessian[(base_i + 1) * hessian_size + (base_i + 1)], gamma * dy * dy);</span>
+<span class="s2">             atomicAdd(&amp;hessian[(base_i + 2) * hessian_size + (base_i + 2)], gamma * dz * dz);</span>
+<span class="s2">             atomicAdd(&amp;hessian[(base_i + 0) * hessian_size + (base_i + 1)], gamma * dx * dy);</span>
+<span class="s2">             atomicAdd(&amp;hessian[(base_i + 0) * hessian_size + (base_i + 2)], gamma * dx * dz);</span>
+<span class="s2">             atomicAdd(&amp;hessian[(base_i + 1) * hessian_size + (base_i + 0)], gamma * dy * dx);</span>
+<span class="s2">             atomicAdd(&amp;hessian[(base_i + 1) * hessian_size + (base_i + 2)], gamma * dy * dz);</span>
+<span class="s2">             atomicAdd(&amp;hessian[(base_i + 2) * hessian_size + (base_i + 0)], gamma * dx * dz);</span>
+<span class="s2">             atomicAdd(&amp;hessian[(base_i + 2) * hessian_size + (base_i + 1)], gamma * dy * dz);</span>
+<span class="s2">             atomicAdd(&amp;hessian[(base_i + 0) * hessian_size + (base_j + 0)], -gamma * dx * dx);</span>
+<span class="s2">             atomicAdd(&amp;hessian[(base_i + 1) * hessian_size + (base_j + 1)], -gamma * dy * dy);</span>
+<span class="s2">             atomicAdd(&amp;hessian[(base_i + 2) * hessian_size + (base_j + 2)], -gamma * dz * dz);</span>
+<span class="s2">             atomicAdd(&amp;hessian[(base_i + 0) * hessian_size + (base_j + 1)], -gamma * dx * dy);</span>
+<span class="s2">             atomicAdd(&amp;hessian[(base_i + 0) * hessian_size + (base_j + 2)], -gamma * dx * dz);</span>
+<span class="s2">             atomicAdd(&amp;hessian[(base_i + 1) * hessian_size + (base_j + 0)], -gamma * dy * dx);</span>
+<span class="s2">             atomicAdd(&amp;hessian[(base_i + 1) * hessian_size + (base_j + 2)], -gamma * dy * dz);</span>
+<span class="s2">             atomicAdd(&amp;hessian[(base_i + 2) * hessian_size + (base_j + 0)], -gamma * dx * dz);</span>
+<span class="s2">             atomicAdd(&amp;hessian[(base_i + 2) * hessian_size + (base_j + 1)], -gamma * dy * dz);</span>
+<span class="s2">         }</span>
+<span class="s2">    }</span>
+<span class="s2">}</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">hessian_kernel</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">RawKernel</span><span class="p">(</span><span class="n">hessian_kernel_code</span><span class="p">,</span> <span class="s2">&quot;hessian_kernel&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="hessian_cuda">
+<a class="viewcode-back" href="../../../reforge.rfgmath.html#reforge.rfgmath.rpykernels.hessian_cuda">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">hessian_cuda</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">spring_constant</span><span class="o">=</span><span class="mf">1000.0</span><span class="p">,</span> <span class="n">dd</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;CUDA version of _hessian.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    vec : cupy.ndarray</span>
+<span class="sd">        A coordinate matrix of shape (n, 3) with type float64.</span>
+<span class="sd">    cutoff : float, optional</span>
+<span class="sd">        Distance cutoff.</span>
+<span class="sd">    spring_constant : float, optional</span>
+<span class="sd">        Base spring constant.</span>
+<span class="sd">    dd : int, optional</span>
+<span class="sd">        Exponent modifier.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cupy.ndarray</span>
+<span class="sd">        Hessian matrix of shape (3*n, 3*n) as a cupy array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">vec</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">hessian_size</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">n</span>
+    <span class="n">hess</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">hessian_size</span><span class="p">,</span> <span class="n">hessian_size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">cp</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">block</span> <span class="o">=</span> <span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+    <span class="n">grid_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="n">block</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">grid_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="n">block</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="p">(</span><span class="n">grid_x</span><span class="p">,</span> <span class="n">grid_y</span><span class="p">)</span>
+    <span class="n">hessian_kernel</span><span class="p">(</span>
+        <span class="n">grid</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">spring_constant</span><span class="p">,</span> <span class="n">dd</span><span class="p">,</span> <span class="n">vec</span><span class="p">,</span> <span class="n">hess</span><span class="p">,</span> <span class="n">hessian_size</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">hess</span></div>
+
+
+
+<span class="c1"># ---------------------------------------------------------------------</span>
+<span class="c1"># CUDA Kernel for computing a perturbation matrix from a covariance matrix.</span>
+<span class="c1"># This version uses directional projections (7 normalized directions).</span>
+<span class="c1"># ---------------------------------------------------------------------</span>
+<span class="n">perturbation_matrix_kernel_code</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">extern &quot;C&quot; __global__</span>
+<span class="s2">void perturbation_matrix_kernel(const int m, const int n, const double *covar, double *pert, const int M)</span>
+<span class="s2">{</span>
+<span class="s2">    // Each thread computes one element of the perturbation matrix (size: m x n)</span>
+<span class="s2">    int i = blockIdx.x * blockDim.x + threadIdx.x;</span>
+<span class="s2">    int j = blockIdx.y * blockDim.y + threadIdx.y;</span>
+<span class="s2">    if(i &lt; m &amp;&amp; j &lt; n) {</span>
+<span class="s2">         double sum = 0.0;</span>
+<span class="s2">         // Define 7 direction vectors</span>
+<span class="s2">         double dirs[7][3] = {</span>
+<span class="s2">             {1.0, 0.0, 0.0},</span>
+<span class="s2">             {0.0, 1.0, 0.0},</span>
+<span class="s2">             {0.0, 0.0, 1.0},</span>
+<span class="s2">             {1.0, 1.0, 0.0},</span>
+<span class="s2">             {1.0, 0.0, 1.0},</span>
+<span class="s2">             {0.0, 1.0, 1.0},</span>
+<span class="s2">             {1.0, 1.0, 1.0}</span>
+<span class="s2">         };</span>
+<span class="s2">         int base_i = 3 * i;</span>
+<span class="s2">         int base_j = 3 * j;</span>
+<span class="s2">         for (int k = 0; k &lt; 7; k++) {</span>
+<span class="s2">             double f0 = dirs[k][0];</span>
+<span class="s2">             double f1 = dirs[k][1];</span>
+<span class="s2">             double f2 = dirs[k][2];</span>
+<span class="s2">             // Normalize the direction vector</span>
+<span class="s2">             double norm = sqrt(f0*f0 + f1*f1 + f2*f2);</span>
+<span class="s2">             f0 /= norm; f1 /= norm; f2 /= norm;</span>
+<span class="s2">             double delta0 = covar[(base_i + 0)*M + (base_j + 0)] * f0 +</span>
+<span class="s2">                             covar[(base_i + 0)*M + (base_j + 1)] * f1 +</span>
+<span class="s2">                             covar[(base_i + 0)*M + (base_j + 2)] * f2;</span>
+<span class="s2">             double delta1 = covar[(base_i + 1)*M + (base_j + 0)] * f0 +</span>
+<span class="s2">                             covar[(base_i + 1)*M + (base_j + 1)] * f1 +</span>
+<span class="s2">                             covar[(base_i + 1)*M + (base_j + 2)] * f2;</span>
+<span class="s2">             double delta2 = covar[(base_i + 2)*M + (base_j + 0)] * f0 +</span>
+<span class="s2">                             covar[(base_i + 2)*M + (base_j + 1)] * f1 +</span>
+<span class="s2">                             covar[(base_i + 2)*M + (base_j + 2)] * f2;</span>
+<span class="s2">             double s_val = sqrt(delta0*delta0 + delta1*delta1 + delta2*delta2);</span>
+<span class="s2">             sum += s_val;</span>
+<span class="s2">         }</span>
+<span class="s2">         pert[i*n + j] = sum;</span>
+<span class="s2">    }</span>
+<span class="s2">}</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">perturbation_matrix_kernel</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">RawKernel</span><span class="p">(</span>
+    <span class="n">perturbation_matrix_kernel_code</span><span class="p">,</span> <span class="s2">&quot;perturbation_matrix_kernel&quot;</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="perturbation_matrix_cuda">
+<a class="viewcode-back" href="../../../reforge.rfgmath.html#reforge.rfgmath.rpykernels.perturbation_matrix_cuda">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">perturbation_matrix_cuda</span><span class="p">(</span><span class="n">covar</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;CUDA version of _perturbation_matrix.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    covar : cupy.ndarray</span>
+<span class="sd">        Covariance matrix of shape (3*m, 3*n) with type float64.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cupy.ndarray</span>
+<span class="sd">        Perturbation matrix of shape (m, n) (normalization should be applied separately if needed).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">covar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># M = 3*n (number of columns)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">covar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">3</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">M</span> <span class="o">//</span> <span class="mi">3</span>
+    <span class="n">pert</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">cp</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">block</span> <span class="o">=</span> <span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+    <span class="n">grid_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="n">m</span> <span class="o">/</span> <span class="n">block</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">grid_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="n">block</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="p">(</span><span class="n">grid_x</span><span class="p">,</span> <span class="n">grid_y</span><span class="p">)</span>
+    <span class="n">perturbation_matrix_kernel</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">covar</span><span class="p">,</span> <span class="n">pert</span><span class="p">,</span> <span class="n">M</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">pert</span></div>
+
+
+
+<span class="c1"># ---------------------------------------------------------------------</span>
+<span class="c1"># CUDA Kernel for computing block-wise perturbation matrix (td version).</span>
+<span class="c1"># ---------------------------------------------------------------------</span>
+<span class="n">td_perturbation_matrix_kernel_code</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">extern &quot;C&quot; __global__</span>
+<span class="s2">void td_perturbation_matrix_kernel(const int m, const int n, const double *ccf, double *pert, const int M)</span>
+<span class="s2">{</span>
+<span class="s2">    // Each thread computes the norm of a 3x3 block corresponding to residues (i,j)</span>
+<span class="s2">    int i = blockIdx.x * blockDim.x + threadIdx.x;</span>
+<span class="s2">    int j = blockIdx.y * blockDim.y + threadIdx.y;</span>
+<span class="s2">    if(i &lt; m &amp;&amp; j &lt; n) {</span>
+<span class="s2">         double temp = 0.0;</span>
+<span class="s2">         int base_i = 3 * i;</span>
+<span class="s2">         int base_j = 3 * j;</span>
+<span class="s2">         for (int a = 0; a &lt; 3; a++) {</span>
+<span class="s2">             for (int b = 0; b &lt; 3; b++) {</span>
+<span class="s2">                 double val = ccf[(base_i + a)*M + (base_j + b)];</span>
+<span class="s2">                 temp += val * val;</span>
+<span class="s2">             }</span>
+<span class="s2">         }</span>
+<span class="s2">         pert[i*n + j] = sqrt(temp);</span>
+<span class="s2">    }</span>
+<span class="s2">}</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">td_perturbation_matrix_kernel</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">RawKernel</span><span class="p">(</span>
+    <span class="n">td_perturbation_matrix_kernel_code</span><span class="p">,</span> <span class="s2">&quot;td_perturbation_matrix_kernel&quot;</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="td_perturbation_matrix_cuda">
+<a class="viewcode-back" href="../../../reforge.rfgmath.html#reforge.rfgmath.rpykernels.td_perturbation_matrix_cuda">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">td_perturbation_matrix_cuda</span><span class="p">(</span><span class="n">ccf</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;CUDA version of _td_perturbation_matrix.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ccf : cupy.ndarray</span>
+<span class="sd">        Covariance (or Hessian) matrix of shape (3*m, 3*n) with type float64.</span>
+<span class="sd">    normalize : bool, optional</span>
+<span class="sd">        If True, the output matrix is normalized so that the total sum equals 1.</span>
+<span class="sd">        (Normalization is performed on the CPU after kernel execution.)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cupy.ndarray</span>
+<span class="sd">        Perturbation matrix of shape (m, n).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">ccf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">ccf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">3</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">M</span> <span class="o">//</span> <span class="mi">3</span>
+    <span class="n">pert</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">cp</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">block</span> <span class="o">=</span> <span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+    <span class="n">grid_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="n">m</span> <span class="o">/</span> <span class="n">block</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">grid_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="n">block</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="p">(</span><span class="n">grid_x</span><span class="p">,</span> <span class="n">grid_y</span><span class="p">)</span>
+    <span class="n">td_perturbation_matrix_kernel</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">ccf</span><span class="p">,</span> <span class="n">pert</span><span class="p">,</span> <span class="n">M</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pert</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">total</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">pert</span> <span class="o">/=</span> <span class="n">total</span>
+    <span class="k">return</span> <span class="n">pert</span></div>
+
+
+
+<span class="c1"># DFI KERNEL</span>
+<span class="n">dfi_kernel_code</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">extern &quot;C&quot; __global__ void dfi_kernel(const float* cov, const float* forces, const int resnum, float *result) {</span>
+<span class="s2">    int bx = blockIdx.x, by = blockIdx.y;</span>
+<span class="s2">    int tx = threadIdx.x, ty = threadIdx.y;</span>
+<span class="s2">    int twx = blockDim.x, twy = blockDim.y;</span>
+<span class="s2">    </span>
+<span class="s2">    __shared__ float f[3];</span>
+<span class="s2">    </span>
+<span class="s2">    // Load forces array into shared memory</span>
+<span class="s2">    if (tx &lt; 3) {</span>
+<span class="s2">        f[tx] = forces[tx];</span>
+<span class="s2">    }</span>
+<span class="s2">    __syncthreads();</span>
+<span class="s2">    </span>
+
+<span class="s2">    if (bx &lt; resnum &amp;&amp; by &lt; resnum){</span>
+<span class="s2">        float sum_ij = 0;</span>
+<span class="s2">        // Compute partial sum of this tile</span>
+<span class="s2">        for (int i = 0; i &lt; twy; i++){</span>
+<span class="s2">            float partial_sum = 0;</span>
+<span class="s2">            for (int j = 0; j &lt; twx; j++){</span>
+<span class="s2">                int row = by * twy + i;</span>
+<span class="s2">                int col = bx * twx + j;</span>
+<span class="s2">                int index = row * 3 * resnum + col;</span>
+<span class="s2">                partial_sum += cov[index] * forces[j] * cov[index] * forces[j];</span>
+<span class="s2">            }</span>
+<span class="s2">            sum_ij += partial_sum;</span>
+<span class="s2">        }</span>
+<span class="s2">        sum_ij = sqrtf(sum_ij);</span>
+<span class="s2">        __syncthreads();</span>
+<span class="s2">        result[by*resnum + bx] = sum_ij;</span>
+<span class="s2">    }</span>
+<span class="s2">    </span>
+<span class="s2">};</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">dfi_kernel</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">RawKernel</span><span class="p">(</span><span class="n">dfi_kernel_code</span><span class="p">,</span> <span class="s2">&quot;dfi_kernel&quot;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Danis Yangaliev.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

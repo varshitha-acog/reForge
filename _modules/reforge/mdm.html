@@ -1,0 +1,542 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>reforge.mdm &mdash; reForge 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b7a6b9b3" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            reForge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../why.html">Why use reForge?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">reForge API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">reForge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">reforge.mdm</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for reforge.mdm</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Math for MD</span>
+
+<span class="sd">Description:</span>
+<span class="sd">    This module provides a unified interface for molecular dynamics and</span>
+<span class="sd">    structural analysis routines within the reForge package. It wraps a variety</span>
+<span class="sd">    of operations including FFT-based cross-correlation, covariance matrix</span>
+<span class="sd">    computation, perturbation matrix calculations (for DFI/DCI metrics), and</span>
+<span class="sd">    elastic network model (ENM) Hessian evaluations. Both CPU and GPU implementations</span>
+<span class="sd">    are supported, with fallbacks to CPU methods if CUDA is not available.</span>
+
+<span class="sd">Usage Example:</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; from mdm import fft_ccf, calc_and_save_covmats, inverse_matrix</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; # Compute FFT-based cross-correlation function in serial mode</span>
+<span class="sd">    &gt;&gt;&gt; ccf = fft_ccf(signal1, signal2, mode=&#39;serial&#39;)</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; # Calculate and save covariance matrices from trajectory positions</span>
+<span class="sd">    &gt;&gt;&gt; calc_and_save_covmats(positions, outdir=&#39;./covmats&#39;, n=5)</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; # Compute the inverse of a matrix using the unified inversion wrapper</span>
+<span class="sd">    &gt;&gt;&gt; inv_mat = inverse_matrix(matrix, device=&#39;cpu_sparse&#39;)</span>
+
+<span class="sd">Requirements:</span>
+<span class="sd">    - Python 3.x</span>
+<span class="sd">    - MDAnalysis</span>
+<span class="sd">    - NumPy</span>
+<span class="sd">    - CuPy (if GPU routines are used)</span>
+<span class="sd">    - Pandas</span>
+<span class="sd">    - reForge utilities (logger, etc.)</span>
+<span class="sd">    - reForge rfgmath modules (rcmath, rpymath)</span>
+
+<span class="sd">Author: DY</span>
+<span class="sd">Date: YYYY-MM-DD</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">cupy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">reforge.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>  <span class="c1"># removed unused imports: sys, MDAnalysis, pandas, timeit, memprofit, cuda_detected</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">reforge.rfgmath</span><span class="w"> </span><span class="kn">import</span> <span class="n">rcmath</span><span class="p">,</span> <span class="n">rpymath</span>
+
+
+<div class="viewcode-block" id="fft_ccf">
+<a class="viewcode-back" href="../../reforge.html#reforge.mdm.fft_ccf">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fft_ccf</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;serial&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Unified wrapper for FFT-based correlation functions.</span>
+
+<span class="sd">    This function dispatches to one of the internal FFT correlation routines</span>
+<span class="sd">    based on the specified mode:</span>
+
+<span class="sd">        - &#39;serial&#39; for sfft_ccf,</span>
+<span class="sd">        - &#39;parallel&#39; for pfft_ccf, or</span>
+<span class="sd">        - &#39;gpu&#39; for gfft_ccf.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    *args :</span>
+<span class="sd">        Positional arguments for the chosen correlation function.</span>
+<span class="sd">    mode : str, optional</span>
+<span class="sd">        Mode to use (&#39;serial&#39;, &#39;parallel&#39;, or &#39;gpu&#39;). Default is &#39;serial&#39;.</span>
+<span class="sd">    **kwargs :</span>
+<span class="sd">        Additional keyword arguments for the internal routines.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        The computed correlation function.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If an unsupported mode is specified.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;serial&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">rpymath</span><span class="o">.</span><span class="n">sfft_ccf</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;parallel&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">rpymath</span><span class="o">.</span><span class="n">pfft_ccf</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;gpu&quot;</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">rpymath</span><span class="o">.</span><span class="n">gfft_ccf</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># Use .get() only if available (e.g. for CuPy arrays)</span>
+        <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="s2">&quot;get&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">result</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Mode must be &#39;serial&#39;, &#39;parallel&#39; or &#39;gpu&#39;.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="covariance_matrix">
+<a class="viewcode-back" href="../../reforge.html#reforge.mdm.covariance_matrix">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">covariance_matrix</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the covariance matrix from trajectory positions.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    positions : np.ndarray</span>
+<span class="sd">        Array of position coordinates.</span>
+<span class="sd">    dtype : data-type, optional</span>
+<span class="sd">        Desired data type (default is np.float64).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        The computed covariance matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">rpymath</span><span class="o">.</span><span class="n">covariance_matrix</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="calc_and_save_covmats">
+<a class="viewcode-back" href="../../reforge.html#reforge.mdm.calc_and_save_covmats">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_and_save_covmats</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">outdir</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">outtag</span><span class="o">=</span><span class="s2">&quot;covmat&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate and save covariance matrices by splitting a trajectory into</span>
+<span class="sd">    segments.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    positions : np.ndarray</span>
+<span class="sd">        Array of positions with shape (n_coords, n_frames).</span>
+<span class="sd">    outdir : str</span>
+<span class="sd">        Directory where the covariance matrices will be saved.</span>
+<span class="sd">    n : int, optional</span>
+<span class="sd">        Number of segments to split the trajectory into (default is 1).</span>
+<span class="sd">    outtag : str, optional</span>
+<span class="sd">        Base tag for output file names (default is &#39;covmat&#39;).</span>
+<span class="sd">    dtype : data-type, optional</span>
+<span class="sd">        Desired data type for covariance computation (default is np.float32).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">trajs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">traj</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">trajs</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Processing covariance matrix </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+        <span class="n">covmat</span> <span class="o">=</span> <span class="n">covariance_matrix</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">outfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">outtag</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">.npy&quot;</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">outfile</span><span class="p">,</span> <span class="n">covmat</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Saved covariance matrix to </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">outfile</span><span class="p">)</span></div>
+
+
+
+<span class="c1">##############################################################</span>
+<span class="c1">## DFI / DCI Calculations</span>
+<span class="c1">##############################################################</span>
+
+<div class="viewcode-block" id="perturbation_matrix">
+<a class="viewcode-back" href="../../reforge.html#reforge.mdm.perturbation_matrix">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">perturbation_matrix</span><span class="p">(</span><span class="n">cov_mat</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the perturbation matrix from a covariance matrix.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cov_mat : np.ndarray</span>
+<span class="sd">        The covariance matrix.</span>
+<span class="sd">    dtype : data-type, optional</span>
+<span class="sd">        Desired data type (default is np.float64).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        The computed perturbation matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cov_mat</span> <span class="o">=</span> <span class="n">cov_mat</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="c1"># pylint: disable=c-extension-no-member</span>
+    <span class="n">pertmat</span> <span class="o">=</span> <span class="n">rcmath</span><span class="o">.</span><span class="n">perturbation_matrix</span><span class="p">(</span><span class="n">cov_mat</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pertmat</span></div>
+
+
+
+<div class="viewcode-block" id="td_perturbation_matrix">
+<a class="viewcode-back" href="../../reforge.html#reforge.mdm.td_perturbation_matrix">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">td_perturbation_matrix</span><span class="p">(</span><span class="n">cov_mat</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the block-wise (td) perturbation matrix from a covariance matrix.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cov_mat : np.ndarray</span>
+<span class="sd">        The covariance matrix.</span>
+<span class="sd">    dtype : data-type, optional</span>
+<span class="sd">        Desired data type (default is np.float64).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        The computed block-wise perturbation matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cov_mat</span> <span class="o">=</span> <span class="n">cov_mat</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="c1"># pylint: disable=c-extension-no-member</span>
+    <span class="n">pertmat</span> <span class="o">=</span> <span class="n">rcmath</span><span class="o">.</span><span class="n">td_perturbation_matrix</span><span class="p">(</span><span class="n">cov_mat</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pertmat</span></div>
+
+
+
+<div class="viewcode-block" id="dfi">
+<a class="viewcode-back" href="../../reforge.html#reforge.mdm.dfi">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">dfi</span><span class="p">(</span><span class="n">pert_mat</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the Dynamic Flexibility Index (DFI) from a perturbation matrix.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    pert_mat : np.ndarray</span>
+<span class="sd">        The perturbation matrix.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        The DFI values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dfi_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pert_mat</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">dfi_val</span> <span class="o">*=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dfi_val</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dfi_val</span></div>
+
+
+
+<div class="viewcode-block" id="dci">
+<a class="viewcode-back" href="../../reforge.html#reforge.mdm.dci">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">dci</span><span class="p">(</span><span class="n">pert_mat</span><span class="p">,</span> <span class="n">asym</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the Dynamic Coupling Index (DCI) from a perturbation matrix.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    pert_mat : np.ndarray</span>
+<span class="sd">        The perturbation matrix.</span>
+<span class="sd">    asym : bool, optional</span>
+<span class="sd">        If True, return an asymmetric version (default is False).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        The DCI matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dci_val</span> <span class="o">=</span> <span class="n">pert_mat</span> <span class="o">*</span> <span class="n">pert_mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pert_mat</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">asym</span><span class="p">:</span>
+        <span class="n">dci_val</span> <span class="o">=</span> <span class="n">dci_val</span> <span class="o">-</span> <span class="n">dci_val</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">return</span> <span class="n">dci_val</span></div>
+
+
+
+<div class="viewcode-block" id="group_molecule_dci">
+<a class="viewcode-back" href="../../reforge.html#reforge.mdm.group_molecule_dci">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">group_molecule_dci</span><span class="p">(</span><span class="n">pert_mat</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asym</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the DCI between groups of atoms and the remainder of the molecule.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    pert_mat : np.ndarray</span>
+<span class="sd">        The perturbation matrix.</span>
+<span class="sd">    groups : list of lists, optional</span>
+<span class="sd">        A list of groups, each containing indices of atoms.</span>
+<span class="sd">        Defaults to a list containing an empty list.</span>
+<span class="sd">    asym : bool, optional</span>
+<span class="sd">        If True, use the asymmetric DCI (default is False).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of np.ndarray</span>
+<span class="sd">        A list of DCI values for each group.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">groups</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="p">[[]]</span>
+    <span class="n">dcis</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">dci_tot</span> <span class="o">=</span> <span class="n">pert_mat</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pert_mat</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">asym</span><span class="p">:</span>
+        <span class="n">dci_tot</span> <span class="o">=</span> <span class="n">dci_tot</span> <span class="o">-</span> <span class="n">dci_tot</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">for</span> <span class="n">ids</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">:</span>
+        <span class="n">top</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dci_tot</span><span class="p">[:,</span> <span class="n">ids</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">pert_mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">bot</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+        <span class="n">dci_val</span> <span class="o">=</span> <span class="n">top</span> <span class="o">/</span> <span class="n">bot</span>
+        <span class="n">dcis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dci_val</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dcis</span></div>
+
+
+
+<div class="viewcode-block" id="group_group_dci">
+<a class="viewcode-back" href="../../reforge.html#reforge.mdm.group_group_dci">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">group_group_dci</span><span class="p">(</span><span class="n">pert_mat</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asym</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the inter-group DCI matrix.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    pert_mat : np.ndarray</span>
+<span class="sd">        The perturbation matrix.</span>
+<span class="sd">    groups : list of lists, optional</span>
+<span class="sd">        A list of groups, each containing indices of atoms.</span>
+<span class="sd">        Defaults to a list containing an empty list.</span>
+<span class="sd">    asym : bool, optional</span>
+<span class="sd">        If True, compute the asymmetric DCI (default is False).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of lists</span>
+<span class="sd">        A 2D list containing the DCI values between each pair of groups.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">groups</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="p">[[]]</span>
+    <span class="n">dcis</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">dci_tot</span> <span class="o">=</span> <span class="n">pert_mat</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pert_mat</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">asym</span><span class="p">:</span>
+        <span class="n">dci_tot</span> <span class="o">=</span> <span class="n">dci_tot</span> <span class="o">-</span> <span class="n">dci_tot</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">for</span> <span class="n">ids1</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">:</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ids2</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">:</span>
+            <span class="n">idx1</span><span class="p">,</span> <span class="n">idx2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">ids1</span><span class="p">,</span> <span class="n">ids2</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">&quot;ij&quot;</span><span class="p">)</span>
+            <span class="n">top</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dci_tot</span><span class="p">[</span><span class="n">idx1</span><span class="p">,</span> <span class="n">idx2</span><span class="p">])</span> <span class="o">*</span> <span class="n">pert_mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">bot</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids1</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids2</span><span class="p">)</span>
+            <span class="n">dci_val</span> <span class="o">=</span> <span class="n">top</span> <span class="o">/</span> <span class="n">bot</span>
+            <span class="n">temp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dci_val</span><span class="p">)</span>
+        <span class="n">dcis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dcis</span></div>
+
+
+
+<span class="c1">##############################################################</span>
+<span class="c1">## Elastic Network Model (ENM)</span>
+<span class="c1">##############################################################</span>
+
+<div class="viewcode-block" id="hessian">
+<a class="viewcode-back" href="../../reforge.html#reforge.mdm.hessian">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">hessian</span><span class="p">(</span><span class="n">vecs</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">spring_constant</span><span class="p">,</span> <span class="n">dd</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the Hessian matrix using an elastic network model.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    vecs : np.ndarray</span>
+<span class="sd">        Coordinate matrix of shape (n, 3) where each row corresponds to a residue.</span>
+<span class="sd">    cutoff : float</span>
+<span class="sd">        Distance cutoff threshold.</span>
+<span class="sd">    spring_constant : float</span>
+<span class="sd">        Base spring constant.</span>
+<span class="sd">    dd : int</span>
+<span class="sd">        Exponent modifier for the inverse distance.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        The computed Hessian matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=c-extension-no-member</span>
+    <span class="k">return</span> <span class="n">rcmath</span><span class="o">.</span><span class="n">hessian</span><span class="p">(</span><span class="n">vecs</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">spring_constant</span><span class="p">,</span> <span class="n">dd</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="inverse_matrix">
+<a class="viewcode-back" href="../../reforge.html#reforge.mdm.inverse_matrix">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">inverse_matrix</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu_sparse&quot;</span><span class="p">,</span> <span class="n">k_singular</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">n_modes</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Unified wrapper for computing the inverse of a matrix via eigen-decomposition.</span>
+
+<span class="sd">    Depending on the &#39;device&#39; parameter, the function selects an appropriate routine.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    matrix : np.ndarray</span>
+<span class="sd">        The input matrix.</span>
+<span class="sd">    device : str, optional</span>
+<span class="sd">        Inversion method (&#39;cpu_sparse&#39;, &#39;cpu_dense&#39;, &#39;gpu_sparse&#39;, or &#39;gpu_dense&#39;).</span>
+<span class="sd">        Default is &#39;cpu_sparse&#39;.</span>
+<span class="sd">    k_singular : int, optional</span>
+<span class="sd">        Number of smallest eigenvalues to set to zero (default is 6).</span>
+<span class="sd">    n_modes : int, optional</span>
+<span class="sd">        Number of eigenmodes to compute/consider.</span>
+<span class="sd">    dtype : data-type, optional</span>
+<span class="sd">        Desired data type for computations (default: matrix.dtype).</span>
+<span class="sd">    **kwargs :</span>
+<span class="sd">        Additional keyword arguments for the eigensolver.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray or cp.ndarray</span>
+<span class="sd">        The computed inverse matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">dtype</span>
+
+    <span class="k">if</span> <span class="n">device</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;gpu&quot;</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">cp</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;CUDA not available.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">device</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;gpu_sparse&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">device</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;gpu_sparse&quot;</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">rpymath</span><span class="o">.</span><span class="n">inverse_sparse_matrix_gpu</span><span class="p">(</span>
+                        <span class="n">matrix</span><span class="p">,</span> <span class="n">k_singular</span><span class="o">=</span><span class="n">k_singular</span><span class="p">,</span> <span class="n">n_modes</span><span class="o">=</span><span class="n">n_modes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+                    <span class="p">)</span>
+            <span class="k">if</span> <span class="n">device</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;gpu_dense&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">rpymath</span><span class="o">.</span><span class="n">inverse_matrix_gpu</span><span class="p">(</span>
+                    <span class="n">matrix</span><span class="p">,</span> <span class="n">k_singular</span><span class="o">=</span><span class="n">k_singular</span><span class="p">,</span> <span class="n">n_modes</span><span class="o">=</span><span class="n">n_modes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+                <span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Unknown GPU method; falling back to CPU sparse inversion.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">rpymath</span><span class="o">.</span><span class="n">inverse_sparse_matrix_cpu</span><span class="p">(</span>
+                <span class="n">matrix</span><span class="p">,</span> <span class="n">k_singular</span><span class="o">=</span><span class="n">k_singular</span><span class="p">,</span> <span class="n">n_modes</span><span class="o">=</span><span class="n">n_modes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-exception-caught</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;GPU inversion failed with error &#39;</span><span class="si">%s</span><span class="s2">&#39;. Falling back to CPU sparse inversion.&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">rpymath</span><span class="o">.</span><span class="n">inverse_sparse_matrix_cpu</span><span class="p">(</span>
+                <span class="n">matrix</span><span class="p">,</span> <span class="n">k_singular</span><span class="o">=</span><span class="n">k_singular</span><span class="p">,</span> <span class="n">n_modes</span><span class="o">=</span><span class="n">n_modes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+            <span class="p">)</span>
+    <span class="k">if</span> <span class="n">device</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;cpu_dense&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">rpymath</span><span class="o">.</span><span class="n">inverse_matrix_cpu</span><span class="p">(</span>
+            <span class="n">matrix</span><span class="p">,</span> <span class="n">k_singular</span><span class="o">=</span><span class="n">k_singular</span><span class="p">,</span> <span class="n">n_modes</span><span class="o">=</span><span class="n">n_modes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">rpymath</span><span class="o">.</span><span class="n">inverse_sparse_matrix_cpu</span><span class="p">(</span>
+        <span class="n">matrix</span><span class="p">,</span> <span class="n">k_singular</span><span class="o">=</span><span class="n">k_singular</span><span class="p">,</span> <span class="n">n_modes</span><span class="o">=</span><span class="n">n_modes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="c1">##############################################################</span>
+<span class="c1">## Miscellaneous Functions</span>
+<span class="c1">##############################################################</span>
+
+<div class="viewcode-block" id="percentile">
+<a class="viewcode-back" href="../../reforge.html#reforge.mdm.percentile">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">percentile</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the percentile ranking for each element in an array.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : np.ndarray</span>
+<span class="sd">        Input array.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        An array containing the percentile (from 0 to 1) of each element in x.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sorted_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">px</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
+        <span class="n">px</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">sorted_idx</span> <span class="o">==</span> <span class="n">n</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">px</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="k">pass</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Danis Yangaliev.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

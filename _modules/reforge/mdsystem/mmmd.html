@@ -1,0 +1,758 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>reforge.mdsystem.mmmd &mdash; reForge 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=b7a6b9b3" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            reForge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../why.html">Why use reForge?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">reForge API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">reForge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">reforge.mdsystem.mmmd</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for reforge.mdsystem.mmmd</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module mmmd</span>
+<span class="sd">===========</span>
+
+<span class="sd">This module defines classes and functions to set up and run coarse-grained (CG)</span>
+<span class="sd">molecular dynamics simulations using OpenMM and associated tools. It includes</span>
+<span class="sd">the system preparation, file management, and MD run routines.</span>
+
+<span class="sd">Classes</span>
+<span class="sd">-------</span>
+<span class="sd">MmSystem</span>
+<span class="sd">    Sets up and analyzes protein-nucleotide-lipid systems for MD simulations.</span>
+<span class="sd">MdRun</span>
+<span class="sd">    Inherits from MmSystem to perform an MD simulation run, including energy</span>
+<span class="sd">    minimization, equilibration, and production.</span>
+<span class="sd">    </span>
+<span class="sd">Helper Functions</span>
+<span class="sd">----------------</span>
+<span class="sd">sort_uld(alist)</span>
+<span class="sd">    Sorts characters in a list so that uppercase letters come first, then lowercase, </span>
+<span class="sd">    followed by digits.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib.resources</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">openmm</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openmm</span><span class="w"> </span><span class="kn">import</span> <span class="n">app</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openmm.unit</span><span class="w"> </span><span class="kn">import</span> <span class="n">nanometer</span><span class="p">,</span> <span class="n">molar</span>
+
+<span class="c1"># Local imports from reforge (only the needed modules)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">reforge</span><span class="w"> </span><span class="kn">import</span> <span class="n">pdbtools</span>
+
+
+<span class="c1">################################################################################</span>
+<span class="c1"># CG system class</span>
+<span class="c1">################################################################################</span>
+
+<div class="viewcode-block" id="MmSystem">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mmmd.MmSystem">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MmSystem</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set up and analyze protein–nucleotide–lipid systems for CG MD simulation.</span>
+
+<span class="sd">    This class initializes file paths and directories required for running CG</span>
+<span class="sd">    molecular dynamics simulations.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sysdir : str</span>
+<span class="sd">        Directory for the system files.</span>
+<span class="sd">    sysname : str</span>
+<span class="sd">        Name of the system.</span>
+<span class="sd">    **kwargs : dict, optional</span>
+<span class="sd">        Additional keyword arguments (currently unused).</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sysname : str</span>
+<span class="sd">        Name of the system.</span>
+<span class="sd">    sysdir : str</span>
+<span class="sd">        Absolute path to the system directory.</span>
+<span class="sd">    wdir : str</span>
+<span class="sd">        Working directory (sysdir joined with sysname).</span>
+<span class="sd">    inpdb : str</span>
+<span class="sd">        Path to the input PDB file.</span>
+<span class="sd">    syspdb : str</span>
+<span class="sd">        Path to the system PDB file.</span>
+<span class="sd">    sysxml : str</span>
+<span class="sd">        Path to the system XML file.</span>
+<span class="sd">    mdcpdb : str</span>
+<span class="sd">        Path to the MD configuration PDB file.</span>
+<span class="sd">    trjpdb : str</span>
+<span class="sd">        Path to the trajectory PDB file.</span>
+<span class="sd">    prodir : str</span>
+<span class="sd">        Directory for protein files.</span>
+<span class="sd">    nucdir : str</span>
+<span class="sd">        Directory for nucleotide files.</span>
+<span class="sd">    iondir : str</span>
+<span class="sd">        Directory for ion files.</span>
+<span class="sd">    ionpdb : str</span>
+<span class="sd">        Path to the ion PDB file.</span>
+<span class="sd">    topdir : str</span>
+<span class="sd">        Directory for topology files.</span>
+<span class="sd">    mapdir : str</span>
+<span class="sd">        Directory for mapping files.</span>
+<span class="sd">    mdpdir : str</span>
+<span class="sd">        Directory for MD parameter files.</span>
+<span class="sd">    cgdir : str</span>
+<span class="sd">        Directory for CG PDB files.</span>
+<span class="sd">    mddir : str</span>
+<span class="sd">        Directory for MD run files.</span>
+<span class="sd">    datdir : str</span>
+<span class="sd">        Directory for data files.</span>
+<span class="sd">    pngdir : str</span>
+<span class="sd">        Directory for PNG figures.</span>
+<span class="sd">    _chains : list</span>
+<span class="sd">        Cached list of chain identifiers.</span>
+<span class="sd">    _mdruns : list</span>
+<span class="sd">        Cached list of MD run directories.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">MDATDIR</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="s2">&quot;reforge&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;martini&quot;</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span>
+    <span class="n">MITPDIR</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="s2">&quot;reforge&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;martini&quot;</span> <span class="o">/</span> <span class="s2">&quot;itp&quot;</span>
+    <span class="n">NUC_RESNAMES</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;A&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;C&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;G&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;U&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;RA3&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;RA5&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;RC3&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;RC5&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;RG3&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;RG5&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;RU3&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;RU5&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sysdir</span><span class="p">,</span> <span class="n">sysname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the MD system with required directories and file paths.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sysdir : str</span>
+<span class="sd">            Directory for the system files.</span>
+<span class="sd">        sysname : str</span>
+<span class="sd">            Name of the system.</span>
+<span class="sd">        **kwargs : dict, optional</span>
+<span class="sd">            Additional keyword arguments.</span>
+<span class="sd">            </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Sets up paths to various files required for CG MD simulation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sysname</span> <span class="o">=</span> <span class="n">sysname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sysdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">sysdir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sysdir</span><span class="p">,</span> <span class="n">sysname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inpdb</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdir</span><span class="p">,</span> <span class="s2">&quot;inpdb.pdb&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">syspdb</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdir</span><span class="p">,</span> <span class="s2">&quot;system.pdb&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sysxml</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdir</span><span class="p">,</span> <span class="s2">&quot;system.xml&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mdcpdb</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdir</span><span class="p">,</span> <span class="s2">&quot;mdc.pdb&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trjpdb</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdir</span><span class="p">,</span> <span class="s2">&quot;traj.pdb&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prodir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdir</span><span class="p">,</span> <span class="s2">&quot;proteins&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nucdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdir</span><span class="p">,</span> <span class="s2">&quot;nucleotides&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iondir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdir</span><span class="p">,</span> <span class="s2">&quot;ions&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ionpdb</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iondir</span><span class="p">,</span> <span class="s2">&quot;ions.pdb&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdir</span><span class="p">,</span> <span class="s2">&quot;topol&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mapdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdir</span><span class="p">,</span> <span class="s2">&quot;map&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mdpdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdir</span><span class="p">,</span> <span class="s2">&quot;mdp&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cgdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdir</span><span class="p">,</span> <span class="s2">&quot;cgpdb&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mddir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdir</span><span class="p">,</span> <span class="s2">&quot;mdruns&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdir</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pngdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdir</span><span class="p">,</span> <span class="s2">&quot;png&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chains</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mdruns</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">chains</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieve the chain identifiers from the system PDB file.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            List of chain identifiers.</span>
+<span class="sd">            </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        If chain IDs have already been extracted, returns the cached list.</span>
+<span class="sd">        Otherwise, parses the system PDB file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chains</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chains</span>
+        <span class="n">chain_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">syspdb</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s2">&quot;ATOM&quot;</span><span class="p">,</span> <span class="s2">&quot;HETATM&quot;</span><span class="p">)):</span>
+                    <span class="n">chain_id</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">21</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>  <span class="c1"># Chain ID is at column 22 (index 21)</span>
+                    <span class="k">if</span> <span class="n">chain_id</span><span class="p">:</span>
+                        <span class="n">chain_names</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">chain_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chains</span> <span class="o">=</span> <span class="n">sort_uld</span><span class="p">(</span><span class="n">chain_names</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chains</span>
+
+    <span class="nd">@chains</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">chains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chains</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chains</span> <span class="o">=</span> <span class="n">chains</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mdruns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieve the list of MD run directories.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            List of MD run directory names.</span>
+<span class="sd">            </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        If the list is already cached, returns it. Otherwise, looks up the directories</span>
+<span class="sd">        in the MD runs folder.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mdruns</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mdruns</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mddir</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mdruns</span>
+        <span class="k">for</span> <span class="n">adir</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mddir</span><span class="p">)):</span>
+            <span class="n">dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mddir</span><span class="p">,</span> <span class="n">adir</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dir_path</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_mdruns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">adir</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mdruns</span>
+
+    <span class="nd">@mdruns</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mdruns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mdruns</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mdruns</span> <span class="o">=</span> <span class="n">mdruns</span>
+
+<div class="viewcode-block" id="MmSystem.prepare_files">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mmmd.MmSystem.prepare_files">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prepare_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepare simulation directories and copy necessary input files.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Creates directories (proteins, nucleotides, topology, mapping, MD parameters,</span>
+<span class="sd">        CG PDB, MD runs, data, PNG) and copies files from source directories.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Preparing files and directories&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prodir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nucdir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">topdir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mapdir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mdpdir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cgdir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># In case working directory is not present</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datdir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pngdir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># Create additional directory (e.g. grodir) if needed</span>
+        <span class="n">grodir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wdir</span><span class="p">,</span> <span class="s2">&quot;gro&quot;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">grodir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MDATDIR</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.mdp&quot;</span><span class="p">):</span>
+                <span class="n">fpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MDATDIR</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+                <span class="n">outpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mdpdir</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">outpath</span><span class="p">)</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MDATDIR</span><span class="p">,</span> <span class="s2">&quot;water.gro&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">wdir</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MITPDIR</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.itp&quot;</span><span class="p">):</span>
+                <span class="n">fpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MITPDIR</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+                <span class="n">outpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">topdir</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">outpath</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MmSystem.clean_pdb">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mmmd.MmSystem.clean_pdb">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clean_pdb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdb_file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Clean the starting PDB file using PDBfixer by OpenMM.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pdb_file : str</span>
+<span class="sd">            Path to the input PDB file.</span>
+<span class="sd">        **kwargs : dict, optional</span>
+<span class="sd">            Additional keyword arguments for the cleaning routine.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cleaning the PDB&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="n">pdbtools</span><span class="o">.</span><span class="n">clean_pdb</span><span class="p">(</span><span class="n">pdb_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inpdb</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MmSystem.forcefield">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mmmd.MmSystem.forcefield">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forcefield</span><span class="p">(</span><span class="n">force_field</span><span class="o">=</span><span class="s2">&quot;amber14-all.xml&quot;</span><span class="p">,</span> <span class="n">water_model</span><span class="o">=</span><span class="s2">&quot;amber14/tip3p.xml&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create and return an OpenMM ForceField object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        force_field : str, optional</span>
+<span class="sd">            Force field file or identifier (default: &#39;amber14-all.xml&#39;).</span>
+<span class="sd">        water_model : str, optional</span>
+<span class="sd">            Water model file or identifier (default: &#39;amber14/tip3p.xml&#39;).</span>
+<span class="sd">        **kwargs : dict, optional</span>
+<span class="sd">            Additional keyword arguments for the ForceField constructor.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        openmm.app.ForceField</span>
+<span class="sd">            The constructed ForceField object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">forcefield</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">ForceField</span><span class="p">(</span><span class="n">force_field</span><span class="p">,</span> <span class="n">water_model</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">forcefield</span></div>
+
+
+<div class="viewcode-block" id="MmSystem.modeller">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mmmd.MmSystem.modeller">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">modeller</span><span class="p">(</span><span class="n">inpdb</span><span class="p">,</span> <span class="n">forcefield</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a modeller object with added solvent.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inpdb : str</span>
+<span class="sd">            Path to the input PDB file.</span>
+<span class="sd">        forcefield : openmm.app.ForceField</span>
+<span class="sd">            The force field object to be used.</span>
+<span class="sd">        **kwargs : dict, optional</span>
+<span class="sd">            Additional keyword arguments for solvent addition. Default values include:</span>
+<span class="sd">                model : &#39;tip3p&#39;</span>
+<span class="sd">                boxShape : &#39;dodecahedron&#39;</span>
+<span class="sd">                padding : 1.0 * nanometer</span>
+<span class="sd">                positiveIon : &#39;Na+&#39;</span>
+<span class="sd">                negativeIon : &#39;Cl-&#39;</span>
+<span class="sd">                ionicStrength : 0.1 * molar</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        openmm.app.Modeller</span>
+<span class="sd">            The modeller object with solvent added.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="s2">&quot;tip3p&quot;</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;boxShape&quot;</span><span class="p">,</span> <span class="s2">&quot;dodecahedron&quot;</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;padding&quot;</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">nanometer</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;positiveIon&quot;</span><span class="p">,</span> <span class="s2">&quot;Na+&quot;</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;negativeIon&quot;</span><span class="p">,</span> <span class="s2">&quot;Cl-&quot;</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;ionicStrength&quot;</span><span class="p">,</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="n">molar</span><span class="p">)</span>
+        <span class="n">pdb_file</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">PDBFile</span><span class="p">(</span><span class="n">inpdb</span><span class="p">)</span>
+        <span class="n">modeller_obj</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">Modeller</span><span class="p">(</span><span class="n">pdb_file</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="n">pdb_file</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
+        <span class="n">modeller_obj</span><span class="o">.</span><span class="n">addSolvent</span><span class="p">(</span><span class="n">forcefield</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">modeller_obj</span></div>
+
+
+<div class="viewcode-block" id="MmSystem.model">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mmmd.MmSystem.model">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forcefield</span><span class="p">,</span> <span class="n">modeller_obj</span><span class="p">,</span> <span class="n">barostat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">thermostat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a simulation model using the specified force field and modeller.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        forcefield : openmm.app.ForceField</span>
+<span class="sd">            The force field object.</span>
+<span class="sd">        modeller_obj : openmm.app.Modeller</span>
+<span class="sd">            The modeller object with the prepared topology.</span>
+<span class="sd">        barostat : openmm.Force, optional</span>
+<span class="sd">            Barostat force to add (default: None).</span>
+<span class="sd">        thermostat : openmm.Force, optional</span>
+<span class="sd">            Thermostat force to add (default: None).</span>
+<span class="sd">        **kwargs : dict, optional</span>
+<span class="sd">            Additional keyword arguments for creating the system. Defaults include:</span>
+<span class="sd">                nonbondedMethod : app.PME</span>
+<span class="sd">                nonbondedCutoff : 1.0 * nanometer</span>
+<span class="sd">                constraints : app.HBonds</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        openmm.System</span>
+<span class="sd">            The simulation system created by the force field.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;nonbondedMethod&quot;</span><span class="p">,</span> <span class="n">app</span><span class="o">.</span><span class="n">PME</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;nonbondedCutoff&quot;</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">nanometer</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;constraints&quot;</span><span class="p">,</span> <span class="n">app</span><span class="o">.</span><span class="n">HBonds</span><span class="p">)</span>
+        <span class="n">model_obj</span> <span class="o">=</span> <span class="n">forcefield</span><span class="o">.</span><span class="n">createSystem</span><span class="p">(</span><span class="n">modeller_obj</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">barostat</span><span class="p">:</span>
+            <span class="n">model_obj</span><span class="o">.</span><span class="n">addForce</span><span class="p">(</span><span class="n">barostat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">thermostat</span><span class="p">:</span>
+            <span class="n">model_obj</span><span class="o">.</span><span class="n">addForce</span><span class="p">(</span><span class="n">thermostat</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">syspdb</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">app</span><span class="o">.</span><span class="n">PDBFile</span><span class="o">.</span><span class="n">writeFile</span><span class="p">(</span><span class="n">modeller_obj</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="n">modeller_obj</span><span class="o">.</span><span class="n">positions</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">keepIds</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sysxml</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">mm</span><span class="o">.</span><span class="n">XmlSerializer</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">model_obj</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">model_obj</span></div>
+</div>
+
+
+
+<span class="c1">################################################################################</span>
+<span class="c1"># MDRun class</span>
+<span class="c1">################################################################################</span>
+
+<div class="viewcode-block" id="MdRun">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mmmd.MdRun">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MdRun</span><span class="p">(</span><span class="n">MmSystem</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run molecular dynamics (MD) simulation using specified input files.</span>
+
+<span class="sd">    This class extends MmSystem to perform an MD simulation run including</span>
+<span class="sd">    energy minimization, equilibration, and production.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sysdir : str</span>
+<span class="sd">        Directory for the system files.</span>
+<span class="sd">    sysname : str</span>
+<span class="sd">        Name of the system.</span>
+<span class="sd">    runname : str</span>
+<span class="sd">        Name of the MD run.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rundir : str</span>
+<span class="sd">        Directory for the run files.</span>
+<span class="sd">    rmsdir : str</span>
+<span class="sd">        Directory for RMS analysis.</span>
+<span class="sd">    covdir : str</span>
+<span class="sd">        Directory for covariance analysis.</span>
+<span class="sd">    lrtdir : str</span>
+<span class="sd">        Directory for LRT analysis.</span>
+<span class="sd">    cludir : str</span>
+<span class="sd">        Directory for clustering.</span>
+<span class="sd">    pngdir : str</span>
+<span class="sd">        Directory for output figures.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sysdir</span><span class="p">,</span> <span class="n">sysname</span><span class="p">,</span> <span class="n">runname</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the MD run with required directories and files.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sysdir : str</span>
+<span class="sd">            Directory for the system files.</span>
+<span class="sd">        sysname : str</span>
+<span class="sd">            Name of the system.</span>
+<span class="sd">        runname : str</span>
+<span class="sd">            Name of the MD run.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sysdir</span><span class="p">,</span> <span class="n">sysname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runname</span> <span class="o">=</span> <span class="n">runname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rundir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mddir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">runname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rmsdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="p">,</span> <span class="s2">&quot;rms_analysis&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">covdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="p">,</span> <span class="s2">&quot;cov_analysis&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lrtdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="p">,</span> <span class="s2">&quot;lrt_analysis&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cludir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="p">,</span> <span class="s2">&quot;clusters&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pngdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="p">,</span> <span class="s2">&quot;png&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MdRun.prepare_files">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mmmd.MdRun.prepare_files">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prepare_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create directories required for the MD run.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Creates directories for run outputs including RMS, covariance, LRT,</span>
+<span class="sd">        clustering, and figures.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rmsdir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">covdir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lrtdir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cludir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pngdir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MdRun.build_modeller">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mmmd.MdRun.build_modeller">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build_modeller</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a modeller object from the system PDB file.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        openmm.app.Modeller</span>
+<span class="sd">            The modeller object initialized with the system topology and positions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pdb_file</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">PDBFile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">syspdb</span><span class="p">)</span>
+        <span class="n">modeller_obj</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">Modeller</span><span class="p">(</span><span class="n">pdb_file</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="n">pdb_file</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">modeller_obj</span></div>
+
+
+<div class="viewcode-block" id="MdRun.simulation">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mmmd.MdRun.simulation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">simulation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modeller_obj</span><span class="p">,</span> <span class="n">integrator</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize and return a simulation object for the MD run.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        modeller_obj : openmm.app.Modeller</span>
+<span class="sd">            The modeller object with prepared topology and positions.</span>
+<span class="sd">        integrator : openmm.Integrator</span>
+<span class="sd">            The integrator for the simulation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        openmm.app.Simulation</span>
+<span class="sd">            The initialized simulation object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">simulation_obj</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">Simulation</span><span class="p">(</span><span class="n">modeller_obj</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sysxml</span><span class="p">,</span> <span class="n">integrator</span><span class="p">)</span>
+        <span class="n">simulation_obj</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">modeller_obj</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">simulation_obj</span></div>
+
+
+<div class="viewcode-block" id="MdRun.save_state">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mmmd.MdRun.save_state">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation_obj</span><span class="p">,</span> <span class="n">file_prefix</span><span class="o">=</span><span class="s2">&quot;sim&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Save the current simulation state to XML and PDB files.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        simulation_obj : openmm.app.Simulation</span>
+<span class="sd">            The simulation object.</span>
+<span class="sd">        file_prefix : str, optional</span>
+<span class="sd">            Prefix for the state files (default: &#39;sim&#39;).</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Saves the simulation state as an XML file and writes the current positions to a PDB file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pdb_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="p">,</span> <span class="n">file_prefix</span> <span class="o">+</span> <span class="s2">&quot;.pdb&quot;</span><span class="p">)</span>
+        <span class="n">xml_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="p">,</span> <span class="n">file_prefix</span> <span class="o">+</span> <span class="s2">&quot;.xml&quot;</span><span class="p">)</span>
+        <span class="n">simulation_obj</span><span class="o">.</span><span class="n">saveState</span><span class="p">(</span><span class="n">xml_file</span><span class="p">)</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">simulation_obj</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="n">getPositions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">positions</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">getPositions</span><span class="p">()</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pdb_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">app</span><span class="o">.</span><span class="n">PDBFile</span><span class="o">.</span><span class="n">writeFile</span><span class="p">(</span><span class="n">simulation_obj</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="n">positions</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">keepIds</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MdRun.em">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mmmd.MdRun.em">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">em</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation_obj</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform energy minimization for the simulation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        simulation_obj : openmm.app.Simulation</span>
+<span class="sd">            The simulation object.</span>
+<span class="sd">        tolerance : float, optional</span>
+<span class="sd">            Tolerance for energy minimization (default: 100).</span>
+<span class="sd">        max_iterations : int, optional</span>
+<span class="sd">            Maximum number of iterations (default: 1000).</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Minimizes the energy, saves the minimized state, and logs progress.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Minimizing energy...&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="n">log_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="p">,</span> <span class="s2">&quot;em.log&quot;</span><span class="p">)</span>
+        <span class="n">reporter</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">StateDataReporter</span><span class="p">(</span>
+            <span class="n">log_file</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">potentialEnergy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="n">simulation_obj</span><span class="o">.</span><span class="n">reporters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reporter</span><span class="p">)</span>
+        <span class="n">simulation_obj</span><span class="o">.</span><span class="n">minimizeEnergy</span><span class="p">(</span><span class="n">tolerance</span><span class="p">,</span> <span class="n">max_iterations</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_state</span><span class="p">(</span><span class="n">simulation_obj</span><span class="p">,</span> <span class="s2">&quot;em&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Minimization complete.&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MdRun.eq">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mmmd.MdRun.eq">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation_obj</span><span class="p">,</span> <span class="n">nsteps</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">nlog</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run equilibration simulation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        simulation_obj : openmm.app.Simulation</span>
+<span class="sd">            The simulation object.</span>
+<span class="sd">        nsteps : int, optional</span>
+<span class="sd">            Number of steps for equilibration (default: 10000).</span>
+<span class="sd">        nlog : int, optional</span>
+<span class="sd">            Logging frequency (default: 10000).</span>
+<span class="sd">        **kwargs : dict, optional</span>
+<span class="sd">            Additional keyword arguments for the StateDataReporter.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Loads the minimized state, runs equilibration, and saves the equilibrated state.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting equilibration...&quot;</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;step&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;potentialEnergy&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;density&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">em_xml</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="p">,</span> <span class="s2">&quot;em.xml&quot;</span><span class="p">)</span>
+        <span class="n">log_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="p">,</span> <span class="s2">&quot;eq.log&quot;</span><span class="p">)</span>
+        <span class="n">reporter</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">StateDataReporter</span><span class="p">(</span><span class="n">log_file</span><span class="p">,</span> <span class="n">nlog</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">simulation_obj</span><span class="o">.</span><span class="n">loadState</span><span class="p">(</span><span class="n">em_xml</span><span class="p">)</span>
+        <span class="n">simulation_obj</span><span class="o">.</span><span class="n">reporters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reporter</span><span class="p">)</span>
+        <span class="n">simulation_obj</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">nsteps</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_state</span><span class="p">(</span><span class="n">simulation_obj</span><span class="p">,</span> <span class="s2">&quot;eq&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Equilibration complete.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MdRun.md">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mmmd.MdRun.md">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">md</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation_obj</span><span class="p">,</span> <span class="n">nsteps</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span> <span class="n">nout</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">nlog</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">nchk</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run production MD simulation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        simulation_obj : openmm.app.Simulation</span>
+<span class="sd">            The simulation object.</span>
+<span class="sd">        nsteps : int, optional</span>
+<span class="sd">            Number of production steps (default: 100000).</span>
+<span class="sd">        nout : int, optional</span>
+<span class="sd">            Frequency for writing trajectory frames (default: 1000).</span>
+<span class="sd">        nlog : int, optional</span>
+<span class="sd">            Logging frequency (default: 10000).</span>
+<span class="sd">        nchk : int, optional</span>
+<span class="sd">            Checkpoint frequency (default: 10000).</span>
+<span class="sd">        **kwargs : dict, optional</span>
+<span class="sd">            Additional keyword arguments for the StateDataReporter.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Loads the equilibrated state, runs production, and saves the final simulation state.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Production run...&quot;</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;step&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;potentialEnergy&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;density&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">eq_xml</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="p">,</span> <span class="s2">&quot;eq.xml&quot;</span><span class="p">)</span>
+        <span class="n">trj_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="p">,</span> <span class="s2">&quot;md.dcd&quot;</span><span class="p">)</span>
+        <span class="n">log_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="p">,</span> <span class="s2">&quot;md.log&quot;</span><span class="p">)</span>
+        <span class="n">xml_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="p">,</span> <span class="s2">&quot;md.xml&quot;</span><span class="p">)</span>
+        <span class="n">pdb_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="p">,</span> <span class="s2">&quot;md.pdb&quot;</span><span class="p">)</span>
+        <span class="n">trj_reporter</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">DCDReporter</span><span class="p">(</span><span class="n">trj_file</span><span class="p">,</span> <span class="n">nout</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">log_reporter</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">StateDataReporter</span><span class="p">(</span><span class="n">log_file</span><span class="p">,</span> <span class="n">nlog</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">xml_reporter</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">CheckpointReporter</span><span class="p">(</span><span class="n">xml_file</span><span class="p">,</span> <span class="n">nchk</span><span class="p">,</span> <span class="n">writeState</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># If PDBReporter is not used, remove the assignment to avoid unused variable warnings.</span>
+        <span class="n">reporters</span> <span class="o">=</span> <span class="p">[</span><span class="n">trj_reporter</span><span class="p">,</span> <span class="n">log_reporter</span><span class="p">,</span> <span class="n">xml_reporter</span><span class="p">]</span>
+        <span class="n">simulation_obj</span><span class="o">.</span><span class="n">loadState</span><span class="p">(</span><span class="n">eq_xml</span><span class="p">)</span>
+        <span class="n">simulation_obj</span><span class="o">.</span><span class="n">reporters</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">reporters</span><span class="p">)</span>
+        <span class="n">simulation_obj</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">nsteps</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_state</span><span class="p">(</span><span class="n">simulation_obj</span><span class="p">,</span> <span class="s2">&quot;md&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Production complete.&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="c1">################################################################################</span>
+<span class="c1"># Helper functions</span>
+<span class="c1">################################################################################</span>
+
+<div class="viewcode-block" id="sort_uld">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mmmd.sort_uld">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">sort_uld</span><span class="p">(</span><span class="n">alist</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sort characters in a list in a specific order.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    alist : list of str</span>
+<span class="sd">        List of characters to sort.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of str</span>
+<span class="sd">        Sorted list with uppercase letters first, then lowercase letters, and digits last.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function is used to help organize GROMACS multichain files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">slist</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">alist</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">isdigit</span><span class="p">(),</span> <span class="n">x</span><span class="o">.</span><span class="n">islower</span><span class="p">(),</span> <span class="n">x</span><span class="o">.</span><span class="n">isupper</span><span class="p">(),</span> <span class="n">x</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">slist</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Danis Yangaliev.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

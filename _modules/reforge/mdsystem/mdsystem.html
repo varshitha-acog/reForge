@@ -1,0 +1,766 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>reforge.mdsystem.mdsystem &mdash; reForge 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=b7a6b9b3" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            reForge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../why.html">Why use reForge?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">reForge API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">reForge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">reforge.mdsystem.mdsystem</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for reforge.mdsystem.mdsystem</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;File: mdsystem.py</span>
+
+<span class="sd">Description:</span>
+<span class="sd">    This module provides classes and functions for setting up, running, and</span>
+<span class="sd">    analyzing molecular dynamics (MD) simulations.  The main</span>
+<span class="sd">    classes include:</span>
+
+<span class="sd">Usage:</span>
+<span class="sd">  </span>
+<span class="sd">Requirements:</span>
+<span class="sd">    - Python 3.x</span>
+<span class="sd">    - MDAnalysis</span>
+<span class="sd">    - NumPy</span>
+<span class="sd">    - Pandas</span>
+<span class="sd">    - The reforge package and its dependencies</span>
+
+<span class="sd">Author: DY</span>
+<span class="sd">Date: 2025-02-27</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">reforge</span><span class="w"> </span><span class="kn">import</span> <span class="n">cli</span><span class="p">,</span> <span class="n">mdm</span><span class="p">,</span> <span class="n">pdbtools</span><span class="p">,</span> <span class="n">io</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">reforge.pdbtools</span><span class="w"> </span><span class="kn">import</span> <span class="n">AtomList</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">reforge.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">cd</span><span class="p">,</span> <span class="n">clean_dir</span><span class="p">,</span> <span class="n">logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">reforge.martini</span><span class="w"> </span><span class="kn">import</span> <span class="n">getgo</span><span class="p">,</span> <span class="n">martini_tools</span>
+
+<span class="c1">################################################################################</span>
+<span class="c1"># GMX system class</span>
+<span class="c1">################################################################################</span>
+
+<div class="viewcode-block" id="MDSystem">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MDSystem</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Most attributes are paths to files and directories needed to set up</span>
+<span class="sd">    and run the MD simulation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">NUC_RESNAMES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;RA3&quot;</span><span class="p">,</span> <span class="s2">&quot;RA5&quot;</span><span class="p">,</span> <span class="s2">&quot;RC3&quot;</span><span class="p">,</span> <span class="s2">&quot;RC5&quot;</span><span class="p">,</span> 
+                    <span class="s2">&quot;RG3&quot;</span><span class="p">,</span> <span class="s2">&quot;RG5&quot;</span><span class="p">,</span> <span class="s2">&quot;RU3&quot;</span><span class="p">,</span> <span class="s2">&quot;RU5&quot;</span><span class="p">,]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sysdir</span><span class="p">,</span> <span class="n">sysname</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes the MD system with required directories and file paths.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            sysdir (str): Base directory for collection of MD systems</span>
+<span class="sd">            sysname (str): Name of the MD system.</span>
+
+<span class="sd">        Sets up paths for various files required for coarse-grained MD simulation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sysname</span> <span class="o">=</span> <span class="n">sysname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sysdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">sysdir</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sysdir</span> <span class="o">/</span> <span class="n">sysname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inpdb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;inpdb.pdb&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">solupdb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;solute.pdb&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">syspdb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;system.pdb&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prodir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;proteins&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nucdir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;nucleotides&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iondir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;ions&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ionpdb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iondir</span> <span class="o">/</span> <span class="s2">&quot;ions.pdb&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topdir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;topol&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mapdir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;map&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cgdir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;cgpdb&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mddir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;mdruns&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datdir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pngdir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;png&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">chains</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieves and returns a sorted list of chain identifiers from the</span>
+<span class="sd">        input PDB.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Sorted chain identifiers extracted from the PDB file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">atoms</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">pdb2atomlist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inpdb</span><span class="p">)</span>
+        <span class="n">chains</span> <span class="o">=</span> <span class="n">pdbtools</span><span class="o">.</span><span class="n">sort_uld</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">atoms</span><span class="o">.</span><span class="n">chids</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">chains</span>
+
+<div class="viewcode-block" id="MDSystem.sort_input_pdb">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.sort_input_pdb">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sort_input_pdb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_pdb</span><span class="o">=</span><span class="s2">&quot;inpdb.pdb&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sorts and renames atoms and chains in the input PDB file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            in_pdb (str): Path to the input PDB file (default: &quot;inpdb.pdb&quot;).</span>
+
+<span class="sd">        Uses pdbtools to perform sorting and renaming, saving the result to self.inpdb.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">cd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">):</span>
+            <span class="n">pdbtools</span><span class="o">.</span><span class="n">sort_pdb</span><span class="p">(</span><span class="n">in_pdb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inpdb</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDSystem.clean_pdb_mm">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.clean_pdb_mm">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clean_pdb_mm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_pdb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cleans the starting PDB file using PDBfixer (via OpenMM).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            in_pdb (str, optional): Input PDB file to clean. If None, uses self.inpdb.</span>
+<span class="sd">            kwargs: Additional keyword arguments for pdbtools.clean_pdb.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Cleaning the PDB using OpenMM&#39;s PDBfixer...&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">in_pdb</span><span class="p">:</span>
+            <span class="n">in_pdb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inpdb</span>
+        <span class="n">pdbtools</span><span class="o">.</span><span class="n">clean_pdb</span><span class="p">(</span><span class="n">in_pdb</span><span class="p">,</span> <span class="n">in_pdb</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDSystem.clean_pdb_gmx">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.clean_pdb_gmx">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clean_pdb_gmx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_pdb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cleans the PDB file using GROMACS pdb2gmx tool.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            in_pdb (str, optional): Input PDB file to clean. If None, uses self.inpdb.</span>
+<span class="sd">            kwargs: Additional keyword arguments for the GROMACS command.</span>
+
+<span class="sd">        After running pdb2gmx, cleans up temporary files (e.g., &quot;topol*&quot; and &quot;posre*&quot;).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Cleaning the PDB using GROMACS pdb2gmx...&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">in_pdb</span><span class="p">:</span>
+            <span class="n">in_pdb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inpdb</span>
+        <span class="k">with</span> <span class="n">cd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">):</span>
+            <span class="n">cli</span><span class="o">.</span><span class="n">gmx</span><span class="p">(</span><span class="s2">&quot;pdb2gmx&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">in_pdb</span><span class="p">,</span> <span class="n">o</span><span class="o">=</span><span class="n">in_pdb</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">clean_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;topol*&quot;</span><span class="p">)</span>
+        <span class="n">clean_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;posre*&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDSystem.split_chains">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.split_chains">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">split_chains</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Splits the input PDB file into separate files for each chain.</span>
+
+<span class="sd">        Nucleotide chains are saved to self.nucdir, while protein chains are saved to self.prodir.</span>
+<span class="sd">        The determination is based on the residue names.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">it_is_nucleotide</span><span class="p">(</span><span class="n">atoms</span><span class="p">):</span>
+            <span class="c1"># Check if the chain is nucleotide based on residue name.</span>
+            <span class="k">return</span> <span class="n">atoms</span><span class="o">.</span><span class="n">resnames</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">NUC_RESNAMES</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Splitting chains from the input PDB...&quot;</span><span class="p">)</span>
+        <span class="n">system</span> <span class="o">=</span> <span class="n">pdbtools</span><span class="o">.</span><span class="n">pdb2system</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inpdb</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">system</span><span class="o">.</span><span class="n">chains</span><span class="p">():</span>
+            <span class="n">atoms</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">atoms</span>
+            <span class="k">if</span> <span class="n">it_is_nucleotide</span><span class="p">(</span><span class="n">atoms</span><span class="p">):</span>
+                <span class="n">out_pdb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nucdir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;chain_</span><span class="si">{</span><span class="n">chain</span><span class="o">.</span><span class="n">chid</span><span class="si">}</span><span class="s2">.pdb&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out_pdb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prodir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;chain_</span><span class="si">{</span><span class="n">chain</span><span class="o">.</span><span class="n">chid</span><span class="si">}</span><span class="s2">.pdb&quot;</span>
+            <span class="n">atoms</span><span class="o">.</span><span class="n">write_pdb</span><span class="p">(</span><span class="n">out_pdb</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDSystem.clean_chains_mm">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.clean_chains_mm">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clean_chains_mm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cleans chain-specific PDB files using PDBfixer (OpenMM).</span>
+
+<span class="sd">        Kwargs are passed to pdbtools.clean_pdb. Also renames chain IDs based on the file name.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;add_missing_atoms&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;add_hydrogens&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;pH&quot;</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Cleaning chain PDBs using OpenMM...&quot;</span><span class="p">)</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prodir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">())</span>
+        <span class="n">files</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nucdir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">())</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="n">pdbtools</span><span class="o">.</span><span class="n">clean_pdb</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">new_chain_id</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;chain_&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">pdbtools</span><span class="o">.</span><span class="n">rename_chain_in_pdb</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">new_chain_id</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDSystem.clean_chains_gmx">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.clean_chains_gmx">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clean_chains_gmx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cleans chain-specific PDB files using GROMACS pdb2gmx tool.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            kwargs: Additional keyword arguments for the GROMACS command.</span>
+
+<span class="sd">        Processes all files in the protein and nucleotide directories, renaming chains</span>
+<span class="sd">        and cleaning temporary files afterward.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Cleaning chain PDBs using GROMACS pdb2gmx...&quot;</span><span class="p">)</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prodir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)]</span>
+        <span class="n">files</span> <span class="o">+=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nucdir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">)]</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">cd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                <span class="n">new_chain_id</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;chain_&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">cli</span><span class="o">.</span><span class="n">gmx</span><span class="p">(</span><span class="s2">&quot;pdb2gmx&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">file</span><span class="p">,</span> <span class="n">o</span><span class="o">=</span><span class="n">file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">pdbtools</span><span class="o">.</span><span class="n">rename_chain_and_histidines_in_pdb</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">new_chain_id</span><span class="p">)</span>
+            <span class="n">clean_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prodir</span><span class="p">)</span>
+            <span class="n">clean_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nucdir</span><span class="p">)</span>
+        <span class="n">clean_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;topol*&quot;</span><span class="p">)</span>
+        <span class="n">clean_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;posre*&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDSystem.get_go_maps">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.get_go_maps">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_go_maps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieves GO contact maps for proteins using the RCSU server.</span>
+<span class="sd">        </span>
+<span class="sd">        http://info.ifpan.edu.pl/~rcsu/rcsu/index.html</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            append (bool, optional): If True, filters out maps that already exist in self.mapdir.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Getting GO-maps&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="n">pdbs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">prodir</span> <span class="o">/</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prodir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()])</span>
+        <span class="n">map_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;pdb&quot;</span><span class="p">,</span> <span class="s2">&quot;map&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prodir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()]</span>
+        <span class="k">if</span> <span class="n">append</span><span class="p">:</span>
+            <span class="n">pdbs</span> <span class="o">=</span> <span class="p">[</span><span class="n">pdb</span> <span class="k">for</span> <span class="n">pdb</span><span class="p">,</span> <span class="n">amap</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">pdbs</span><span class="p">,</span> <span class="n">map_names</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">amap</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapdir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()]]</span>
+        <span class="k">if</span> <span class="n">pdbs</span><span class="p">:</span>
+            <span class="n">getgo</span><span class="o">.</span><span class="n">get_go</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mapdir</span><span class="p">,</span> <span class="n">pdbs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Maps already there&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDSystem.martinize_proteins_go">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.martinize_proteins_go">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">martinize_proteins_go</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Performs virtual site-based GoMartini coarse-graining on protein PDBs.</span>
+
+<span class="sd">        Uses Martinize2 from https://github.com/marrink-lab/vermouth-martinize.</span>
+<span class="sd">        All keyword arguments are passed directly to Martinize2. </span>
+<span class="sd">        Run `martinize2 -h` to see the full list of parameters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            append (bool, optional): If True, only processes proteins for </span>
+<span class="sd">                which corresponding topology files do not already exist.</span>
+<span class="sd">            kwargs: Additional parameters for the martinize_go function.</span>
+
+<span class="sd">        Generates .itp files and cleans temporary directories after processing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Working on proteins (GoMartini)...&quot;</span><span class="p">)</span>
+        <span class="n">pdbs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prodir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()])</span>
+        <span class="n">itps</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;pdb&quot;</span><span class="p">,</span> <span class="s2">&quot;itp&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">pdbs</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">append</span><span class="p">:</span>
+            <span class="n">pdbs</span> <span class="o">=</span> <span class="p">[</span><span class="n">pdb</span> <span class="k">for</span> <span class="n">pdb</span><span class="p">,</span> <span class="n">itp</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">pdbs</span><span class="p">,</span> <span class="n">itps</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">topdir</span> <span class="o">/</span> <span class="n">itp</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">clean_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">topdir</span><span class="p">,</span> <span class="s2">&quot;go_*.itp&quot;</span><span class="p">)</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">topdir</span> <span class="o">/</span> <span class="s2">&quot;go_atomtypes.itp&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">file_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;[ atomtypes ]</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">topdir</span> <span class="o">/</span> <span class="s2">&quot;go_nbparams.itp&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">file_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;[ nonbond_params ]</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">pdbs</span><span class="p">:</span>
+            <span class="n">in_pdb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prodir</span> <span class="o">/</span> <span class="n">file</span>
+            <span class="n">cg_pdb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cgdir</span> <span class="o">/</span> <span class="n">file</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">go_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapdir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.map&quot;</span>
+            <span class="n">martini_tools</span><span class="o">.</span><span class="n">martinize_go</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">topdir</span><span class="p">,</span> <span class="n">in_pdb</span><span class="p">,</span> <span class="n">cg_pdb</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">clean_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cgdir</span><span class="p">)</span>
+        <span class="n">clean_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
+        <span class="n">clean_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;*.itp&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDSystem.martinize_proteins_en">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.martinize_proteins_en">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">martinize_proteins_en</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates an elastic network for proteins using the Martini elastic network model.</span>
+
+<span class="sd">        Uses Martinize2 from https://github.com/marrink-lab/vermouth-martinize.</span>
+<span class="sd">        All keyword arguments are passed directly to Martinize2. </span>
+<span class="sd">        Run `martinize2 -h` to see the full list of parameters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            append (bool, optional): If True, processes only proteins that do not </span>
+<span class="sd">                already have corresponding topology files.</span>
+<span class="sd">            kwargs: Elastic network parameters (e.g., elastic bond force constants, cutoffs).</span>
+
+<span class="sd">        Modifies the generated ITP files by replacing the default molecule name </span>
+<span class="sd">        with the actual protein name and cleans temporary files.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Working on proteins (Elastic Network)...&quot;</span><span class="p">)</span>
+        <span class="n">pdbs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prodir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()])</span>
+        <span class="n">itps</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;pdb&quot;</span><span class="p">,</span> <span class="s2">&quot;itp&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">pdbs</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">append</span><span class="p">:</span>
+            <span class="n">pdbs</span> <span class="o">=</span> <span class="p">[</span><span class="n">pdb</span> <span class="k">for</span> <span class="n">pdb</span><span class="p">,</span> <span class="n">itp</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">pdbs</span><span class="p">,</span> <span class="n">itps</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">topdir</span> <span class="o">/</span> <span class="n">itp</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()]</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">pdbs</span><span class="p">:</span>
+            <span class="n">in_pdb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prodir</span> <span class="o">/</span> <span class="n">file</span>
+            <span class="n">cg_pdb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cgdir</span> <span class="o">/</span> <span class="n">file</span>
+            <span class="n">new_itp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;molecule_0.itp&quot;</span>
+            <span class="n">updated_itp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">topdir</span> <span class="o">/</span> <span class="n">file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;pdb&quot;</span><span class="p">,</span> <span class="s2">&quot;itp&quot;</span><span class="p">)</span>
+            <span class="n">new_top</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;protein.top&quot;</span>
+            <span class="n">martini_tools</span><span class="o">.</span><span class="n">martinize_en</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">in_pdb</span><span class="p">,</span> <span class="n">cg_pdb</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">new_itp</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">updated_content</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;molecule_0&quot;</span><span class="p">,</span> <span class="n">file</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">updated_itp</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">updated_content</span><span class="p">)</span>
+            <span class="n">new_top</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+        <span class="n">clean_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cgdir</span><span class="p">)</span>
+        <span class="n">clean_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDSystem.martinize_nucleotides">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.martinize_nucleotides">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">martinize_nucleotides</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Performs coarse-graining on nucleotide PDBs using the martinize_nucleotide tool.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            append (bool, optional): If True, skips already existing topologies.</span>
+<span class="sd">            kwargs: Additional parameters for the martinize_nucleotide function.</span>
+
+<span class="sd">        After processing, renames files and moves the resulting ITP files to the topology directory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Working on nucleotides...&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nucdir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">():</span>
+            <span class="n">in_pdb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nucdir</span> <span class="o">/</span> <span class="n">file</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">cg_pdb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cgdir</span> <span class="o">/</span> <span class="n">file</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">martini_tools</span><span class="o">.</span><span class="n">martinize_nucleotide</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">in_pdb</span><span class="p">,</span> <span class="n">cg_pdb</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">nfiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Nucleic&quot;</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">nfiles</span><span class="p">:</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="n">f</span>
+            <span class="n">command</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;sed -i s/Nucleic_/chain_/g </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">sp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">outfile</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;Nucleic&quot;</span><span class="p">,</span> <span class="s2">&quot;chain&quot;</span><span class="p">)</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">topdir</span> <span class="o">/</span> <span class="n">outfile</span><span class="p">)</span>
+        <span class="n">clean_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cgdir</span><span class="p">)</span>
+        <span class="n">clean_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDSystem.martinize_rna">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.martinize_rna">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">martinize_rna</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Coarse-grains RNA molecules using the martinize_rna tool.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            append (bool, optional): If True, processes only RNA files without existing topologies.</span>
+<span class="sd">            kwargs: Additional parameters for the martinize_rna function.</span>
+
+<span class="sd">        Exits the process with an error message if coarse-graining fails.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Working on RNA molecules...&quot;</span><span class="p">)</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nucdir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()]</span>
+        <span class="k">if</span> <span class="n">append</span><span class="p">:</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">topdir</span> <span class="o">/</span> <span class="n">f</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;pdb&quot;</span><span class="p">,</span> <span class="s2">&quot;itp&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">exists</span><span class="p">()]</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="n">molname</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">in_pdb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nucdir</span> <span class="o">/</span> <span class="n">file</span>
+            <span class="n">cg_pdb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cgdir</span> <span class="o">/</span> <span class="n">file</span>
+            <span class="n">cg_itp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">topdir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">molname</span><span class="si">}</span><span class="s2">.itp&quot;</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">martini_tools</span><span class="o">.</span><span class="n">martinize_rna</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> 
+                    <span class="n">f</span><span class="o">=</span><span class="n">in_pdb</span><span class="p">,</span> <span class="n">os</span><span class="o">=</span><span class="n">cg_pdb</span><span class="p">,</span> <span class="n">ot</span><span class="o">=</span><span class="n">cg_itp</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="n">molname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not coarse-grain </span><span class="si">{</span><span class="n">in_pdb</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDSystem.make_cg_solute_pdb">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.make_cg_solute_pdb">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_cg_solute_pdb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Merges coarse-grained PDB files into a single solute PDB file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            kwargs: Additional keyword arguments for the GROMACS editconf command. Defaults:</span>
+<span class="sd">                - d: Distance parameter (default: 1.0)</span>
+<span class="sd">                - bt: Box type (default: &quot;dodecahedron&quot;).</span>
+
+<span class="sd">        Uses the AtomList from pdbtools to merge and renumber atoms, then calls the</span>
+<span class="sd">        GROMACS &#39;editconf&#39; command to finalize the solute PDB.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;bt&quot;</span><span class="p">,</span> <span class="s2">&quot;dodecahedron&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Merging CG PDB files into a single solute PDB...&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">cd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">):</span>
+            <span class="n">cg_pdb_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cgdir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()]</span>
+            <span class="n">cg_pdb_files</span> <span class="o">=</span> <span class="n">pdbtools</span><span class="o">.</span><span class="n">sort_uld</span><span class="p">(</span><span class="n">cg_pdb_files</span><span class="p">)</span>
+            <span class="n">cg_pdb_files</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cgdir</span> <span class="o">/</span> <span class="n">fname</span> <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">cg_pdb_files</span><span class="p">]</span>
+            <span class="n">all_atoms</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">cg_pdb_files</span><span class="p">:</span>
+                <span class="n">atoms</span> <span class="o">=</span> <span class="n">pdbtools</span><span class="o">.</span><span class="n">pdb2atomlist</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+                <span class="n">all_atoms</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span>
+            <span class="n">all_atoms</span><span class="o">.</span><span class="n">renumber</span><span class="p">()</span>
+            <span class="n">all_atoms</span><span class="o">.</span><span class="n">write_pdb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">solupdb</span><span class="p">)</span>
+            <span class="n">cli</span><span class="o">.</span><span class="n">gmx</span><span class="p">(</span><span class="s2">&quot;editconf&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">solupdb</span><span class="p">,</span> <span class="n">o</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">solupdb</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDSystem.find_resolved_ions">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.find_resolved_ions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find_resolved_ions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;MG&quot;</span><span class="p">,</span> <span class="s2">&quot;ZN&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">)):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Identifies resolved ions in the input PDB file and writes them to &quot;ions.pdb&quot;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            mask (list, optional): List of ion identifiers to look for (default: [&quot;MG&quot;, &quot;ZN&quot;, &quot;K&quot;]).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pdbtools</span><span class="o">.</span><span class="n">mask_atoms</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inpdb</span><span class="p">,</span> <span class="s2">&quot;ions.pdb&quot;</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDSystem.count_resolved_ions">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.count_resolved_ions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">count_resolved_ions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ions</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;MG&quot;</span><span class="p">,</span> <span class="s2">&quot;ZN&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">)):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Counts the number of resolved ions in the system PDB file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ions (list, optional): </span>
+<span class="sd">            List of ion names to count (default: [&quot;MG&quot;, &quot;ZN&quot;, &quot;K&quot;]).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------  </span>
+<span class="sd">        dict: </span>
+<span class="sd">            A dictionary mapping ion names to their counts.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">counts</span> <span class="o">=</span> <span class="p">{</span><span class="n">ion</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">ion</span> <span class="ow">in</span> <span class="n">ions</span><span class="p">}</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">syspdb</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;ATOM&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;HETATM&quot;</span><span class="p">):</span>
+                    <span class="n">current_ion</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">16</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">current_ion</span> <span class="ow">in</span> <span class="n">ions</span><span class="p">:</span>
+                        <span class="n">counts</span><span class="p">[</span><span class="n">current_ion</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">counts</span></div>
+
+
+<div class="viewcode-block" id="MDSystem.get_mean_sem">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.get_mean_sem">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_mean_sem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;dfi*.npy&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates the mean and standard error of the mean (SEM) from numpy files.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            pattern (str, optional): Filename pattern to search for (default: &quot;dfi*.npy&quot;).</span>
+
+<span class="sd">        Saves the calculated averages and errors as numpy files in the data directory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Calculating averages and errors from </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">pull_files</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mddir</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span>
+        <span class="n">datas</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">]</span>
+        <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">datas</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">sem</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">datas</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">datas</span><span class="p">))</span>
+        <span class="n">file_mean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datdir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pattern</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">_av.npy&quot;</span>
+        <span class="n">file_err</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datdir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pattern</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">_err.npy&quot;</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">file_mean</span><span class="p">,</span> <span class="n">mean</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">file_err</span><span class="p">,</span> <span class="n">sem</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDSystem.get_td_averages">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.get_td_averages">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_td_averages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates time-dependent averages from a set of numpy files.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            fname (str): Filename pattern to pull files from the MD runs directory.</span>
+<span class="sd">            loop (bool, optional): If True, processes files sequentially (default: True).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy.ndarray: The time-dependent average.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Getting time-dependent averages&quot;</span><span class="p">)</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">pull_files</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mddir</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">loop</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Processing </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">average</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Processing </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+                <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="n">average</span> <span class="o">+=</span> <span class="n">arr</span>
+            <span class="n">average</span> <span class="o">/=</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">arrays</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">]</span>
+            <span class="n">average</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">arrays</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datdir</span> <span class="o">/</span> <span class="n">fname</span><span class="p">,</span> <span class="n">average</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Done!&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">average</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="MDRun">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDRun">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MDRun</span><span class="p">(</span><span class="n">MDSystem</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Subclass of MDSystem for executing molecular dynamics (MD) simulations</span>
+<span class="sd">    and performing post-processing analyses.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sysdir</span><span class="p">,</span> <span class="n">sysname</span><span class="p">,</span> <span class="n">runname</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes the MD run environment with additional directories for analysis.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            sysdir (str): Base directory for the system.</span>
+<span class="sd">            sysname (str): Name of the MD system.</span>
+<span class="sd">            runname (str): Name for the MD run.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sysdir</span><span class="p">,</span> <span class="n">sysname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runname</span> <span class="o">=</span> <span class="n">runname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rundir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mddir</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">runname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rmsdir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rundir</span> <span class="o">/</span> <span class="s2">&quot;rms_analysis&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">covdir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rundir</span> <span class="o">/</span> <span class="s2">&quot;cov_analysis&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lrtdir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rundir</span> <span class="o">/</span> <span class="s2">&quot;lrt_analysis&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cludir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rundir</span> <span class="o">/</span> <span class="s2">&quot;clusters&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pngdir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rundir</span> <span class="o">/</span> <span class="s2">&quot;png&quot;</span>
+
+<div class="viewcode-block" id="MDRun.prepare_files">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDRun.prepare_files">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prepare_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates necessary directories for the MD run and copies essential files.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mddir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rmsdir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cludir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">covdir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lrtdir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pngdir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;atommass.dat&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="MDRun.get_covmats">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDRun.get_covmats">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_covmats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates covariance matrices by splitting the trajectory into chunks.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            u (MDAnalysis.Universe, optional): Pre-loaded MDAnalysis Universe; if None, creates one.</span>
+<span class="sd">            ag (AtomGroup, optional): Atom selection; if None, selects backbone atoms.</span>
+<span class="sd">            sample_rate (int, optional): Sampling rate for positions.</span>
+<span class="sd">            b (int, optional): Begin time/frame.</span>
+<span class="sd">            e (int, optional): End time/frame.</span>
+<span class="sd">            n (int, optional): Number of covariance matrices to calculate.</span>
+<span class="sd">            outtag (str, optional): Tag prefix for output files.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;sample_rate&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">50000</span><span class="p">)</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="mi">1000000</span><span class="p">)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">outtag</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;outtag&#39;</span><span class="p">,</span> <span class="s1">&#39;covmat&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Calculating covariance matrices...&quot;</span><span class="p">)</span>
+        <span class="n">positions</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">read_positions</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="n">sample_rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">e</span><span class="o">=</span><span class="n">e</span><span class="p">)</span>
+        <span class="n">mdm</span><span class="o">.</span><span class="n">calc_and_save_covmats</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">outdir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">covdir</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">outtag</span><span class="o">=</span><span class="n">outtag</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished calculating covariance matrices!&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDRun.get_pertmats">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDRun.get_pertmats">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_pertmats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intag</span><span class="o">=</span><span class="s2">&quot;covmat&quot;</span><span class="p">,</span> <span class="n">outtag</span><span class="o">=</span><span class="s2">&quot;pertmat&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates perturbation matrices from the covariance matrices.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            intag (str, optional): Input file tag for covariance matrices.</span>
+<span class="sd">            outtag (str, optional): Output file tag for perturbation matrices.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">cd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">covdir</span><span class="p">):</span>
+            <span class="n">cov_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">covdir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">())</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">intag</span><span class="p">)]</span>
+            <span class="k">for</span> <span class="n">cov_file</span> <span class="ow">in</span> <span class="n">cov_files</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;  Processing covariance matrix </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">cov_file</span><span class="p">)</span>
+                <span class="n">covmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">covdir</span> <span class="o">/</span> <span class="n">cov_file</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;  Calculating perturbation matrix&quot;</span><span class="p">)</span>
+                <span class="n">pertmat</span> <span class="o">=</span> <span class="n">mdm</span><span class="o">.</span><span class="n">perturbation_matrix</span><span class="p">(</span><span class="n">covmat</span><span class="p">)</span>
+                <span class="n">pert_file</span> <span class="o">=</span> <span class="n">cov_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">intag</span><span class="p">,</span> <span class="n">outtag</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;  Saving perturbation matrix at </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">pert_file</span><span class="p">)</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">covdir</span> <span class="o">/</span> <span class="n">pert_file</span><span class="p">,</span> <span class="n">pertmat</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished calculating perturbation matrices!&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDRun.get_dfi">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDRun.get_dfi">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_dfi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intag</span><span class="o">=</span><span class="s2">&quot;pertmat&quot;</span><span class="p">,</span> <span class="n">outtag</span><span class="o">=</span><span class="s2">&quot;dfi&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates Dynamic Flexibility Index (DFI) from perturbation matrices.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            intag (str, optional): Input file tag for perturbation matrices.</span>
+<span class="sd">            outtag (str, optional): Output file tag for DFI values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">cd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">covdir</span><span class="p">):</span>
+            <span class="n">pert_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">covdir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">())</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">intag</span><span class="p">)]</span>
+            <span class="k">for</span> <span class="n">pert_file</span> <span class="ow">in</span> <span class="n">pert_files</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;  Processing perturbation matrix </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">pert_file</span><span class="p">)</span>
+                <span class="n">pertmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">covdir</span> <span class="o">/</span> <span class="n">pert_file</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;  Calculating DFI&quot;</span><span class="p">)</span>
+                <span class="n">dfi_val</span> <span class="o">=</span> <span class="n">mdm</span><span class="o">.</span><span class="n">dfi</span><span class="p">(</span><span class="n">pertmat</span><span class="p">)</span>
+                <span class="n">dfi_file</span> <span class="o">=</span> <span class="n">pert_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">intag</span><span class="p">,</span> <span class="n">outtag</span><span class="p">)</span>
+                <span class="n">dfi_file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">covdir</span> <span class="o">/</span> <span class="n">dfi_file</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">dfi_file_path</span><span class="p">,</span> <span class="n">dfi_val</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;  Saved DFI at </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">dfi_file_path</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished calculating DFIs!&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDRun.get_dci">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDRun.get_dci">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_dci</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intag</span><span class="o">=</span><span class="s2">&quot;pertmat&quot;</span><span class="p">,</span> <span class="n">outtag</span><span class="o">=</span><span class="s2">&quot;dci&quot;</span><span class="p">,</span> <span class="n">asym</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates the Dynamic Coupling Index (DCI) from perturbation matrices.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            intag (str, optional): Input file tag for perturbation matrices.</span>
+<span class="sd">            outtag (str, optional): Output file tag for DCI values.</span>
+<span class="sd">            asym (bool, optional): If True, calculates asymmetric DCI.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">cd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">covdir</span><span class="p">):</span>
+            <span class="n">pert_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">covdir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">())</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">intag</span><span class="p">)]</span>
+            <span class="k">for</span> <span class="n">pert_file</span> <span class="ow">in</span> <span class="n">pert_files</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;  Processing perturbation matrix </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">pert_file</span><span class="p">)</span>
+                <span class="n">pertmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">covdir</span> <span class="o">/</span> <span class="n">pert_file</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;  Calculating DCI&quot;</span><span class="p">)</span>
+                <span class="n">dci_file</span> <span class="o">=</span> <span class="n">pert_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">intag</span><span class="p">,</span> <span class="n">outtag</span><span class="p">)</span>
+                <span class="n">dci_file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">covdir</span> <span class="o">/</span> <span class="n">dci_file</span>
+                <span class="n">dci_val</span> <span class="o">=</span> <span class="n">mdm</span><span class="o">.</span><span class="n">dci</span><span class="p">(</span><span class="n">pertmat</span><span class="p">,</span> <span class="n">asym</span><span class="o">=</span><span class="n">asym</span><span class="p">)</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">dci_file_path</span><span class="p">,</span> <span class="n">dci_val</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;  Saved DCI at </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">dci_file_path</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished calculating DCIs!&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDRun.get_group_dci">
+<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDRun.get_group_dci">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_group_dci</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">asym</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates DCI between specified groups based on perturbation matrices.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            groups (list): List of groups (atom indices or similar) to compare.</span>
+<span class="sd">            labels (list): Corresponding labels for the groups.</span>
+<span class="sd">            asym (bool, optional): If True, computes asymmetric group DCI.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">cd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">covdir</span><span class="p">):</span>
+            <span class="n">pert_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;pertmat*&quot;</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">pert_file</span> <span class="ow">in</span> <span class="n">pert_files</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;  Processing perturbation matrix </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">pert_file</span><span class="p">)</span>
+                <span class="n">pertmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">pert_file</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;  Calculating group DCI&quot;</span><span class="p">)</span>
+                <span class="n">dcis</span> <span class="o">=</span> <span class="n">mdm</span><span class="o">.</span><span class="n">group_molecule_dci</span><span class="p">(</span><span class="n">pertmat</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="n">groups</span><span class="p">,</span> <span class="n">asym</span><span class="o">=</span><span class="n">asym</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">dci_val</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">group_id</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dcis</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+                    <span class="n">dci_file</span> <span class="o">=</span> <span class="n">pert_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;pertmat&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;gdci_</span><span class="si">{</span><span class="n">group_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">dci_file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">covdir</span> <span class="o">/</span> <span class="n">dci_file</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">dci_file_path</span><span class="p">,</span> <span class="n">dci_val</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;  Saved group DCI at </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">dci_file_path</span><span class="p">)</span>
+                <span class="n">ch_dci_file</span> <span class="o">=</span> <span class="n">pert_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;pertmat&quot;</span><span class="p">,</span> <span class="s2">&quot;ggdci&quot;</span><span class="p">)</span>
+                <span class="n">ch_dci_file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">covdir</span> <span class="o">/</span> <span class="n">ch_dci_file</span>
+                <span class="n">ch_dci</span> <span class="o">=</span> <span class="n">mdm</span><span class="o">.</span><span class="n">group_group_dci</span><span class="p">(</span><span class="n">pertmat</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="n">groups</span><span class="p">,</span> <span class="n">asym</span><span class="o">=</span><span class="n">asym</span><span class="p">)</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">ch_dci_file_path</span><span class="p">,</span> <span class="n">ch_dci</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;  Saved group-group DCI at </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ch_dci_file_path</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished calculating group DCIs!&quot;</span><span class="p">)</span></div>
+</div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Danis Yangaliev.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

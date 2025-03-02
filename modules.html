@@ -6,9 +6,13 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>reforge &mdash; reForge 0.1.0 documentation</title>
+  <title>reForge API &mdash; reForge 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
       <link rel="stylesheet" type="text/css" href="_static/custom.css?v=b7a6b9b3" />
 
   
@@ -19,7 +23,9 @@
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="reforge package" href="reforge.html" />
+    <link rel="prev" title="Simple CG Protein" href="auto_examples/go_protein.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -41,13 +47,14 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul>
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="getting_started.html#running-the-tutorial">Running the Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="getting_started.html#copyright">Copyright</a></li>
 <li class="toctree-l1"><a class="reference internal" href="why.html">Why use reForge?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Tutorials.html">Gmx Pipe Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reforge.html">reforge package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">reForge API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reforge.html">reforge package</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -64,7 +71,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">reforge</li>
+      <li class="breadcrumb-item active">reForge API</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/modules.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -74,59 +81,260 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="reforge">
-<h1>reforge<a class="headerlink" href="#reforge" title="Link to this heading"></a></h1>
+  <section id="reforge-api">
+<h1>reForge API<a class="headerlink" href="#reforge-api" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="reforge.html">reforge package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="reforge.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="reforge.forge.html">reforge.forge package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="reforge.forge.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="reforge.forge.html#reforge-forge-cgmap-module">reforge.forge.cgmap module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="reforge.forge.html#reforge-forge-forcefields-module">reforge.forge.forcefields module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="reforge.forge.html#reforge-forge-geometry-module">reforge.forge.geometry module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="reforge.forge.html#reforge-forge-persistence-length-module">reforge.forge.persistence_length module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="reforge.forge.html#reforge-forge-topology-module">reforge.forge.topology module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="reforge.forge.html#module-contents">Module contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.forge.html#module-reforge.forge.cgmap">reforge.forge.cgmap module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.forge.html#module-reforge.forge.forcefields">reforge.forge.forcefields module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.forge.html#module-reforge.forge.geometry">reforge.forge.geometry module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.forge.html#module-reforge.forge.persistence_length">reforge.forge.persistence_length module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.forge.html#module-reforge.forge.topology">reforge.forge.topology module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.forge.html#module-reforge.forge">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="reforge.martini.html">reforge.martini package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="reforge.martini.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="reforge.martini.html#reforge-martini-getgo-module">reforge.martini.getgo module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="reforge.martini.html#reforge-martini-martini-tools-module">reforge.martini.martini_tools module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="reforge.martini.html#reforge-martini-martinize-nucleotides-module">reforge.martini.martinize_nucleotides module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="reforge.martini.html#reforge-martini-martinize-rna-module">reforge.martini.martinize_rna module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="reforge.martini.html#module-contents">Module contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.martini.html#module-reforge.martini.getgo">reforge.martini.getgo module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.martini.html#module-reforge.martini.martini_tools">reforge.martini.martini_tools module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.martini.html#module-reforge.martini.martinize_nucleotides">reforge.martini.martinize_nucleotides module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.martini.html#module-reforge.martini.martinize_rna">reforge.martini.martinize_rna module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.martini.html#module-reforge.martini">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="reforge.mdsystem.html">reforge.mdsystem package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge-mdsystem-gmxmd-module">reforge.mdsystem.gmxmd module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge-mdsystem-mdsystem-module">reforge.mdsystem.mdsystem module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge-mdsystem-mmmd-module">reforge.mdsystem.mmmd module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#module-contents">Module contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#module-reforge.mdsystem.gmxmd">reforge.mdsystem.gmxmd module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#module-reforge.mdsystem.mdsystem">reforge.mdsystem.mdsystem module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#module-reforge.mdsystem.mmmd">reforge.mdsystem.mmmd module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#module-reforge.mdsystem">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="reforge.rfgmath.html">reforge.rfgmath package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="reforge.rfgmath.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="reforge.rfgmath.html#reforge-rfgmath-legacy-module">reforge.rfgmath.legacy module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="reforge.rfgmath.html#reforge-rfgmath-rcmath-module">reforge.rfgmath.rcmath module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="reforge.rfgmath.html#reforge-rfgmath-rpykernels-module">reforge.rfgmath.rpykernels module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="reforge.rfgmath.html#reforge-rfgmath-rpymath-module">reforge.rfgmath.rpymath module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="reforge.rfgmath.html#module-contents">Module contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.rfgmath.html#module-reforge.rfgmath.legacy">reforge.rfgmath.legacy module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.rfgmath.html#module-reforge.rfgmath.rcmath">reforge.rfgmath.rcmath module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.rfgmath.html#module-reforge.rfgmath.rpykernels">reforge.rfgmath.rpykernels module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.rfgmath.html#module-reforge.rfgmath.rpymath">reforge.rfgmath.rpymath module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.rfgmath.html#module-reforge.rfgmath">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="reforge.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reforge.html#reforge-cli-module">reforge.cli module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reforge.html#reforge-io-module">reforge.io module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reforge.html#reforge-itpio-module">reforge.itpio module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reforge.html#reforge-mdm-module">reforge.mdm module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reforge.html#reforge-pdbtools-module">reforge.pdbtools module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reforge.html#reforge-plotting-module">reforge.plotting module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reforge.html#reforge-utils-module">reforge.utils module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reforge.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reforge.html#module-reforge.cli">reforge.cli module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.cli.run"><code class="docutils literal notranslate"><span class="pre">run()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.cli.sbatch"><code class="docutils literal notranslate"><span class="pre">sbatch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.cli.gmx"><code class="docutils literal notranslate"><span class="pre">gmx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.cli.change_directory"><code class="docutils literal notranslate"><span class="pre">change_directory()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.cli.from_wdir"><code class="docutils literal notranslate"><span class="pre">from_wdir()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.cli.gmx_editconf"><code class="docutils literal notranslate"><span class="pre">gmx_editconf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.cli.gmx_solvate"><code class="docutils literal notranslate"><span class="pre">gmx_solvate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.cli.gmx_make_ndx"><code class="docutils literal notranslate"><span class="pre">gmx_make_ndx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.cli.gmx_grompp"><code class="docutils literal notranslate"><span class="pre">gmx_grompp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.cli.gmx_mdrun"><code class="docutils literal notranslate"><span class="pre">gmx_mdrun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.cli.gmx_trjconv"><code class="docutils literal notranslate"><span class="pre">gmx_trjconv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.cli.gmx_rmsf"><code class="docutils literal notranslate"><span class="pre">gmx_rmsf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.cli.gmx_rms"><code class="docutils literal notranslate"><span class="pre">gmx_rms()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.cli.gmx_rdf"><code class="docutils literal notranslate"><span class="pre">gmx_rdf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.cli.gmx_cluster"><code class="docutils literal notranslate"><span class="pre">gmx_cluster()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.cli.gmx_extract_cluster"><code class="docutils literal notranslate"><span class="pre">gmx_extract_cluster()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.cli.gmx_covar"><code class="docutils literal notranslate"><span class="pre">gmx_covar()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.cli.gmx_anaeig"><code class="docutils literal notranslate"><span class="pre">gmx_anaeig()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.cli.gmx_make_edi"><code class="docutils literal notranslate"><span class="pre">gmx_make_edi()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.cli.args_to_str"><code class="docutils literal notranslate"><span class="pre">args_to_str()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.cli.kwargs_to_str"><code class="docutils literal notranslate"><span class="pre">kwargs_to_str()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reforge.html#module-reforge.io">reforge.io module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.io.read_positions"><code class="docutils literal notranslate"><span class="pre">read_positions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.io.read_velocities"><code class="docutils literal notranslate"><span class="pre">read_velocities()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.io.parse_covar_dat"><code class="docutils literal notranslate"><span class="pre">parse_covar_dat()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.io.fname_filter"><code class="docutils literal notranslate"><span class="pre">fname_filter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.io.filter_files"><code class="docutils literal notranslate"><span class="pre">filter_files()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.io.pull_files"><code class="docutils literal notranslate"><span class="pre">pull_files()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.io.pull_all_files"><code class="docutils literal notranslate"><span class="pre">pull_all_files()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.io.xvg2npy"><code class="docutils literal notranslate"><span class="pre">xvg2npy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.io.pdb2system"><code class="docutils literal notranslate"><span class="pre">pdb2system()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.io.pdb2atomlist"><code class="docutils literal notranslate"><span class="pre">pdb2atomlist()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.io.read_data"><code class="docutils literal notranslate"><span class="pre">read_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.io.read_xvg"><code class="docutils literal notranslate"><span class="pre">read_xvg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.io.npy2csv"><code class="docutils literal notranslate"><span class="pre">npy2csv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.io.save_1d_data"><code class="docutils literal notranslate"><span class="pre">save_1d_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.io.save_2d_data"><code class="docutils literal notranslate"><span class="pre">save_2d_data()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reforge.html#module-reforge.itpio">reforge.itpio module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.itpio.read_itp"><code class="docutils literal notranslate"><span class="pre">read_itp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.itpio.line2bond"><code class="docutils literal notranslate"><span class="pre">line2bond()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.itpio.bond2line"><code class="docutils literal notranslate"><span class="pre">bond2line()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.itpio.format_header"><code class="docutils literal notranslate"><span class="pre">format_header()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.itpio.format_sequence_section"><code class="docutils literal notranslate"><span class="pre">format_sequence_section()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.itpio.format_moleculetype_section"><code class="docutils literal notranslate"><span class="pre">format_moleculetype_section()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.itpio.format_atoms_section"><code class="docutils literal notranslate"><span class="pre">format_atoms_section()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.itpio.format_bonded_section"><code class="docutils literal notranslate"><span class="pre">format_bonded_section()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.itpio.format_posres_section"><code class="docutils literal notranslate"><span class="pre">format_posres_section()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.itpio.write_itp"><code class="docutils literal notranslate"><span class="pre">write_itp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.itpio.make_in_terms"><code class="docutils literal notranslate"><span class="pre">make_in_terms()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.itpio.make_cross_terms"><code class="docutils literal notranslate"><span class="pre">make_cross_terms()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.itpio.make_marnatini_itp"><code class="docutils literal notranslate"><span class="pre">make_marnatini_itp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.itpio.make_ions_itp"><code class="docutils literal notranslate"><span class="pre">make_ions_itp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.itpio.count_itp_atoms"><code class="docutils literal notranslate"><span class="pre">count_itp_atoms()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reforge.html#module-reforge.mdm">reforge.mdm module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.mdm.fft_ccf"><code class="docutils literal notranslate"><span class="pre">fft_ccf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.mdm.covariance_matrix"><code class="docutils literal notranslate"><span class="pre">covariance_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.mdm.calc_and_save_covmats"><code class="docutils literal notranslate"><span class="pre">calc_and_save_covmats()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.mdm.perturbation_matrix"><code class="docutils literal notranslate"><span class="pre">perturbation_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.mdm.td_perturbation_matrix"><code class="docutils literal notranslate"><span class="pre">td_perturbation_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.mdm.dfi"><code class="docutils literal notranslate"><span class="pre">dfi()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.mdm.dci"><code class="docutils literal notranslate"><span class="pre">dci()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.mdm.group_molecule_dci"><code class="docutils literal notranslate"><span class="pre">group_molecule_dci()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.mdm.group_group_dci"><code class="docutils literal notranslate"><span class="pre">group_group_dci()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.mdm.hessian"><code class="docutils literal notranslate"><span class="pre">hessian()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.mdm.inverse_matrix"><code class="docutils literal notranslate"><span class="pre">inverse_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.mdm.percentile"><code class="docutils literal notranslate"><span class="pre">percentile()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reforge.html#module-reforge.pdbtools">reforge.pdbtools module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.pdbtools.Atom"><code class="docutils literal notranslate"><span class="pre">Atom</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.Atom.from_pdb_line"><code class="docutils literal notranslate"><span class="pre">Atom.from_pdb_line()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.Atom.to_pdb_line"><code class="docutils literal notranslate"><span class="pre">Atom.to_pdb_line()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList"><code class="docutils literal notranslate"><span class="pre">AtomList</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.key_funcs"><code class="docutils literal notranslate"><span class="pre">AtomList.key_funcs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.records"><code class="docutils literal notranslate"><span class="pre">AtomList.records</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.atids"><code class="docutils literal notranslate"><span class="pre">AtomList.atids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.names"><code class="docutils literal notranslate"><span class="pre">AtomList.names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.alt_locs"><code class="docutils literal notranslate"><span class="pre">AtomList.alt_locs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.resnames"><code class="docutils literal notranslate"><span class="pre">AtomList.resnames</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.chids"><code class="docutils literal notranslate"><span class="pre">AtomList.chids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.resids"><code class="docutils literal notranslate"><span class="pre">AtomList.resids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.icodes"><code class="docutils literal notranslate"><span class="pre">AtomList.icodes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.xs"><code class="docutils literal notranslate"><span class="pre">AtomList.xs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.ys"><code class="docutils literal notranslate"><span class="pre">AtomList.ys</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.zs"><code class="docutils literal notranslate"><span class="pre">AtomList.zs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.occupancies"><code class="docutils literal notranslate"><span class="pre">AtomList.occupancies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.bfactors"><code class="docutils literal notranslate"><span class="pre">AtomList.bfactors</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.segids"><code class="docutils literal notranslate"><span class="pre">AtomList.segids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.elements"><code class="docutils literal notranslate"><span class="pre">AtomList.elements</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.charges"><code class="docutils literal notranslate"><span class="pre">AtomList.charges</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.vecs"><code class="docutils literal notranslate"><span class="pre">AtomList.vecs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.chains"><code class="docutils literal notranslate"><span class="pre">AtomList.chains</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.residues"><code class="docutils literal notranslate"><span class="pre">AtomList.residues</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.renum"><code class="docutils literal notranslate"><span class="pre">AtomList.renum()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.sort"><code class="docutils literal notranslate"><span class="pre">AtomList.sort()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.mask"><code class="docutils literal notranslate"><span class="pre">AtomList.mask()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.mask_out"><code class="docutils literal notranslate"><span class="pre">AtomList.mask_out()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.renumber"><code class="docutils literal notranslate"><span class="pre">AtomList.renumber()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.remove_atoms"><code class="docutils literal notranslate"><span class="pre">AtomList.remove_atoms()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.read_pdb"><code class="docutils literal notranslate"><span class="pre">AtomList.read_pdb()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.write_pdb"><code class="docutils literal notranslate"><span class="pre">AtomList.write_pdb()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomList.write_ndx"><code class="docutils literal notranslate"><span class="pre">AtomList.write_ndx()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomListCollection"><code class="docutils literal notranslate"><span class="pre">AtomListCollection</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomListCollection.records"><code class="docutils literal notranslate"><span class="pre">AtomListCollection.records</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomListCollection.atids"><code class="docutils literal notranslate"><span class="pre">AtomListCollection.atids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomListCollection.names"><code class="docutils literal notranslate"><span class="pre">AtomListCollection.names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomListCollection.alt_locs"><code class="docutils literal notranslate"><span class="pre">AtomListCollection.alt_locs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomListCollection.resnames"><code class="docutils literal notranslate"><span class="pre">AtomListCollection.resnames</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomListCollection.chids"><code class="docutils literal notranslate"><span class="pre">AtomListCollection.chids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomListCollection.resids"><code class="docutils literal notranslate"><span class="pre">AtomListCollection.resids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomListCollection.icodes"><code class="docutils literal notranslate"><span class="pre">AtomListCollection.icodes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomListCollection.xs"><code class="docutils literal notranslate"><span class="pre">AtomListCollection.xs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomListCollection.ys"><code class="docutils literal notranslate"><span class="pre">AtomListCollection.ys</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomListCollection.zs"><code class="docutils literal notranslate"><span class="pre">AtomListCollection.zs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomListCollection.occupancies"><code class="docutils literal notranslate"><span class="pre">AtomListCollection.occupancies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomListCollection.bfactors"><code class="docutils literal notranslate"><span class="pre">AtomListCollection.bfactors</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomListCollection.segids"><code class="docutils literal notranslate"><span class="pre">AtomListCollection.segids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomListCollection.elements"><code class="docutils literal notranslate"><span class="pre">AtomListCollection.elements</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomListCollection.charges"><code class="docutils literal notranslate"><span class="pre">AtomListCollection.charges</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.AtomListCollection.vecs"><code class="docutils literal notranslate"><span class="pre">AtomListCollection.vecs</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.pdbtools.Residue"><code class="docutils literal notranslate"><span class="pre">Residue</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.Residue.add_atom"><code class="docutils literal notranslate"><span class="pre">Residue.add_atom()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.Residue.atoms"><code class="docutils literal notranslate"><span class="pre">Residue.atoms</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.pdbtools.Chain"><code class="docutils literal notranslate"><span class="pre">Chain</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.Chain.add_atom"><code class="docutils literal notranslate"><span class="pre">Chain.add_atom()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.Chain.atoms"><code class="docutils literal notranslate"><span class="pre">Chain.atoms</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.pdbtools.Model"><code class="docutils literal notranslate"><span class="pre">Model</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.Model.add_atom"><code class="docutils literal notranslate"><span class="pre">Model.add_atom()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.Model.atoms"><code class="docutils literal notranslate"><span class="pre">Model.atoms</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.Model.select_chains"><code class="docutils literal notranslate"><span class="pre">Model.select_chains()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.pdbtools.System"><code class="docutils literal notranslate"><span class="pre">System</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.System.add_atom"><code class="docutils literal notranslate"><span class="pre">System.add_atom()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.System.add_atoms"><code class="docutils literal notranslate"><span class="pre">System.add_atoms()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.System.atoms"><code class="docutils literal notranslate"><span class="pre">System.atoms</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.System.residues"><code class="docutils literal notranslate"><span class="pre">System.residues()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.System.chains"><code class="docutils literal notranslate"><span class="pre">System.chains()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.System.write_pdb"><code class="docutils literal notranslate"><span class="pre">System.write_pdb()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.pdbtools.PDBParser"><code class="docutils literal notranslate"><span class="pre">PDBParser</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="reforge.html#reforge.pdbtools.PDBParser.parse"><code class="docutils literal notranslate"><span class="pre">PDBParser.parse()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.pdbtools.pdb2system"><code class="docutils literal notranslate"><span class="pre">pdb2system()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.pdbtools.pdb2atomlist"><code class="docutils literal notranslate"><span class="pre">pdb2atomlist()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.pdbtools.sort_chains_atoms"><code class="docutils literal notranslate"><span class="pre">sort_chains_atoms()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.pdbtools.rename_chains_for_gromacs"><code class="docutils literal notranslate"><span class="pre">rename_chains_for_gromacs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.pdbtools.sort_pdb"><code class="docutils literal notranslate"><span class="pre">sort_pdb()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.pdbtools.clean_pdb"><code class="docutils literal notranslate"><span class="pre">clean_pdb()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.pdbtools.rename_chain_in_pdb"><code class="docutils literal notranslate"><span class="pre">rename_chain_in_pdb()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.pdbtools.rename_chain_and_histidines_in_pdb"><code class="docutils literal notranslate"><span class="pre">rename_chain_and_histidines_in_pdb()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.pdbtools.write_ndx"><code class="docutils literal notranslate"><span class="pre">write_ndx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.pdbtools.update_bfactors"><code class="docutils literal notranslate"><span class="pre">update_bfactors()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.pdbtools.sort_uld"><code class="docutils literal notranslate"><span class="pre">sort_uld()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reforge.html#module-reforge.plotting">reforge.plotting module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.plotting.init_figure"><code class="docutils literal notranslate"><span class="pre">init_figure()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.plotting.make_hist"><code class="docutils literal notranslate"><span class="pre">make_hist()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.plotting.make_errorbar"><code class="docutils literal notranslate"><span class="pre">make_errorbar()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.plotting.set_ax_parameters"><code class="docutils literal notranslate"><span class="pre">set_ax_parameters()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.plotting.plot_figure"><code class="docutils literal notranslate"><span class="pre">plot_figure()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.plotting.response_1"><code class="docutils literal notranslate"><span class="pre">response_1()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.plotting.response_2"><code class="docutils literal notranslate"><span class="pre">response_2()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.plotting.response_2_2d"><code class="docutils literal notranslate"><span class="pre">response_2_2d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.plotting.response_force"><code class="docutils literal notranslate"><span class="pre">response_force()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.plotting.response"><code class="docutils literal notranslate"><span class="pre">response()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.plotting.make_1d_data"><code class="docutils literal notranslate"><span class="pre">make_1d_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.plotting.make_2d_data"><code class="docutils literal notranslate"><span class="pre">make_2d_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.plotting.make_heatmap"><code class="docutils literal notranslate"><span class="pre">make_heatmap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.plotting.make_plot"><code class="docutils literal notranslate"><span class="pre">make_plot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.plotting.make_plot_t"><code class="docutils literal notranslate"><span class="pre">make_plot_t()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.plotting.make_plot_t_2d"><code class="docutils literal notranslate"><span class="pre">make_plot_t_2d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.plotting.animate_1d"><code class="docutils literal notranslate"><span class="pre">animate_1d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.plotting.animate_2d"><code class="docutils literal notranslate"><span class="pre">animate_2d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.plotting.make_animation"><code class="docutils literal notranslate"><span class="pre">make_animation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.plotting.mkfigure"><code class="docutils literal notranslate"><span class="pre">mkfigure()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.plotting.make_1d_plots"><code class="docutils literal notranslate"><span class="pre">make_1d_plots()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reforge.html#module-reforge.utils">reforge.utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.utils.timeit"><code class="docutils literal notranslate"><span class="pre">timeit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.utils.memprofit"><code class="docutils literal notranslate"><span class="pre">memprofit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.utils.cd"><code class="docutils literal notranslate"><span class="pre">cd()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.utils.clean_dir"><code class="docutils literal notranslate"><span class="pre">clean_dir()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.utils.cuda_info"><code class="docutils literal notranslate"><span class="pre">cuda_info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.html#reforge.utils.cuda_detected"><code class="docutils literal notranslate"><span class="pre">cuda_detected()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reforge.html#module-reforge">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -136,7 +344,10 @@
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="auto_examples/go_protein.html" class="btn btn-neutral float-left" title="Simple CG Protein" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="reforge.html" class="btn btn-neutral float-right" title="reforge package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

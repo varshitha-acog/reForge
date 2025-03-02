@@ -1,0 +1,369 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>reforge.forge.persistence_length &mdash; reForge 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=b7a6b9b3" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            reForge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../why.html">Why use reForge?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">reForge API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">reForge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">reforge.forge.persistence_length</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for reforge.forge.persistence_length</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Description:</span>
+<span class="sd">    This module computes the persistence length of a nucleic acid system by</span>
+<span class="sd">    calculating angles between consecutive bond vectors in a coarse-grained model.</span>
+<span class="sd">    It provides functions to read a structure from a PDB file, compute geometric</span>
+<span class="sd">    measures (angles, rotation matrices), and finally plot the average angles.</span>
+
+<span class="sd">Author: DY</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">Bio.PDB.MMCIFParser</span><span class="w"> </span><span class="kn">import</span> <span class="n">MMCIFParser</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">Bio.PDB.PDBParser</span><span class="w"> </span><span class="kn">import</span> <span class="n">PDBParser</span>
+
+
+<div class="viewcode-block" id="get_structure_cif">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.persistence_length.get_structure_cif">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_structure_cif</span><span class="p">(</span><span class="n">cif_id</span><span class="o">=</span><span class="s2">&quot;path/to/cif&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read a structure from a CIF file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cif_id (str): Path to the CIF file.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        structure: A Bio.PDB structure object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">MMCIFParser</span><span class="p">()</span>
+    <span class="n">structure</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="s2">&quot;structure&quot;</span><span class="p">,</span> <span class="n">cif_id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">structure</span></div>
+
+
+
+<div class="viewcode-block" id="get_structure_pdb">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.persistence_length.get_structure_pdb">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_structure_pdb</span><span class="p">(</span><span class="n">pdb_id</span><span class="o">=</span><span class="s2">&quot;path/to/pdb&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read a structure from a PDB file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        pdb_id (str): Path to the PDB file.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        structure: A Bio.PDB structure object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">PDBParser</span><span class="p">()</span>
+    <span class="n">structure</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="s2">&quot;structure&quot;</span><span class="p">,</span> <span class="n">pdb_id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">structure</span></div>
+
+
+
+<div class="viewcode-block" id="get_residues">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.persistence_length.get_residues">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_residues</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract all residues from a model.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        model: A Bio.PDB model object.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: A list of residue objects.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">model</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">residue</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">get_unpacked_list</span><span class="p">()):</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">residue</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+
+<div class="viewcode-block" id="get_resid">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.persistence_length.get_resid">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_resid</span><span class="p">(</span><span class="n">residue</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract the residue id from the string representation of a residue.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        residue: A Bio.PDB residue object.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: The residue id.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Use the built-in repr function instead of __repr__()</span>
+    <span class="n">rep</span> <span class="o">=</span> <span class="nb">repr</span><span class="p">(</span><span class="n">residue</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Expecting a format like &quot;... resid=123 ...&quot;</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">rep</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not extract residue id from: &quot;</span> <span class="o">+</span> <span class="n">rep</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_atoms_by_name">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.persistence_length.get_atoms_by_name">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_atoms_by_name</span><span class="p">(</span><span class="n">residues</span><span class="p">,</span> <span class="n">atom_name</span><span class="o">=</span><span class="s2">&quot;BB3&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Select atoms with a given name from a list of residues.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        residues (list): List of residue objects.</span>
+<span class="sd">        atom_name (str): Name of the atom to select (default &quot;BB3&quot;).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: A tuple (atoms, resids) where atoms is a list of matching atom objects,</span>
+<span class="sd">               and resids is a list of corresponding residue ids.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">atoms</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">resids</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">residues</span><span class="p">:</span>
+        <span class="n">rid</span> <span class="o">=</span> <span class="n">get_resid</span><span class="p">(</span><span class="n">residue</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">residue</span><span class="o">.</span><span class="n">get_atoms</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span> <span class="o">==</span> <span class="n">atom_name</span><span class="p">:</span>
+                <span class="n">atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+                <span class="n">resids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rid</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">resids</span></div>
+
+
+
+<div class="viewcode-block" id="get_coords">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.persistence_length.get_coords">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_coords</span><span class="p">(</span><span class="n">atoms</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the coordinates for a list of atoms.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        atoms (list): List of atom objects.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: List of coordinate arrays.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">get_coord</span><span class="p">()</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="get_angle">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.persistence_length.get_angle">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_angle</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the angle (in degrees) between two vectors.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        v1: First vector.</span>
+<span class="sd">        v2: Second vector.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Angle in degrees.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dot_product</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span>
+    <span class="n">magnitude_v1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+    <span class="n">magnitude_v2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span>
+    <span class="n">cos_theta</span> <span class="o">=</span> <span class="n">dot_product</span> <span class="o">/</span> <span class="p">(</span><span class="n">magnitude_v1</span> <span class="o">*</span> <span class="n">magnitude_v2</span><span class="p">)</span>
+    <span class="n">angle_radians</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">cos_theta</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
+    <span class="n">angle_degrees</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">angle_radians</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">angle_degrees</span></div>
+
+
+
+<div class="viewcode-block" id="rotation_matrix_from_vectors">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.persistence_length.rotation_matrix_from_vectors">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">rotation_matrix_from_vectors</span><span class="p">(</span><span class="n">vec1</span><span class="p">,</span> <span class="n">vec2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find the rotation matrix that aligns vec1 to vec2.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        vec1 (array-like): Source vector.</span>
+<span class="sd">        vec2 (array-like): Destination vector.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: A 3x3 rotation matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">vec1</span> <span class="o">==</span> <span class="n">vec2</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">vec1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vec1</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">vec2</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vec2</span><span class="p">)</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="n">kmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+                     <span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                     <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">]])</span>
+    <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">kmat</span> <span class="o">+</span> <span class="n">kmat</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">kmat</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">c</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">s</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">rotation_matrix</span></div>
+
+
+
+<div class="viewcode-block" id="persistence_length">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.persistence_length.persistence_length">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">persistence_length</span><span class="p">(</span><span class="n">structure</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate and plot the persistence length from a structure.</span>
+
+<span class="sd">    For each model in the structure, the function computes the angle between</span>
+<span class="sd">    bond vectors (taken from atoms with name &quot;BB3&quot;) after aligning them with</span>
+<span class="sd">    a reference vector. The average angles are then plotted and saved to a file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        structure: A Bio.PDB structure object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">all_angles</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">global_vec0</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">global_rmats</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">model</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">structure</span><span class="p">):</span>
+        <span class="n">residues</span> <span class="o">=</span> <span class="n">get_residues</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+        <span class="n">atoms</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_atoms_by_name</span><span class="p">(</span><span class="n">residues</span><span class="p">,</span> <span class="n">atom_name</span><span class="o">=</span><span class="s2">&quot;BB3&quot;</span><span class="p">)</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">get_coords</span><span class="p">(</span><span class="n">atoms</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">11</span><span class="p">:</span>
+            <span class="k">continue</span>  <span class="c1"># Not enough data</span>
+        <span class="n">vecs</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">coords</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1"># For the first model, set the reference vector and rotation matrices.</span>
+        <span class="k">if</span> <span class="n">idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">rvec</span> <span class="o">=</span> <span class="n">vecs</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span>
+            <span class="n">global_vec0</span> <span class="o">=</span> <span class="n">vecs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">global_rmats</span> <span class="o">=</span> <span class="p">[</span><span class="n">rotation_matrix_from_vectors</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">rvec</span><span class="p">)</span> <span class="k">for</span> <span class="n">vec</span> <span class="ow">in</span> <span class="n">vecs</span><span class="p">]</span>
+        <span class="c1"># Use global values from the first model</span>
+        <span class="n">rvec</span> <span class="o">=</span> <span class="n">vecs</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span>
+        <span class="c1"># Apply rotation matrices to align bond vectors.</span>
+        <span class="n">vecs_trans</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;ijk,ik-&gt;ij&quot;</span><span class="p">,</span> <span class="n">global_rmats</span><span class="p">,</span> <span class="n">vecs</span><span class="p">)</span>
+        <span class="c1"># Compute angles between each transformed vector and the reference vector.</span>
+        <span class="n">angles</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_angle</span><span class="p">(</span><span class="n">vecs_trans</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">rvec</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vecs_trans</span><span class="p">))]</span>
+        <span class="n">all_angles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">all_angles</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No valid angle data found.&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="n">all_angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">all_angles</span><span class="p">)</span>
+    <span class="n">av_angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">all_angles</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">av_angles</span><span class="p">)</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">16.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">av_angles</span><span class="p">))[:</span><span class="mi">200</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">av_angles</span><span class="p">)[:</span><span class="mi">200</span><span class="p">])</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;pers_length.png&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="test_rmats">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.persistence_length.test_rmats">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_rmats</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Test function for rotation_matrix_from_vectors.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">vecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>
+    <span class="n">rmats</span> <span class="o">=</span> <span class="p">[</span><span class="n">rotation_matrix_from_vectors</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">vecs</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="k">for</span> <span class="n">vec</span> <span class="ow">in</span> <span class="n">vecs</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;ijk,ik-&gt;ij&quot;</span><span class="p">,</span> <span class="n">rmats</span><span class="p">,</span> <span class="n">vecs</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../../reforge.forge.html#reforge.forge.persistence_length.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main function to compute persistence length.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">wdir</span> <span class="o">=</span> <span class="s2">&quot;systems/100bpRNA/mdrun&quot;</span>
+    <span class="n">structure</span> <span class="o">=</span> <span class="n">get_structure_pdb</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wdir</span><span class="si">}</span><span class="s2">/md.pdb&quot;</span><span class="p">)</span>
+    <span class="n">persistence_length</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Danis Yangaliev.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,691 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>reforge.itpio &mdash; reForge 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b7a6b9b3" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            reForge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../why.html">Why use reForge?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">reForge API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">reForge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">reforge.itpio</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for reforge.itpio</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;IO for GROMACS topology .itp files.</span>
+
+<span class="sd">Description:</span>
+<span class="sd">    This module provides functions for reading, parsing, formatting, and writing</span>
+<span class="sd">    GROMACS ITP files. It includes utilities to extract and format different sections</span>
+<span class="sd">    (such as bonds, angles, atoms, etc.) and higher-level functions tailored for</span>
+<span class="sd">    Martini RNA and ion topologies.</span>
+
+<span class="sd">Requirements:</span>
+<span class="sd">    - Python 3.x</span>
+<span class="sd">    - Standard library modules: shutil, typing</span>
+<span class="sd">    - (Optional) Additional modules for extended functionality.</span>
+
+<span class="sd">Author: DY</span>
+<span class="sd">Date: 2025-02-27</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="c1">###################################</span>
+<span class="c1"># Generic functions</span>
+<span class="c1">###################################</span>
+
+<div class="viewcode-block" id="read_itp">
+<a class="viewcode-back" href="../../reforge.html#reforge.itpio.read_itp">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_itp</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read a Gromacs ITP file and organize its contents by section.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filename : str</span>
+<span class="sd">        The path to the ITP file.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        A dictionary where keys are section names and values are lists of entries,</span>
+<span class="sd">        each entry being a list of [connectivity, parameters, comment].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">itp_data</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file</span><span class="p">:</span>
+            <span class="c1"># Skip comments and empty lines</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;;&quot;</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="c1"># Detect section headers; break long condition into multiple lines.</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;[&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">line</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;]</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)):</span>
+                <span class="n">tag</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">2</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">itp_data</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">connectivity</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="n">line2bond</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">tag</span><span class="p">)</span>
+                <span class="n">itp_data</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">connectivity</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">comment</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">itp_data</span></div>
+
+
+
+<div class="viewcode-block" id="line2bond">
+<a class="viewcode-back" href="../../reforge.html#reforge.itpio.line2bond">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">line2bond</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">tag</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse a line from an ITP file and return connectivity, parameters, and comment.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    line : str</span>
+<span class="sd">        A line from the ITP file.</span>
+<span class="sd">    tag : str</span>
+<span class="sd">        The section tag (e.g. &#39;bonds&#39;, &#39;angles&#39;, etc.).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple</span>
+<span class="sd">        A tuple (connectivity, parameters, comment) where connectivity is a tuple of ints,</span>
+<span class="sd">        parameters is a tuple of numbers (first as int, rest as floats), and comment is a string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s2">&quot;;&quot;</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="n">comment</span> <span class="o">=</span> <span class="n">comment</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;bonds&quot;</span> <span class="ow">or</span> <span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;constraints&quot;</span><span class="p">:</span>
+        <span class="n">connectivity</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+    <span class="k">elif</span> <span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;angles&quot;</span><span class="p">:</span>
+        <span class="n">connectivity</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
+    <span class="k">elif</span> <span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;dihedrals&quot;</span><span class="p">:</span>
+        <span class="n">connectivity</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span>
+    <span class="k">elif</span> <span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;virtual_sites3&quot;</span><span class="p">:</span>
+        <span class="n">connectivity</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">connectivity</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="n">parameters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">parameters</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
+    <span class="n">connectivity</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">connectivity</span><span class="p">)</span>
+    <span class="n">parameters</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">connectivity</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">comment</span></div>
+
+
+
+<div class="viewcode-block" id="bond2line">
+<a class="viewcode-back" href="../../reforge.html#reforge.itpio.bond2line">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">bond2line</span><span class="p">(</span><span class="n">connectivity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Format a bond entry into a string for a Gromacs ITP file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    connectivity : tuple, optional</span>
+<span class="sd">        Connectivity indices.</span>
+<span class="sd">    parameters : tuple, optional</span>
+<span class="sd">        Bond parameters.</span>
+<span class="sd">    comment : str, optional</span>
+<span class="sd">        Optional comment.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        A formatted string representing the bond entry.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">connectivity_str</span> <span class="o">=</span> <span class="s2">&quot;   &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">connectivity</span><span class="p">)</span>
+    <span class="n">type_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">parameters_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="n">type_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">parameters_str</span> <span class="o">=</span> <span class="s2">&quot;   &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">param</span><span class="p">)</span><span class="si">:</span><span class="s2">7.4f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="n">line</span> <span class="o">=</span> <span class="n">connectivity_str</span> <span class="o">+</span> <span class="s2">&quot;   &quot;</span> <span class="o">+</span> <span class="n">type_str</span> <span class="o">+</span> <span class="s2">&quot;   &quot;</span> <span class="o">+</span> <span class="n">parameters_str</span>
+    <span class="k">if</span> <span class="n">comment</span><span class="p">:</span>
+        <span class="n">line</span> <span class="o">+=</span> <span class="s2">&quot; ; &quot;</span> <span class="o">+</span> <span class="n">comment</span>
+    <span class="n">line</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">line</span></div>
+
+
+
+<div class="viewcode-block" id="format_header">
+<a class="viewcode-back" href="../../reforge.html#reforge.itpio.format_header">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">format_header</span><span class="p">(</span><span class="n">molname</span><span class="o">=</span><span class="s2">&quot;molecule&quot;</span><span class="p">,</span> <span class="n">forcefield</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Format the header of the topology file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    molname : str, optional</span>
+<span class="sd">        Molecule name. Default is &quot;molecule&quot;.</span>
+<span class="sd">    forcefield : str, optional</span>
+<span class="sd">        Force field identifier.</span>
+<span class="sd">    arguments : str, optional</span>
+<span class="sd">        Command-line arguments used.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[str]</span>
+<span class="sd">        A list of header lines.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;; MARTINI (</span><span class="si">{</span><span class="n">forcefield</span><span class="si">}</span><span class="s1">) Coarse Grained topology file for &quot;</span><span class="si">{</span><span class="n">molname</span><span class="si">}</span><span class="s1">&quot;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">]</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;; Created using the following options:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;; </span><span class="si">{</span><span class="n">arguments</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;; &quot;</span> <span class="o">+</span> <span class="s2">&quot;#&quot;</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">lines</span></div>
+
+
+
+<div class="viewcode-block" id="format_sequence_section">
+<a class="viewcode-back" href="../../reforge.html#reforge.itpio.format_sequence_section">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">format_sequence_section</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">secstruct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Format the sequence section.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sequence : iterable</span>
+<span class="sd">        Sequence characters.</span>
+<span class="sd">    secstruct : iterable</span>
+<span class="sd">        Secondary structure characters.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[str]</span>
+<span class="sd">        Formatted lines for the sequence section.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sequence_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
+    <span class="n">secstruct_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">secstruct</span><span class="p">)</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;; Sequence:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">]</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;; </span><span class="si">{</span><span class="n">sequence_str</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;; Secondary Structure:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;; </span><span class="si">{</span><span class="n">secstruct_str</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">lines</span></div>
+
+
+
+<div class="viewcode-block" id="format_moleculetype_section">
+<a class="viewcode-back" href="../../reforge.html#reforge.itpio.format_moleculetype_section">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">format_moleculetype_section</span><span class="p">(</span><span class="n">molname</span><span class="o">=</span><span class="s2">&quot;molecule&quot;</span><span class="p">,</span> <span class="n">nrexcl</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Format the moleculetype section.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    molname : str, optional</span>
+<span class="sd">        Molecule name. Default is &quot;molecule&quot;.</span>
+<span class="sd">    nrexcl : int, optional</span>
+<span class="sd">        Number of exclusions. Default is 1.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[str]</span>
+<span class="sd">        Formatted lines for the moleculetype section.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[ moleculetype ]</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">]</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;; Name         Exclusions</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">molname</span><span class="si">:</span><span class="s2">&lt;15s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">nrexcl</span><span class="si">:</span><span class="s2">3d</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">lines</span></div>
+
+
+
+<div class="viewcode-block" id="format_atoms_section">
+<a class="viewcode-back" href="../../reforge.html#reforge.itpio.format_atoms_section">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">format_atoms_section</span><span class="p">(</span><span class="n">atoms</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Format the atoms section for a Gromacs ITP file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    atoms : List[Tuple]</span>
+<span class="sd">        List of atom records.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[str]</span>
+<span class="sd">        A list of formatted lines.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[ atoms ]</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">]</span>
+    <span class="n">fs8</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%5d</span><span class="s2"> </span><span class="si">%5s</span><span class="s2"> </span><span class="si">%5d</span><span class="s2"> </span><span class="si">%5s</span><span class="s2"> </span><span class="si">%5s</span><span class="s2"> </span><span class="si">%5d</span><span class="s2"> </span><span class="si">%7.4f</span><span class="s2"> ; </span><span class="si">%s</span><span class="s2">&quot;</span>
+    <span class="n">fs9</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%5d</span><span class="s2"> </span><span class="si">%5s</span><span class="s2"> </span><span class="si">%5d</span><span class="s2"> </span><span class="si">%5s</span><span class="s2"> </span><span class="si">%5s</span><span class="s2"> </span><span class="si">%5d</span><span class="s2"> </span><span class="si">%7.4f</span><span class="s2"> </span><span class="si">%7.4f</span><span class="s2"> ; </span><span class="si">%s</span><span class="s2">&quot;</span>
+    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">:</span>
+        <span class="n">atom</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">fs9</span> <span class="o">%</span> <span class="n">atom</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span> <span class="o">==</span> <span class="mi">9</span> <span class="k">else</span> <span class="n">fs8</span> <span class="o">%</span> <span class="n">atom</span>
+        <span class="n">line</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">lines</span></div>
+
+
+
+<div class="viewcode-block" id="format_bonded_section">
+<a class="viewcode-back" href="../../reforge.html#reforge.itpio.format_bonded_section">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">format_bonded_section</span><span class="p">(</span><span class="n">header</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">bonds</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Format a bonded section (e.g., bonds, angles) for a Gromacs ITP file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    header : str</span>
+<span class="sd">        Section header.</span>
+<span class="sd">    bonds : List[List]</span>
+<span class="sd">        List of bond entries.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[str]</span>
+<span class="sd">        A list of formatted lines.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[ </span><span class="si">{</span><span class="n">header</span><span class="si">}</span><span class="s2"> ]</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="n">bonds</span><span class="p">:</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">bond2line</span><span class="p">(</span><span class="o">*</span><span class="n">bond</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">lines</span></div>
+
+
+
+<div class="viewcode-block" id="format_posres_section">
+<a class="viewcode-back" href="../../reforge.html#reforge.itpio.format_posres_section">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">format_posres_section</span><span class="p">(</span><span class="n">atoms</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">],</span> <span class="n">posres_fc</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> 
+                          <span class="n">selection</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Format the position restraints section.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    atoms : List[Tuple]</span>
+<span class="sd">        List of atom records.</span>
+<span class="sd">    posres_fc : float, optional</span>
+<span class="sd">        Force constant for restraints. Default is 1000.</span>
+<span class="sd">    selection : List[str], optional</span>
+<span class="sd">        Atom names to select. Defaults to [&quot;BB1&quot;, &quot;BB3&quot;, &quot;SC1&quot;] if not provided.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[str]</span>
+<span class="sd">        A list of formatted lines.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">selection</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">selection</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;BB1&quot;</span><span class="p">,</span> <span class="s2">&quot;BB3&quot;</span><span class="p">,</span> <span class="s2">&quot;SC1&quot;</span><span class="p">]</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">#ifdef POSRES</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">&quot;#define POSRES_FC </span><span class="si">{</span><span class="n">posres_fc</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s2">&quot; [ position_restraints ]</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">atom</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="ow">in</span> <span class="n">selection</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">atom</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2">    1    POSRES_FC    POSRES_FC    POSRES_FC</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;#endif&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">lines</span></div>
+
+
+
+<div class="viewcode-block" id="write_itp">
+<a class="viewcode-back" href="../../reforge.html#reforge.itpio.write_itp">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_itp</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">lines</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write a list of lines to an ITP file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filename : str</span>
+<span class="sd">        Output file path.</span>
+<span class="sd">    lines : List[str]</span>
+<span class="sd">        Lines to write.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span></div>
+
+
+
+<span class="c1">###################################</span>
+<span class="c1"># HL functions for martini_rna</span>
+<span class="c1">###################################</span>
+
+<div class="viewcode-block" id="make_in_terms">
+<a class="viewcode-back" href="../../reforge.html#reforge.itpio.make_in_terms">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_in_terms</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="n">output_file</span><span class="p">,</span> <span class="n">dict_of_names</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a Martini ITP file using input terms and a dictionary of names.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_file : str</span>
+<span class="sd">        Path to the input ITP file.</span>
+<span class="sd">    output_file : str</span>
+<span class="sd">        Path to the output ITP file.</span>
+<span class="sd">    dict_of_names : dict</span>
+<span class="sd">        Dictionary mapping keys to desired names.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tag</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">pairs</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_sigma</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">):</span>
+        <span class="n">list_of_pairs_1</span> <span class="o">=</span> <span class="p">{(</span><span class="s2">&quot;TA4&quot;</span><span class="p">,</span> <span class="s2">&quot;TU3&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;TA5&quot;</span><span class="p">,</span> <span class="s2">&quot;TU4&quot;</span><span class="p">),</span>
+                           <span class="p">(</span><span class="s2">&quot;TG3&quot;</span><span class="p">,</span> <span class="s2">&quot;TY2&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;TG4&quot;</span><span class="p">,</span> <span class="s2">&quot;TY3&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;TG5&quot;</span><span class="p">,</span> <span class="s2">&quot;TY4&quot;</span><span class="p">)}</span>
+        <span class="n">list_of_pairs_2</span> <span class="o">=</span> <span class="p">{(</span><span class="s2">&quot;TA4&quot;</span><span class="p">,</span> <span class="s2">&quot;TU2&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;TA4&quot;</span><span class="p">,</span> <span class="s2">&quot;TU4&quot;</span><span class="p">),</span>
+                           <span class="p">(</span><span class="s2">&quot;TA5&quot;</span><span class="p">,</span> <span class="s2">&quot;TU3&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;TG3&quot;</span><span class="p">,</span> <span class="s2">&quot;TY3&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;TG4&quot;</span><span class="p">,</span> <span class="s2">&quot;TY2&quot;</span><span class="p">),</span>
+                           <span class="p">(</span><span class="s2">&quot;TG4&quot;</span><span class="p">,</span> <span class="s2">&quot;TY4&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;TG5&quot;</span><span class="p">,</span> <span class="s2">&quot;TY3&quot;</span><span class="p">)}</span>
+        <span class="n">list_of_pairs_3</span> <span class="o">=</span> <span class="p">{(</span><span class="s2">&quot;TA4&quot;</span><span class="p">,</span> <span class="s2">&quot;TY3&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;TA5&quot;</span><span class="p">,</span> <span class="s2">&quot;TY4&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;TA4&quot;</span><span class="p">,</span> <span class="s2">&quot;TY2&quot;</span><span class="p">),</span>
+                           <span class="p">(</span><span class="s2">&quot;TA4&quot;</span><span class="p">,</span> <span class="s2">&quot;TY4&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;TA5&quot;</span><span class="p">,</span> <span class="s2">&quot;TY3&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;TG3&quot;</span><span class="p">,</span> <span class="s2">&quot;TU2&quot;</span><span class="p">),</span>
+                           <span class="p">(</span><span class="s2">&quot;TG4&quot;</span><span class="p">,</span> <span class="s2">&quot;TU3&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;TG5&quot;</span><span class="p">,</span> <span class="s2">&quot;TU4&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;TG3&quot;</span><span class="p">,</span> <span class="s2">&quot;TU3&quot;</span><span class="p">),</span>
+                           <span class="p">(</span><span class="s2">&quot;TG4&quot;</span><span class="p">,</span> <span class="s2">&quot;TU2&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;TG4&quot;</span><span class="p">,</span> <span class="s2">&quot;TU4&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;TG5&quot;</span><span class="p">,</span> <span class="s2">&quot;TU3&quot;</span><span class="p">)}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">list_of_pairs_1</span> <span class="ow">or</span> <span class="p">(</span><span class="n">b2</span><span class="p">,</span> <span class="n">b1</span><span class="p">)</span> <span class="ow">in</span> <span class="n">list_of_pairs_1</span><span class="p">:</span>
+            <span class="n">sigma</span> <span class="o">=</span> <span class="s2">&quot;2.75000e-01&quot;</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">list_of_pairs_2</span> <span class="ow">or</span> <span class="p">(</span><span class="n">b2</span><span class="p">,</span> <span class="n">b1</span><span class="p">)</span> <span class="ow">in</span> <span class="n">list_of_pairs_2</span><span class="p">:</span>
+            <span class="n">sigma</span> <span class="o">=</span> <span class="s2">&quot;2.750000e-01&quot;</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">list_of_pairs_3</span> <span class="ow">or</span> <span class="p">(</span><span class="n">b2</span><span class="p">,</span> <span class="n">b1</span><span class="p">)</span> <span class="ow">in</span> <span class="n">list_of_pairs_3</span><span class="p">:</span>
+            <span class="n">sigma</span> <span class="o">=</span> <span class="s2">&quot;2.750000e-01&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sigma</span> <span class="o">=</span> <span class="s2">&quot;3.300000e-01&quot;</span>
+        <span class="k">return</span> <span class="n">sigma</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;[ atomtypes ]</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">dict_of_vdw</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;TA1&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;3.250000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.000000e-01&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TA2&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;3.250000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.000000e-01&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TA3&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;3.250000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.000000e-01&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TA4&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;2.800000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.368000e-01&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TA5&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;2.800000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.368000e-01&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TA6&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;3.250000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.000000e-01&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TY1&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;3.250000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.000000e-01&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TY2&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;2.800000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.000000e-01&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TY3&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;2.800000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.000000e-01&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TY4&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;2.800000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.000000e-01&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TY5&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;3.250000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.000000e-01&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TG1&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;3.250000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.000000e-01&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TG2&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;3.250000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.000000e-01&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TG3&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;2.800000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.368000e-01&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TG4&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;2.800000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.368000e-01&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TG5&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;2.800000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.368000e-01&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TG6&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;3.250000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.000000e-01&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TG7&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;0.400000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.368000e-01&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TG8&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;3.250000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.000000e-01&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TU1&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;3.250000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.000000e-01&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TU2&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;2.800000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.000000e-01&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TU3&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;2.800000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.368000e-01&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TU4&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;2.800000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.000000e-01&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TU5&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;3.250000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.000000e-01&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TU6&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;0.400000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.368000e-01&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;TU7&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;3.250000e-01&quot;</span><span class="p">,</span> <span class="s2">&quot;1.000000e-01&quot;</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dict_of_names</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">  45.000  0.000  A  </span><span class="si">{</span><span class="n">dict_of_vdw</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">dict_of_vdw</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[ nonbond_params ]</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;;&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="n">atom_name_1</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">atom_name_2</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">atom_name_1</span> <span class="ow">in</span> <span class="n">dict_of_names</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="ow">and</span> 
+                <span class="n">atom_name_2</span> <span class="ow">in</span> <span class="n">dict_of_names</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+                <span class="n">keys_1</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dict_of_names</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">atom_name_1</span><span class="p">]</span>
+                <span class="n">keys_2</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dict_of_names</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">atom_name_2</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">key_1</span> <span class="ow">in</span> <span class="n">keys_1</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">key_2</span> <span class="ow">in</span> <span class="n">keys_2</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="p">(</span><span class="n">key_1</span><span class="p">,</span> <span class="n">key_2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">pairs</span> <span class="ow">or</span> <span class="p">(</span><span class="n">key_2</span><span class="p">,</span> <span class="n">key_1</span><span class="p">)</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                        <span class="n">pairs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">key_1</span><span class="p">,</span> <span class="n">key_2</span><span class="p">))</span>
+                        <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">key_1</span>
+                        <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">key_2</span>
+                        <span class="n">parts</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_sigma</span><span class="p">(</span><span class="n">key_1</span><span class="p">,</span> <span class="n">key_2</span><span class="p">)</span>
+                        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;  &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="make_cross_terms">
+<a class="viewcode-back" href="../../reforge.html#reforge.itpio.make_cross_terms">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_cross_terms</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="n">output_file</span><span class="p">,</span> <span class="n">old_name</span><span class="p">,</span> <span class="n">new_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Append cross-term entries to an ITP file by replacing an old name with a new one.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_file : str</span>
+<span class="sd">        Path to the input ITP file.</span>
+<span class="sd">    output_file : str</span>
+<span class="sd">        Path to the output ITP file.</span>
+<span class="sd">    old_name : str</span>
+<span class="sd">        The name to be replaced.</span>
+<span class="sd">    new_name : str</span>
+<span class="sd">        The replacement name.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">switch</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;;&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;[ nonbond_params ]&quot;</span><span class="p">):</span>
+                <span class="n">switch</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">switch</span><span class="p">:</span>
+                <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                <span class="n">atom_name_1</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">atom_name_2</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">atom_name_1</span> <span class="o">==</span> <span class="n">old_name</span><span class="p">:</span>
+                    <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_name</span>
+                    <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;  &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">atom_name_2</span> <span class="o">==</span> <span class="n">old_name</span><span class="p">:</span>
+                    <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_name</span>
+                    <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;  &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">continue</span></div>
+
+
+
+<div class="viewcode-block" id="make_marnatini_itp">
+<a class="viewcode-back" href="../../reforge.html#reforge.itpio.make_marnatini_itp">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_marnatini_itp</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate and copy a Martini RNA ITP file.</span>
+
+<span class="sd">    This high-level function processes a base Martini ITP file using defined name mappings</span>
+<span class="sd">    and copies the resulting file to several target directories.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dict_of_names</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;TA1&quot;</span><span class="p">:</span> <span class="s2">&quot;SC5&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TA2&quot;</span><span class="p">:</span> <span class="s2">&quot;TN1a&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TA3&quot;</span><span class="p">:</span> <span class="s2">&quot;TC6&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TA4&quot;</span><span class="p">:</span> <span class="s2">&quot;TN4r&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TA5&quot;</span><span class="p">:</span> <span class="s2">&quot;TN4r&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TA6&quot;</span><span class="p">:</span> <span class="s2">&quot;TN1a&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TY1&quot;</span><span class="p">:</span> <span class="s2">&quot;SC3&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TY2&quot;</span><span class="p">:</span> <span class="s2">&quot;TN3&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TY3&quot;</span><span class="p">:</span> <span class="s2">&quot;TN4&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TY4&quot;</span><span class="p">:</span> <span class="s2">&quot;TN3&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TY5&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">&quot;TG1&quot;</span><span class="p">:</span> <span class="s2">&quot;SC5&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TG2&quot;</span><span class="p">:</span> <span class="s2">&quot;TN1a&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TG3&quot;</span><span class="p">:</span> <span class="s2">&quot;TN3r&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TG4&quot;</span><span class="p">:</span> <span class="s2">&quot;TN4r&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TG5&quot;</span><span class="p">:</span> <span class="s2">&quot;TN4r&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TG6&quot;</span><span class="p">:</span> <span class="s2">&quot;TN1a&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TG7&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">&quot;TG8&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">&quot;TU1&quot;</span><span class="p">:</span> <span class="s2">&quot;SC3&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TU2&quot;</span><span class="p">:</span> <span class="s2">&quot;TN3&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TU3&quot;</span><span class="p">:</span> <span class="s2">&quot;TN4&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TU4&quot;</span><span class="p">:</span> <span class="s2">&quot;TN3&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TU5&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">&quot;TU6&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">&quot;TU7&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">out_file</span> <span class="o">=</span> <span class="s2">&quot;reforge/itp/martini_RNA.itp&quot;</span>
+    <span class="n">make_in_terms</span><span class="p">(</span><span class="s2">&quot;reforge/itp/martini.itp&quot;</span><span class="p">,</span> <span class="n">out_file</span><span class="p">,</span> <span class="n">dict_of_names</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">new_name</span><span class="p">,</span> <span class="n">old_name</span> <span class="ow">in</span> <span class="n">dict_of_names</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">make_cross_terms</span><span class="p">(</span><span class="s2">&quot;reforge/itp/martini.itp&quot;</span><span class="p">,</span> <span class="n">out_file</span><span class="p">,</span> <span class="n">old_name</span><span class="p">,</span> <span class="n">new_name</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="s2">&quot;/scratch/dyangali/reforge/systems/dsRNA/topol/martini_v3.0.0_rna.itp&quot;</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="s2">&quot;/scratch/dyangali/reforge/systems/ssRNA/topol/martini_v3.0.0_rna.itp&quot;</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="s2">&quot;/scratch/dyangali/maRNAtini_sims/dimerization_pmf_us/topol/martini_RNA.itp&quot;</span><span class="p">)</span>
+    <span class="n">sh</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="s2">&quot;/scratch/dyangali/maRNAtini_sims/angled_dimerization_pmf_us/topol/martini_RNA.itp&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="make_ions_itp">
+<a class="viewcode-back" href="../../reforge.html#reforge.itpio.make_ions_itp">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_ions_itp</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate an ITP file for ions.</span>
+
+<span class="sd">    This function modifies a base Martini ITP file, adjusts parameters, and writes</span>
+<span class="sd">    the final Martini ions ITP file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+    <span class="n">dict_of_names</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;TMG&quot;</span><span class="p">:</span> <span class="s2">&quot;TD&quot;</span><span class="p">}</span>
+    <span class="n">out_file</span> <span class="o">=</span> <span class="s2">&quot;reforge/itp/ions.itp&quot;</span>
+    <span class="k">for</span> <span class="n">new_name</span><span class="p">,</span> <span class="n">old_name</span> <span class="ow">in</span> <span class="n">dict_of_names</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">make_cross_terms</span><span class="p">(</span><span class="s2">&quot;reforge/itp/martini_v3.0.0.itp&quot;</span><span class="p">,</span> <span class="n">out_file</span><span class="p">,</span> <span class="n">old_name</span><span class="p">,</span> <span class="n">new_name</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">s+&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-=</span> <span class="mf">0.08</span>
+    <span class="n">tmp_file</span> <span class="o">=</span> <span class="s2">&quot;reforge/itp/ions_tmp.itp&quot;</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">tmp_file</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">float_format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%.6e</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">out_file</span> <span class="o">=</span> <span class="s2">&quot;reforge/itp/martini_ions.itp&quot;</span>
+    <span class="n">new_lines</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;[ atomtypes ]</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TMG  45.000  0.000  A  0.0  0.0</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;[ nonbond_params ]</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TMG TMG 1 3.580000e-01 1.100000e+00</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">original_content</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="s2">&quot;w+&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">new_lines</span> <span class="o">+</span> <span class="n">original_content</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="count_itp_atoms">
+<a class="viewcode-back" href="../../reforge.html#reforge.itpio.count_itp_atoms">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">count_itp_atoms</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Count the number of atom entries in the [ atoms ] section of an ITP file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    file_path : str</span>
+<span class="sd">        Path to the ITP file.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    int</span>
+<span class="sd">        The atom count, or 0 if an error occurs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">in_atoms_section</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">atom_count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;;&quot;</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;[ atoms ]&quot;</span><span class="p">):</span>
+                    <span class="n">in_atoms_section</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">in_atoms_section</span> <span class="ow">and</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;[&quot;</span><span class="p">):</span>
+                    <span class="k">break</span>
+                <span class="k">if</span> <span class="n">in_atoms_section</span><span class="p">:</span>
+                    <span class="n">atom_count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">atom_count</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: File </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2"> not found.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An error occurred: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="k">pass</span>
+    <span class="c1"># make_ions_itp()</span>
+    <span class="c1"># make_marnatini_itp()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Danis Yangaliev.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
