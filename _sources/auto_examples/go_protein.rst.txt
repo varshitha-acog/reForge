@@ -29,11 +29,8 @@ Author: DY
 
 .. code-block:: Python
 
-
     import os
     import sys
-    import numpy as np
-    import pandas as pd
     import shutil
     import MDAnalysis as mda
     from pathlib import Path
@@ -41,7 +38,16 @@ Author: DY
     from reforge.mdsystem.gmxmd import GmxSystem, GmxRun
     from reforge.utils import *  # Assuming this imports required utilities
 
-    cli.run('rm -rf tests/test/*')
+
+    WDIR = '.' # '.' for html, 'examples' for manual
+    os.chdir(WDIR)
+    cli.run('rm -rf test/*')
+
+
+
+
+
+
 
 .. GENERATED FROM PYTHON SOURCE LINES 24-27
 
@@ -53,65 +59,250 @@ and root directory 'test' in 'tests' for our system
 
 .. code-block:: Python
 
-    mdsys = GmxSystem(sysdir='tests', sysname='test')
+    mdsys = GmxSystem(sysdir='.', sysname='test')
+
+
+
+
+
+
 
 .. GENERATED FROM PYTHON SOURCE LINES 29-30
 
 This command will actually prepare the necessary files
 
-.. GENERATED FROM PYTHON SOURCE LINES 30-31
+.. GENERATED FROM PYTHON SOURCE LINES 30-33
 
 .. code-block:: Python
 
     mdsys.prepare_files()
+    for f in mdsys.root.iterdir():
+        print(f)
 
-.. GENERATED FROM PYTHON SOURCE LINES 32-34
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /scratch/dyangali/reforge/docs/examples/test/png
+    /scratch/dyangali/reforge/docs/examples/test/data
+    /scratch/dyangali/reforge/docs/examples/test/nucleotides
+    /scratch/dyangali/reforge/docs/examples/test/proteins
+    /scratch/dyangali/reforge/docs/examples/test/mdp
+    /scratch/dyangali/reforge/docs/examples/test/map
+    /scratch/dyangali/reforge/docs/examples/test/system.gro
+    /scratch/dyangali/reforge/docs/examples/test/inpdb.pdb
+    /scratch/dyangali/reforge/docs/examples/test/cgpdb
+    /scratch/dyangali/reforge/docs/examples/test/system.pdb
+    /scratch/dyangali/reforge/docs/examples/test/solute.pdb
+    /scratch/dyangali/reforge/docs/examples/test/protein.top
+    /scratch/dyangali/reforge/docs/examples/test/water.gro
+    /scratch/dyangali/reforge/docs/examples/test/system.ndx
+    /scratch/dyangali/reforge/docs/examples/test/system.top
+    /scratch/dyangali/reforge/docs/examples/test/atommass.dat
+    /scratch/dyangali/reforge/docs/examples/test/topol
+    /scratch/dyangali/reforge/docs/examples/test/mdout.mdp
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 34-36
 
 This will sort chains and atoms in our PDB to avoid conflicts in the future and make file 'inpdb.pdb',
 which we can access later as mdsys.inpdb
 
-.. GENERATED FROM PYTHON SOURCE LINES 34-37
+.. GENERATED FROM PYTHON SOURCE LINES 36-40
 
 .. code-block:: Python
 
-    mdsys.sort_input_pdb("../1btl.pdb")
+    in_pdb = "../1btl.pdb" # relatrive to mdsys.root
+    mdsys.sort_input_pdb(in_pdb)
     print(mdsys.inpdb)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-40
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    Chains and atoms sorted, renamed and saved to /scratch/dyangali/reforge/docs/examples/test/inpdb.pdb
+    /scratch/dyangali/reforge/docs/examples/test/inpdb.pdb
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 41-43
 
 Even though we don't need to have multiple chains in this case, this command splits our mdsys.inpdb
 into separate chains and moves Proteins and RNA/DNA to their respective directories
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-42
+.. GENERATED FROM PYTHON SOURCE LINES 43-45
 
 .. code-block:: Python
 
     mdsys.split_chains()
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 43-61
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 46-47
+
+Coarse-grain the proteins using martinize2 by Martini
+
+.. GENERATED FROM PYTHON SOURCE LINES 47-49
 
 .. code-block:: Python
 
-    print("Results:", 42)
-    import matplotlib.pyplot as plt
-    plt.plot([1, 2, 3], [4, 5, 6])
-    plt.show()  # Optional: Sphinx Gallery captures figures automatically
-    plt.close()
-    # Coarse-grain the proteins using martinize2 by Martini
-    # mdsys.martinize_proteins_go(go_eps=10.0, go_low=0.3, go_up=1.0, p="backbone", pf=500, append=False)
-    # Let's take a look at generated files:
-
-    # # 4. Solvate and add ions.
-    # solvent = os.path.join(mdsys.wdir, "water.gro")
-    # mdsys.solvate(cp=mdsys.solupdb, cs=solvent)
-    # mdsys.add_bulk_ions(conc=0.15, pname="NA", nname="CL")
-
-    # # 5. Create index files.
-    # mdsys.make_sys_ndx(backbone_atoms=["BB", "BB1", "BB3"])
+    mdsys.martinize_proteins_go(go_eps=10.0, go_low=0.3, go_up=1.0, p="backbone", pf=500, append=False)
 
 
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /home/dyangali/.conda/envs/reforge/lib/python3.12/site-packages/MDAnalysis/topology/PDBParser.py:346: UserWarning: Unknown element  found for some atoms. These have been given an empty element record. If needed they can be guessed using universe.guess_TopologyAttrs(context='default', to_guess=['elements']).
+      warnings.warn(wmsg)
+    /home/dyangali/.conda/envs/reforge/lib/python3.12/site-packages/MDAnalysis/analysis/base.py:522: UserWarning: Reader has no dt information, set to 1.0 ps
+      self.times[idx] = ts.time
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 50-52
+
+Let's take a look at generated files. The topology should contain the main protein topology file 'chain_A.itp'
+and virtual sites parameters for go-model - 'go_atomtypes.itp' and 'go_nbparams.itp'
+
+.. GENERATED FROM PYTHON SOURCE LINES 52-55
+
+.. code-block:: Python
+
+    for f in mdsys.topdir.iterdir():
+        print(f)
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /scratch/dyangali/reforge/docs/examples/test/topol/martini_v3.0.0_solvents_v1.itp
+    /scratch/dyangali/reforge/docs/examples/test/topol/martini_v3.0.0_small_molecules_v2.itp
+    /scratch/dyangali/reforge/docs/examples/test/topol/go_nbparams.itp
+    /scratch/dyangali/reforge/docs/examples/test/topol/martini_v3.0.0_ions_v1.itp
+    /scratch/dyangali/reforge/docs/examples/test/topol/martini_v3.0.0.itp
+    /scratch/dyangali/reforge/docs/examples/test/topol/chain_A.itp
+    /scratch/dyangali/reforge/docs/examples/test/topol/go_atomtypes.itp
+    /scratch/dyangali/reforge/docs/examples/test/topol/martini_v3.0.0_phospholipids_v1.itp
+    /scratch/dyangali/reforge/docs/examples/test/topol/martini_RNA.itp
+    /scratch/dyangali/reforge/docs/examples/test/topol/martini_v3.0.0_rna.itp
+    /scratch/dyangali/reforge/docs/examples/test/topol/martini_ions.itp
+    /scratch/dyangali/reforge/docs/examples/test/topol/martini_v3.0.0_sugars_v2.itp
+    /scratch/dyangali/reforge/docs/examples/test/topol/martini_v3.0.0_nucleobases_v1.itp
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 56-57
+
+And the coarse-grained structure shoulbe in 'cgdir'
+
+.. GENERATED FROM PYTHON SOURCE LINES 57-60
+
+.. code-block:: Python
+
+    for f in mdsys.cgdir.iterdir():
+        print(f)
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /scratch/dyangali/reforge/docs/examples/test/cgpdb/chain_A.pdb
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 61-62
+
+These two commands will combine all topology and structre files. 
+
+.. GENERATED FROM PYTHON SOURCE LINES 62-67
+
+.. code-block:: Python
+
+    mdsys.make_cg_topology() # CG topology. Returns mdsys.systop ("mdsys.top") file
+    # make_cg_structure uses 'gmx pdb2gmx' module to make the simulation box.
+    # the description of the module can be found online
+    mdsys.make_cg_structure(bt='dodecahedron', d='1.2', ) # CG structure. Returns mdsys.solupdb ("solute.pdb") file    
+
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 68-69
+
+Now we need to add solvent and neutralize the system's charge
+
+.. GENERATED FROM PYTHON SOURCE LINES 69-73
+
+.. code-block:: Python
+
+    solvent = mdsys.root / "water.gro"
+    mdsys.solvate(cp=mdsys.solupdb, cs=solvent)
+    mdsys.add_bulk_ions(conc=0.15, pname="NA", nname="CL")
+
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 74-77
+
+In order to work with GROMACS' selections we need to make a .ndx file mdsys.sysndx
+Order of the groups: 1.System 2.Solute 3.Backbone 4.Solvent 5. Not Water 6...chains... 
+Can add custom groups using AtomList.write_to_ndx() method
+
+.. GENERATED FROM PYTHON SOURCE LINES 77-80
+
+.. code-block:: Python
+
+    mdsys.make_system_ndx(backbone_atoms=["BB"])
+
+
+
+
+
+
+
+
+
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** (0 minutes 58.164 seconds)
 
 
 .. _sphx_glr_download_auto_examples_go_protein.py:

@@ -193,6 +193,23 @@ coarse-grained PDBs, GRO files, MD runs, data, and PNG outputs.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="reforge.mdsystem.gmxmd.GmxSystem.make_cg_structure">
+<span class="sig-name descname"><span class="pre">make_cg_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/mdsystem/gmxmd.html#GmxSystem.make_cg_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.mdsystem.gmxmd.GmxSystem.make_cg_structure" title="Link to this definition"></a></dt>
+<dd><p>Merges coarse-grained PDB files into a single solute PDB file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> (<em>Additional keyword arguments for the GROMACS editconf command. Defaults:</em>) –</p>
+<ul class="simple">
+<li><p>d: Distance parameter (default: 1.0)</p></li>
+<li><p>bt: Box type (default: “dodecahedron”).</p></li>
+</ul>
+</dd>
+</dl>
+<p>Uses the AtomList from pdbtools to merge and renumber atoms, then calls the
+GROMACS ‘editconf’ command to finalize the solute PDB.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="reforge.mdsystem.gmxmd.GmxSystem.make_cg_topology">
 <span class="sig-name descname"><span class="pre">make_cg_topology</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">add_resolved_ions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'chain'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/mdsystem/gmxmd.html#GmxSystem.make_cg_topology"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.mdsystem.gmxmd.GmxSystem.make_cg_topology" title="Link to this definition"></a></dt>
 <dd><p>Creates the system topology file by including all relevant ITP files and
@@ -779,23 +796,6 @@ with the actual protein name and cleans temporary files.</p>
 </dd>
 </dl>
 <p>Exits the process with an error message if coarse-graining fails.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="reforge.mdsystem.mdsystem.MDSystem.make_cg_solute_pdb">
-<span class="sig-name descname"><span class="pre">make_cg_solute_pdb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/mdsystem/mdsystem.html#MDSystem.make_cg_solute_pdb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.mdsystem.mdsystem.MDSystem.make_cg_solute_pdb" title="Link to this definition"></a></dt>
-<dd><p>Merges coarse-grained PDB files into a single solute PDB file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>kwargs</strong> (<em>Additional keyword arguments for the GROMACS editconf command. Defaults:</em>) –</p>
-<ul class="simple">
-<li><p>d: Distance parameter (default: 1.0)</p></li>
-<li><p>bt: Box type (default: “dodecahedron”).</p></li>
-</ul>
-</dd>
-</dl>
-<p>Uses the AtomList from pdbtools to merge and renumber atoms, then calls the
-GROMACS ‘editconf’ command to finalize the solute PDB.</p>
 </dd></dl>
 
 <dl class="py method">

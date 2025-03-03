@@ -443,36 +443,6 @@
                 <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not coarse-grain </span><span class="si">{</span><span class="n">in_pdb</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="MDSystem.make_cg_solute_pdb">
-<a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.make_cg_solute_pdb">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">make_cg_solute_pdb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Merges coarse-grained PDB files into a single solute PDB file.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">            kwargs: Additional keyword arguments for the GROMACS editconf command. Defaults:</span>
-<span class="sd">                - d: Distance parameter (default: 1.0)</span>
-<span class="sd">                - bt: Box type (default: &quot;dodecahedron&quot;).</span>
-
-<span class="sd">        Uses the AtomList from pdbtools to merge and renumber atoms, then calls the</span>
-<span class="sd">        GROMACS &#39;editconf&#39; command to finalize the solute PDB.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
-        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;bt&quot;</span><span class="p">,</span> <span class="s2">&quot;dodecahedron&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Merging CG PDB files into a single solute PDB...&quot;</span><span class="p">)</span>
-        <span class="k">with</span> <span class="n">cd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">):</span>
-            <span class="n">cg_pdb_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cgdir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()]</span>
-            <span class="n">cg_pdb_files</span> <span class="o">=</span> <span class="n">pdbtools</span><span class="o">.</span><span class="n">sort_uld</span><span class="p">(</span><span class="n">cg_pdb_files</span><span class="p">)</span>
-            <span class="n">cg_pdb_files</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cgdir</span> <span class="o">/</span> <span class="n">fname</span> <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">cg_pdb_files</span><span class="p">]</span>
-            <span class="n">all_atoms</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">cg_pdb_files</span><span class="p">:</span>
-                <span class="n">atoms</span> <span class="o">=</span> <span class="n">pdbtools</span><span class="o">.</span><span class="n">pdb2atomlist</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-                <span class="n">all_atoms</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span>
-            <span class="n">all_atoms</span><span class="o">.</span><span class="n">renumber</span><span class="p">()</span>
-            <span class="n">all_atoms</span><span class="o">.</span><span class="n">write_pdb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">solupdb</span><span class="p">)</span>
-            <span class="n">cli</span><span class="o">.</span><span class="n">gmx</span><span class="p">(</span><span class="s2">&quot;editconf&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">solupdb</span><span class="p">,</span> <span class="n">o</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">solupdb</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-
-
 <div class="viewcode-block" id="MDSystem.find_resolved_ions">
 <a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.find_resolved_ions">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">find_resolved_ions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;MG&quot;</span><span class="p">,</span> <span class="s2">&quot;ZN&quot;</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">)):</span>

@@ -93,8 +93,6 @@ to download the full example code.</p>
 <p>Author: DY</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">MDAnalysis</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mda</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
@@ -102,23 +100,53 @@ to download the full example code.</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">reforge.mdsystem.gmxmd</span><span class="w"> </span><span class="kn">import</span> <span class="n">GmxSystem</span><span class="p">,</span> <span class="n">GmxRun</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">reforge.utils</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>  <span class="c1"># Assuming this imports required utilities</span>
 
-<span class="n">cli</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;rm -rf tests/test/*&#39;</span><span class="p">)</span>
+
+<span class="n">WDIR</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span> <span class="c1"># &#39;.&#39; for html, &#39;examples&#39; for manual</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">WDIR</span><span class="p">)</span>
+<span class="n">cli</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;rm -rf test/*&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>First, we need to initialize an instance of GmxSystem which will take care of pathing
 and necessary files. This will use parent directory ‘tests’ relative to the current directory
 and root directory ‘test’ in ‘tests’ for our system</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">mdsys</span> <span class="o">=</span> <span class="n">GmxSystem</span><span class="p">(</span><span class="n">sysdir</span><span class="o">=</span><span class="s1">&#39;tests&#39;</span><span class="p">,</span> <span class="n">sysname</span><span class="o">=</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">mdsys</span> <span class="o">=</span> <span class="n">GmxSystem</span><span class="p">(</span><span class="n">sysdir</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">sysname</span><span class="o">=</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This command will actually prepare the necessary files</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">mdsys</span><span class="o">.</span><span class="n">prepare_files</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">mdsys</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">iterdir</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/scratch/dyangali/reforge/docs/examples/test/png
+/scratch/dyangali/reforge/docs/examples/test/data
+/scratch/dyangali/reforge/docs/examples/test/nucleotides
+/scratch/dyangali/reforge/docs/examples/test/proteins
+/scratch/dyangali/reforge/docs/examples/test/mdp
+/scratch/dyangali/reforge/docs/examples/test/map
+/scratch/dyangali/reforge/docs/examples/test/system.gro
+/scratch/dyangali/reforge/docs/examples/test/inpdb.pdb
+/scratch/dyangali/reforge/docs/examples/test/cgpdb
+/scratch/dyangali/reforge/docs/examples/test/system.pdb
+/scratch/dyangali/reforge/docs/examples/test/solute.pdb
+/scratch/dyangali/reforge/docs/examples/test/protein.top
+/scratch/dyangali/reforge/docs/examples/test/water.gro
+/scratch/dyangali/reforge/docs/examples/test/system.ndx
+/scratch/dyangali/reforge/docs/examples/test/system.top
+/scratch/dyangali/reforge/docs/examples/test/atommass.dat
+/scratch/dyangali/reforge/docs/examples/test/topol
+/scratch/dyangali/reforge/docs/examples/test/mdout.mdp
 </pre></div>
 </div>
 <p>This will sort chains and atoms in our PDB to avoid conflicts in the future and make file ‘inpdb.pdb’,
 which we can access later as mdsys.inpdb</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">mdsys</span><span class="o">.</span><span class="n">sort_input_pdb</span><span class="p">(</span><span class="s2">&quot;../1btl.pdb&quot;</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">in_pdb</span> <span class="o">=</span> <span class="s2">&quot;../1btl.pdb&quot;</span> <span class="c1"># relatrive to mdsys.root</span>
+<span class="n">mdsys</span><span class="o">.</span><span class="n">sort_input_pdb</span><span class="p">(</span><span class="n">in_pdb</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">mdsys</span><span class="o">.</span><span class="n">inpdb</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Chains and atoms sorted, renamed and saved to /scratch/dyangali/reforge/docs/examples/test/inpdb.pdb
+/scratch/dyangali/reforge/docs/examples/test/inpdb.pdb
 </pre></div>
 </div>
 <p>Even though we don’t need to have multiple chains in this case, this command splits our mdsys.inpdb
@@ -126,24 +154,65 @@ into separate chains and moves Proteins and RNA/DNA to their respective director
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">mdsys</span><span class="o">.</span><span class="n">split_chains</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Results:&quot;</span><span class="p">,</span> <span class="mi">42</span><span class="p">)</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>  <span class="c1"># Optional: Sphinx Gallery captures figures automatically</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-<span class="c1"># Coarse-grain the proteins using martinize2 by Martini</span>
-<span class="c1"># mdsys.martinize_proteins_go(go_eps=10.0, go_low=0.3, go_up=1.0, p=&quot;backbone&quot;, pf=500, append=False)</span>
-<span class="c1"># Let&#39;s take a look at generated files:</span>
-
-<span class="c1"># # 4. Solvate and add ions.</span>
-<span class="c1"># solvent = os.path.join(mdsys.wdir, &quot;water.gro&quot;)</span>
-<span class="c1"># mdsys.solvate(cp=mdsys.solupdb, cs=solvent)</span>
-<span class="c1"># mdsys.add_bulk_ions(conc=0.15, pname=&quot;NA&quot;, nname=&quot;CL&quot;)</span>
-
-<span class="c1"># # 5. Create index files.</span>
-<span class="c1"># mdsys.make_sys_ndx(backbone_atoms=[&quot;BB&quot;, &quot;BB1&quot;, &quot;BB3&quot;])</span>
+<p>Coarse-grain the proteins using martinize2 by Martini</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">mdsys</span><span class="o">.</span><span class="n">martinize_proteins_go</span><span class="p">(</span><span class="n">go_eps</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">go_low</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">go_up</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="s2">&quot;backbone&quot;</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/dyangali/.conda/envs/reforge/lib/python3.12/site-packages/MDAnalysis/topology/PDBParser.py:346: UserWarning: Unknown element  found for some atoms. These have been given an empty element record. If needed they can be guessed using universe.guess_TopologyAttrs(context=&#39;default&#39;, to_guess=[&#39;elements&#39;]).
+  warnings.warn(wmsg)
+/home/dyangali/.conda/envs/reforge/lib/python3.12/site-packages/MDAnalysis/analysis/base.py:522: UserWarning: Reader has no dt information, set to 1.0 ps
+  self.times[idx] = ts.time
+</pre></div>
+</div>
+<p>Let’s take a look at generated files. The topology should contain the main protein topology file ‘chain_A.itp’
+and virtual sites parameters for go-model - ‘go_atomtypes.itp’ and ‘go_nbparams.itp’</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">mdsys</span><span class="o">.</span><span class="n">topdir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/scratch/dyangali/reforge/docs/examples/test/topol/martini_v3.0.0_solvents_v1.itp
+/scratch/dyangali/reforge/docs/examples/test/topol/martini_v3.0.0_small_molecules_v2.itp
+/scratch/dyangali/reforge/docs/examples/test/topol/go_nbparams.itp
+/scratch/dyangali/reforge/docs/examples/test/topol/martini_v3.0.0_ions_v1.itp
+/scratch/dyangali/reforge/docs/examples/test/topol/martini_v3.0.0.itp
+/scratch/dyangali/reforge/docs/examples/test/topol/chain_A.itp
+/scratch/dyangali/reforge/docs/examples/test/topol/go_atomtypes.itp
+/scratch/dyangali/reforge/docs/examples/test/topol/martini_v3.0.0_phospholipids_v1.itp
+/scratch/dyangali/reforge/docs/examples/test/topol/martini_RNA.itp
+/scratch/dyangali/reforge/docs/examples/test/topol/martini_v3.0.0_rna.itp
+/scratch/dyangali/reforge/docs/examples/test/topol/martini_ions.itp
+/scratch/dyangali/reforge/docs/examples/test/topol/martini_v3.0.0_sugars_v2.itp
+/scratch/dyangali/reforge/docs/examples/test/topol/martini_v3.0.0_nucleobases_v1.itp
+</pre></div>
+</div>
+<p>And the coarse-grained structure shoulbe in ‘cgdir’</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">mdsys</span><span class="o">.</span><span class="n">cgdir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/scratch/dyangali/reforge/docs/examples/test/cgpdb/chain_A.pdb
+</pre></div>
+</div>
+<p>These two commands will combine all topology and structre files.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">mdsys</span><span class="o">.</span><span class="n">make_cg_topology</span><span class="p">()</span> <span class="c1"># CG topology. Returns mdsys.systop (&quot;mdsys.top&quot;) file</span>
+<span class="c1"># make_cg_structure uses &#39;gmx pdb2gmx&#39; module to make the simulation box.</span>
+<span class="c1"># the description of the module can be found online</span>
+<span class="n">mdsys</span><span class="o">.</span><span class="n">make_cg_structure</span><span class="p">(</span><span class="n">bt</span><span class="o">=</span><span class="s1">&#39;dodecahedron&#39;</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="s1">&#39;1.2&#39;</span><span class="p">,</span> <span class="p">)</span> <span class="c1"># CG structure. Returns mdsys.solupdb (&quot;solute.pdb&quot;) file</span>
+</pre></div>
+</div>
+<p>Now we need to add solvent and neutralize the system’s charge</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">solvent</span> <span class="o">=</span> <span class="n">mdsys</span><span class="o">.</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;water.gro&quot;</span>
+<span class="n">mdsys</span><span class="o">.</span><span class="n">solvate</span><span class="p">(</span><span class="n">cp</span><span class="o">=</span><span class="n">mdsys</span><span class="o">.</span><span class="n">solupdb</span><span class="p">,</span> <span class="n">cs</span><span class="o">=</span><span class="n">solvent</span><span class="p">)</span>
+<span class="n">mdsys</span><span class="o">.</span><span class="n">add_bulk_ions</span><span class="p">(</span><span class="n">conc</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">pname</span><span class="o">=</span><span class="s2">&quot;NA&quot;</span><span class="p">,</span> <span class="n">nname</span><span class="o">=</span><span class="s2">&quot;CL&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In order to work with GROMACS’ selections we need to make a .ndx file mdsys.sysndx
+Order of the groups: 1.System 2.Solute 3.Backbone 4.Solvent 5. Not Water 6…chains…
+Can add custom groups using AtomList.write_to_ndx() method</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">mdsys</span><span class="o">.</span><span class="n">make_system_ndx</span><span class="p">(</span><span class="n">backbone_atoms</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;BB&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 58.164 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-go-protein-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/d519d4482f471d8e7e15f65f44a10fca/go_protein.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">go_protein.ipynb</span></code></a></p>
