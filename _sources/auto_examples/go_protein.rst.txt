@@ -95,6 +95,7 @@ This command will actually prepare the necessary files
     /scratch/dyangali/reforge/docs/examples/test/cgpdb
     /scratch/dyangali/reforge/docs/examples/test/system.pdb
     /scratch/dyangali/reforge/docs/examples/test/solute.pdb
+    /scratch/dyangali/reforge/docs/examples/test/viz.pdb
     /scratch/dyangali/reforge/docs/examples/test/protein.top
     /scratch/dyangali/reforge/docs/examples/test/water.gro
     /scratch/dyangali/reforge/docs/examples/test/system.ndx
@@ -275,7 +276,7 @@ In order to work with GROMACS' selections we need to make a .ndx file mdsys.sysn
 Order of the groups: 1.System,  2.Solute,  3.Backbone,  4.Solvent,  5. Not Water,  6-. Chains.
 Custom groups can be added using AtomList.write_to_ndx() method
 
-.. GENERATED FROM PYTHON SOURCE LINES 69-72
+.. GENERATED FROM PYTHON SOURCE LINES 69-71
 
 .. code-block:: Python
 
@@ -288,11 +289,29 @@ Custom groups can be added using AtomList.write_to_ndx() method
 
 
 
+.. GENERATED FROM PYTHON SOURCE LINES 72-76
+
+One of the little quality of life features of GmxSystem is executing GROMACS commands from your python script
+with GmxSystem.gmx. This will run the command in the working directory of the system.
+To take a look at the system, we can use VMD or PyMol, but we need to correct the generated box for
+the periodic boundary conditions, and we can do it with GROMACS' "trjconv" module. 
+
+.. GENERATED FROM PYTHON SOURCE LINES 76-77
+
+.. code-block:: Python
+
+    mdsys.gmx("trjconv", clinput='0\n', s=mdsys.syspdb, f=mdsys.syspdb, pbc='atom', ur='compact', o="viz.pdb")
+
+
+
+
+
+
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 58.990 seconds)
+   **Total running time of the script:** (0 minutes 58.437 seconds)
 
 
 .. _sphx_glr_download_auto_examples_go_protein.py:

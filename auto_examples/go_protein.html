@@ -130,6 +130,7 @@ and root directory ‘test’ in ‘tests’ for the system.</p>
 /scratch/dyangali/reforge/docs/examples/test/cgpdb
 /scratch/dyangali/reforge/docs/examples/test/system.pdb
 /scratch/dyangali/reforge/docs/examples/test/solute.pdb
+/scratch/dyangali/reforge/docs/examples/test/viz.pdb
 /scratch/dyangali/reforge/docs/examples/test/protein.top
 /scratch/dyangali/reforge/docs/examples/test/water.gro
 /scratch/dyangali/reforge/docs/examples/test/system.ndx
@@ -210,7 +211,14 @@ Custom groups can be added using AtomList.write_to_ndx() method</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">mdsys</span><span class="o">.</span><span class="n">make_system_ndx</span><span class="p">(</span><span class="n">backbone_atoms</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;BB&quot;</span><span class="p">])</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 58.990 seconds)</p>
+<p>One of the little quality of life features of GmxSystem is executing GROMACS commands from your python script
+with GmxSystem.gmx. This will run the command in the working directory of the system.
+To take a look at the system, we can use VMD or PyMol, but we need to correct the generated box for
+the periodic boundary conditions, and we can do it with GROMACS’ “trjconv” module.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">mdsys</span><span class="o">.</span><span class="n">gmx</span><span class="p">(</span><span class="s2">&quot;trjconv&quot;</span><span class="p">,</span> <span class="n">clinput</span><span class="o">=</span><span class="s1">&#39;0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">mdsys</span><span class="o">.</span><span class="n">syspdb</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">mdsys</span><span class="o">.</span><span class="n">syspdb</span><span class="p">,</span> <span class="n">pbc</span><span class="o">=</span><span class="s1">&#39;atom&#39;</span><span class="p">,</span> <span class="n">ur</span><span class="o">=</span><span class="s1">&#39;compact&#39;</span><span class="p">,</span> <span class="n">o</span><span class="o">=</span><span class="s2">&quot;viz.pdb&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 58.437 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-go-protein-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/d519d4482f471d8e7e15f65f44a10fca/go_protein.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">go_protein.ipynb</span></code></a></p>
