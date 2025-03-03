@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:58.164** total execution time for 1 file **from auto_examples**:
+**00:58.990** total execution time for 1 file **from auto_examples**:
 
 .. container::
 
@@ -33,5 +33,5 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_go_protein.py` (``go_protein.py``)
-     - 00:58.164
+     - 00:58.990
      - 0.0
