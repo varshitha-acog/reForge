@@ -437,6 +437,22 @@
             <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">vec</span> <span class="o">=</span> <span class="n">nvec</span>
 
     <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">residues</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Group atoms by residue and return an AtomListCollection.&quot;&quot;&quot;</span>
+        <span class="n">new_residue</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">()</span>
+        <span class="n">residues</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">resid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">resid</span> <span class="o">!=</span> <span class="n">resid</span><span class="p">:</span>
+                <span class="n">residues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_residue</span><span class="p">)</span>
+                <span class="n">new_residue</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">()</span>
+                <span class="n">resid</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">resid</span>
+            <span class="n">new_residue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new_residue</span><span class="p">:</span>
+            <span class="n">residues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_residue</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">AtomListCollection</span><span class="p">(</span><span class="n">residues</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">chains</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Group atoms by chain identifier and return an AtomListCollection.&quot;&quot;&quot;</span>
         <span class="n">new_chain</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">()</span>
@@ -453,20 +469,20 @@
         <span class="k">return</span> <span class="n">AtomListCollection</span><span class="p">(</span><span class="n">chains</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">residues</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Group atoms by residue and return an AtomListCollection.&quot;&quot;&quot;</span>
-        <span class="n">new_residue</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">()</span>
-        <span class="n">residues</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">resid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">segments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Group atoms by segid identifier and return an AtomListCollection.&quot;&quot;&quot;</span>
+        <span class="n">new_segment</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">()</span>
+        <span class="n">segment</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">segid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">segids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">resid</span> <span class="o">!=</span> <span class="n">resid</span><span class="p">:</span>
-                <span class="n">residues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_residue</span><span class="p">)</span>
-                <span class="n">new_residue</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">()</span>
-                <span class="n">resid</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">resid</span>
-            <span class="n">new_residue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">new_residue</span><span class="p">:</span>
-            <span class="n">residues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_residue</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">AtomListCollection</span><span class="p">(</span><span class="n">residues</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">segid</span> <span class="o">!=</span> <span class="n">segid</span><span class="p">:</span>
+                <span class="n">segment</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_segment</span><span class="p">)</span>
+                <span class="n">new_segment</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">()</span>
+                <span class="n">segid</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">segid</span>
+            <span class="n">new_segment</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new_segment</span><span class="p">:</span>
+            <span class="n">segment</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_segment</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">AtomListCollection</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span>
 
 <div class="viewcode-block" id="AtomList.renum">
 <a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.AtomList.renum">[docs]</a>
@@ -1012,6 +1028,14 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">sort_uld</span><span class="p">(</span><span class="n">alist</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Sort a list of characters: uppercase, then lowercase, then digits.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">alist</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">isdigit</span><span class="p">(),</span> <span class="n">x</span><span class="o">.</span><span class="n">islower</span><span class="p">(),</span> <span class="n">x</span><span class="o">.</span><span class="n">isupper</span><span class="p">(),</span> <span class="n">x</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="label_segments">
+<a class="viewcode-back" href="../../reforge.html#reforge.pdbtools.label_segments">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">label_segments</span><span class="p">(</span><span class="n">in_pdb</span><span class="p">,</span> <span class="n">out_pdb</span><span class="p">,):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Label segments based on something&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
 
 
 

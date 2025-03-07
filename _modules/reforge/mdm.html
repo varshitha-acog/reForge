@@ -163,6 +163,15 @@
 
 
 
+<div class="viewcode-block" id="ccf">
+<a class="viewcode-back" href="../../reforge.html#reforge.mdm.ccf">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ccf</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Similar to the previous. Unified wrapper for calculating cross-correlations.&quot;&quot;&quot;</span>
+    <span class="n">corr</span> <span class="o">=</span> <span class="n">rpymath</span><span class="o">.</span><span class="n">ccf</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">corr</span></div>
+
+
+
 <div class="viewcode-block" id="covariance_matrix">
 <a class="viewcode-back" href="../../reforge.html#reforge.mdm.covariance_matrix">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">covariance_matrix</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
@@ -223,12 +232,12 @@
 
 <div class="viewcode-block" id="perturbation_matrix">
 <a class="viewcode-back" href="../../reforge.html#reforge.mdm.perturbation_matrix">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">perturbation_matrix</span><span class="p">(</span><span class="n">cov_mat</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">perturbation_matrix</span><span class="p">(</span><span class="n">covmat</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the perturbation matrix from a covariance matrix.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    cov_mat : np.ndarray</span>
+<span class="sd">    covmat : np.ndarray</span>
 <span class="sd">        The covariance matrix.</span>
 <span class="sd">    dtype : data-type, optional</span>
 <span class="sd">        Desired data type (default is np.float64).</span>
@@ -238,21 +247,20 @@
 <span class="sd">    np.ndarray</span>
 <span class="sd">        The computed perturbation matrix.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">cov_mat</span> <span class="o">=</span> <span class="n">cov_mat</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-    <span class="c1"># pylint: disable=c-extension-no-member</span>
-    <span class="n">pertmat</span> <span class="o">=</span> <span class="n">rcmath</span><span class="o">.</span><span class="n">perturbation_matrix</span><span class="p">(</span><span class="n">cov_mat</span><span class="p">)</span>
+    <span class="n">covmat</span> <span class="o">=</span> <span class="n">covmat</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">pertmat</span> <span class="o">=</span> <span class="n">rcmath</span><span class="o">.</span><span class="n">perturbation_matrix</span><span class="p">(</span><span class="n">covmat</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">pertmat</span></div>
 
 
 
 <div class="viewcode-block" id="td_perturbation_matrix">
 <a class="viewcode-back" href="../../reforge.html#reforge.mdm.td_perturbation_matrix">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">td_perturbation_matrix</span><span class="p">(</span><span class="n">cov_mat</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">td_perturbation_matrix</span><span class="p">(</span><span class="n">covmat</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the block-wise (td) perturbation matrix from a covariance matrix.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    cov_mat : np.ndarray</span>
+<span class="sd">    covmat : np.ndarray</span>
 <span class="sd">        The covariance matrix.</span>
 <span class="sd">    dtype : data-type, optional</span>
 <span class="sd">        Desired data type (default is np.float64).</span>
@@ -262,9 +270,8 @@
 <span class="sd">    np.ndarray</span>
 <span class="sd">        The computed block-wise perturbation matrix.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">cov_mat</span> <span class="o">=</span> <span class="n">cov_mat</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-    <span class="c1"># pylint: disable=c-extension-no-member</span>
-    <span class="n">pertmat</span> <span class="o">=</span> <span class="n">rcmath</span><span class="o">.</span><span class="n">td_perturbation_matrix</span><span class="p">(</span><span class="n">cov_mat</span><span class="p">)</span>
+    <span class="n">covmat</span> <span class="o">=</span> <span class="n">covmat</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">pertmat</span> <span class="o">=</span> <span class="n">rcmath</span><span class="o">.</span><span class="n">td_perturbation_matrix</span><span class="p">(</span><span class="n">covmat</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">pertmat</span></div>
 
 
@@ -284,8 +291,7 @@
 <span class="sd">    np.ndarray</span>
 <span class="sd">        The DFI values.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">dfi_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pert_mat</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">dfi_val</span> <span class="o">*=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dfi_val</span><span class="p">)</span>
+    <span class="n">dfi_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">pert_mat</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">dfi_val</span></div>
 
 
@@ -316,7 +322,7 @@
 
 <div class="viewcode-block" id="group_molecule_dci">
 <a class="viewcode-back" href="../../reforge.html#reforge.mdm.group_molecule_dci">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">group_molecule_dci</span><span class="p">(</span><span class="n">pert_mat</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asym</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">group_molecule_dci</span><span class="p">(</span><span class="n">pert_mat</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asym</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">transpose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the DCI between groups of atoms and the remainder of the molecule.</span>
 
 <span class="sd">    Parameters</span>
@@ -340,6 +346,8 @@
     <span class="n">dci_tot</span> <span class="o">=</span> <span class="n">pert_mat</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pert_mat</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">asym</span><span class="p">:</span>
         <span class="n">dci_tot</span> <span class="o">=</span> <span class="n">dci_tot</span> <span class="o">-</span> <span class="n">dci_tot</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">if</span> <span class="n">transpose</span><span class="p">:</span>
+        <span class="n">dci_tot</span> <span class="o">=</span> <span class="n">dci_tot</span><span class="o">.</span><span class="n">T</span>
     <span class="k">for</span> <span class="n">ids</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">:</span>
         <span class="n">top</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dci_tot</span><span class="p">[:,</span> <span class="n">ids</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">pert_mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">bot</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>

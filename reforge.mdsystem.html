@@ -147,17 +147,17 @@ simulations using GROMACS.</p>
 and run the MD simulation.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="reforge.mdsystem.gmxmd.GmxSystem.MDATDIR">
-<span class="sig-name descname"><span class="pre">MDATDIR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">PosixPath('/scratch/dyangali/reforge/reforge/martini/datdir')</span></em><a class="headerlink" href="#reforge.mdsystem.gmxmd.GmxSystem.MDATDIR" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">MDATDIR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">PosixPath('/home/mywsl/cgtools/reforge/martini/datdir')</span></em><a class="headerlink" href="#reforge.mdsystem.gmxmd.GmxSystem.MDATDIR" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="reforge.mdsystem.gmxmd.GmxSystem.MMDPDIR">
-<span class="sig-name descname"><span class="pre">MMDPDIR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">PosixPath('/scratch/dyangali/reforge/reforge/martini/datdir/mdp')</span></em><a class="headerlink" href="#reforge.mdsystem.gmxmd.GmxSystem.MMDPDIR" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">MMDPDIR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">PosixPath('/home/mywsl/cgtools/reforge/martini/datdir/mdp')</span></em><a class="headerlink" href="#reforge.mdsystem.gmxmd.GmxSystem.MMDPDIR" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="reforge.mdsystem.gmxmd.GmxSystem.MITPDIR">
-<span class="sig-name descname"><span class="pre">MITPDIR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">PosixPath('/scratch/dyangali/reforge/reforge/martini/itp')</span></em><a class="headerlink" href="#reforge.mdsystem.gmxmd.GmxSystem.MITPDIR" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">MITPDIR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">PosixPath('/home/mywsl/cgtools/reforge/martini/itp')</span></em><a class="headerlink" href="#reforge.mdsystem.gmxmd.GmxSystem.MITPDIR" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -196,6 +196,12 @@ coarse-grained PDBs, GRO files, MD runs, data, and PNG outputs.</p></li>
 <dt class="sig sig-object py" id="reforge.mdsystem.gmxmd.GmxSystem.make_cg_structure">
 <span class="sig-name descname"><span class="pre">make_cg_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/mdsystem/gmxmd.html#GmxSystem.make_cg_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.mdsystem.gmxmd.GmxSystem.make_cg_structure" title="Link to this definition"></a></dt>
 <dd><p>Merges coarse-grained PDB files into a single solute PDB file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="reforge.mdsystem.gmxmd.GmxSystem.make_box">
+<span class="sig-name descname"><span class="pre">make_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/mdsystem/gmxmd.html#GmxSystem.make_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.mdsystem.gmxmd.GmxSystem.make_box" title="Link to this definition"></a></dt>
+<dd><p>Sets up simulation box with GROMACS editconf command.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>kwargs</strong> (<em>Additional keyword arguments for the GROMACS editconf command. Defaults:</em>) –</p>
@@ -205,8 +211,6 @@ coarse-grained PDBs, GRO files, MD runs, data, and PNG outputs.</p></li>
 </ul>
 </dd>
 </dl>
-<p>Uses the AtomList from pdbtools to merge and renumber atoms, then calls the
-GROMACS ‘editconf’ command to finalize the solute PDB.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -332,7 +336,7 @@ and performing post-processing analyses.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>kwargs</strong> (<em>Additional parameters for grompp. Defaults include:</em>) –</p>
 <ul class="simple">
-<li><p>f: Path to “em.mdp” file.</p></li>
+<li><p>f: Path to .mdp file.</p></li>
 <li><p>c: Structure file.</p></li>
 <li><p>r: Reference structure.</p></li>
 <li><p>p: Topology file.</p></li>
@@ -351,7 +355,7 @@ and performing post-processing analyses.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>kwargs</strong> (<em>Additional parameters for grompp. Defaults include:</em>) –</p>
 <ul class="simple">
-<li><p>f: Path to “hu.mdp”.</p></li>
+<li><p>f: Path to .mdp file</p></li>
 <li><p>c: Starting structure (“em.gro”).</p></li>
 <li><p>r: Reference structure (“em.gro”).</p></li>
 <li><p>p: Topology file.</p></li>
@@ -370,7 +374,7 @@ and performing post-processing analyses.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>kwargs</strong> (<em>Additional parameters for grompp. Defaults include:</em>) –</p>
 <ul class="simple">
-<li><p>f: Path to “eq.mdp”.</p></li>
+<li><p>f: Path to .mdp file.</p></li>
 <li><p>c: Starting structure (“hu.gro”).</p></li>
 <li><p>r: Reference structure (“hu.gro”).</p></li>
 <li><p>p: Topology file.</p></li>
@@ -389,7 +393,7 @@ and performing post-processing analyses.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>kwargs</strong> (<em>Additional parameters for grompp. Defaults include:</em>) –</p>
 <ul class="simple">
-<li><p>f: Path to “md.mdp”.</p></li>
+<li><p>f: Path to .mdp file.</p></li>
 <li><p>c: Starting structure (“eq.gro”).</p></li>
 <li><p>r: Reference structure (“eq.gro”).</p></li>
 <li><p>p: Topology file.</p></li>
@@ -428,6 +432,12 @@ and performing post-processing analyses.</p>
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="reforge.mdsystem.gmxmd.GmxRun.convert_tpr">
+<span class="sig-name descname"><span class="pre">convert_tpr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clinput</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/mdsystem/gmxmd.html#GmxRun.convert_tpr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.mdsystem.gmxmd.GmxRun.convert_tpr" title="Link to this definition"></a></dt>
+<dd><p>Converts TPR files using GROMACS convert-tpr.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -650,6 +660,12 @@ input PDB.</p>
 </dl>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="reforge.mdsystem.mdsystem.MDSystem.segments">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">segments</span></span><a class="headerlink" href="#reforge.mdsystem.mdsystem.MDSystem.segments" title="Link to this definition"></a></dt>
+<dd><p>Same as for chains but for segments IDs</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="reforge.mdsystem.mdsystem.MDSystem.sort_input_pdb">
 <span class="sig-name descname"><span class="pre">sort_input_pdb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_pdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'inpdb.pdb'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/mdsystem/mdsystem.html#MDSystem.sort_input_pdb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.mdsystem.mdsystem.MDSystem.sort_input_pdb" title="Link to this definition"></a></dt>
@@ -799,6 +815,12 @@ with the actual protein name and cleans temporary files.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="reforge.mdsystem.mdsystem.MDSystem.insert_membrane">
+<span class="sig-name descname"><span class="pre">insert_membrane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/mdsystem/mdsystem.html#MDSystem.insert_membrane"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.mdsystem.mdsystem.MDSystem.insert_membrane" title="Link to this definition"></a></dt>
+<dd><p>Insert CG lipid membrane using INSANE.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="reforge.mdsystem.mdsystem.MDSystem.find_resolved_ions">
 <span class="sig-name descname"><span class="pre">find_resolved_ions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('MG',</span> <span class="pre">'ZN',</span> <span class="pre">'K')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/mdsystem/mdsystem.html#MDSystem.find_resolved_ions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.mdsystem.mdsystem.MDSystem.find_resolved_ions" title="Link to this definition"></a></dt>
 <dd><p>Identifies resolved ions in the input PDB file and writes them to “ions.pdb”.</p>
@@ -934,7 +956,7 @@ and performing post-processing analyses.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="reforge.mdsystem.mdsystem.MDRun.get_group_dci">
-<span class="sig-name descname"><span class="pre">get_group_dci</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groups</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">asym</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/mdsystem/mdsystem.html#MDRun.get_group_dci"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.mdsystem.mdsystem.MDRun.get_group_dci" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_group_dci</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groups</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/mdsystem/mdsystem.html#MDRun.get_group_dci"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.mdsystem.mdsystem.MDRun.get_group_dci" title="Link to this definition"></a></dt>
 <dd><p>Calculates DCI between specified groups based on perturbation matrices.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1019,12 +1041,12 @@ molecular dynamics simulations.</p>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="reforge.mdsystem.mmmd.MmSystem.MDATDIR">
-<span class="sig-name descname"><span class="pre">MDATDIR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">PosixPath('/scratch/dyangali/reforge/reforge/martini/data')</span></em><a class="headerlink" href="#reforge.mdsystem.mmmd.MmSystem.MDATDIR" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">MDATDIR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">PosixPath('/home/mywsl/cgtools/reforge/martini/data')</span></em><a class="headerlink" href="#reforge.mdsystem.mmmd.MmSystem.MDATDIR" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="reforge.mdsystem.mmmd.MmSystem.MITPDIR">
-<span class="sig-name descname"><span class="pre">MITPDIR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">PosixPath('/scratch/dyangali/reforge/reforge/martini/itp')</span></em><a class="headerlink" href="#reforge.mdsystem.mmmd.MmSystem.MITPDIR" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">MITPDIR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">PosixPath('/home/mywsl/cgtools/reforge/martini/itp')</span></em><a class="headerlink" href="#reforge.mdsystem.mmmd.MmSystem.MITPDIR" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">

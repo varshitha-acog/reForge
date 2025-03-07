@@ -121,19 +121,26 @@
 <a class="viewcode-back" href="../../reforge.html#reforge.io.read_positions">[docs]</a>
 <span class="nd">@timeit</span>
 <span class="nd">@memprofit</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">read_positions</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="n">time_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10000000</span><span class="p">),</span> <span class="n">sample_rate</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read and return positions from an MDAnalysis trajectory.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_positions</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">e</span><span class="o">=</span><span class="mi">10000000</span><span class="p">,</span> <span class="n">sample_rate</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract and return positions from an MDAnalysis trajectory.</span>
+
+<span class="sd">    This function reads the positions for a specified atom group from the </span>
+<span class="sd">    trajectory stored in an MDAnalysis Universe. It extracts frames starting </span>
+<span class="sd">    from index `b` up to index `e`, sampling every `sample_rate` frames, and </span>
+<span class="sd">    returns the coordinates in a flattened, contiguous 2D array.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    u : MDAnalysis Universe</span>
+<span class="sd">    u : MDAnalysis.Universe</span>
 <span class="sd">        The MDAnalysis Universe containing the trajectory.</span>
-<span class="sd">    ag : MDAnalysis AtomGroup</span>
+<span class="sd">    ag : MDAnalysis.AtomGroup</span>
 <span class="sd">        The atom group from which to extract positions.</span>
-<span class="sd">    time_range : tuple, optional</span>
-<span class="sd">        The beginning and ending times (default is (0, 10000000)).</span>
+<span class="sd">    b : int, optional</span>
+<span class="sd">        The starting frame index (default is 0).</span>
+<span class="sd">    e : int, optional</span>
+<span class="sd">        The ending frame index (default is 10000000).</span>
 <span class="sd">    sample_rate : int, optional</span>
-<span class="sd">        Sampling rate (default is 1).</span>
+<span class="sd">        The sampling rate for frames (default is 1, meaning every frame is used).</span>
 <span class="sd">    dtype : data-type, optional</span>
 <span class="sd">        The data type for the returned array (default is np.float32).</span>
 
@@ -143,7 +150,7 @@
 <span class="sd">        A contiguous 2D array with shape (n_coords, n_frames) containing flattened </span>
 <span class="sd">        position coordinates.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">b</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="n">time_range</span>
+
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reading positions...&quot;</span><span class="p">)</span>
     <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
         <span class="p">[</span><span class="n">ag</span><span class="o">.</span><span class="n">positions</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="k">for</span> <span class="n">ts</span> <span class="ow">in</span> <span class="n">u</span><span class="o">.</span><span class="n">trajectory</span><span class="p">[::</span><span class="n">sample_rate</span><span class="p">]</span> <span class="k">if</span> <span class="n">b</span> <span class="o">&lt;</span> <span class="n">ts</span><span class="o">.</span><span class="n">time</span> <span class="o">&lt;</span> <span class="n">e</span><span class="p">],</span>
@@ -159,29 +166,8 @@
 <a class="viewcode-back" href="../../reforge.html#reforge.io.read_velocities">[docs]</a>
 <span class="nd">@timeit</span>
 <span class="nd">@memprofit</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">read_velocities</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="n">time_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10000000</span><span class="p">),</span> <span class="n">sample_rate</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read and return velocities from an MDAnalysis trajectory.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    u : MDAnalysis Universe</span>
-<span class="sd">        The MDAnalysis Universe containing the trajectory.</span>
-<span class="sd">    ag : MDAnalysis AtomGroup</span>
-<span class="sd">        The atom group from which to extract velocities.</span>
-<span class="sd">    time_range : tuple, optional</span>
-<span class="sd">        The beginning and ending times (default is (0, 10000000)).</span>
-<span class="sd">    sample_rate : int, optional</span>
-<span class="sd">        Sampling rate (default is 1).</span>
-<span class="sd">    dtype : data-type, optional</span>
-<span class="sd">        The data type for the returned array (default is np.float32).</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    np.ndarray</span>
-<span class="sd">        A contiguous 2D array with shape (n_coords, n_frames) containing flattened </span>
-<span class="sd">        velocity vectors.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">b</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="n">time_range</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_velocities</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">ag</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">e</span><span class="o">=</span><span class="mi">10000000</span><span class="p">,</span> <span class="n">sample_rate</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Saimilar to the previous. Read and return velocities from an MDAnalysis trajectory.&quot;&quot;&quot;</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reading velocities...&quot;</span><span class="p">)</span>
     <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
         <span class="p">[</span><span class="n">ag</span><span class="o">.</span><span class="n">velocities</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="k">for</span> <span class="n">ts</span> <span class="ow">in</span> <span class="n">u</span><span class="o">.</span><span class="n">trajectory</span><span class="p">[::</span><span class="n">sample_rate</span><span class="p">]</span> <span class="k">if</span> <span class="n">b</span> <span class="o">&lt;</span> <span class="n">ts</span><span class="o">.</span><span class="n">time</span> <span class="o">&lt;</span> <span class="n">e</span><span class="p">],</span>

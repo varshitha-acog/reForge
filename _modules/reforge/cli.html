@@ -203,6 +203,50 @@
 
 
 
+<div class="viewcode-block" id="dojob">
+<a class="viewcode-back" href="../../reforge.html#reforge.cli.dojob">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">dojob</span><span class="p">(</span><span class="n">submit</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Submit or run a job based on the &#39;submit&#39; flag.</span>
+
+<span class="sd">    This function provides a simple interface to either submit a job to SLURM</span>
+<span class="sd">    (using the &#39;sbatch&#39; command) or to run it locally via bash. When `submit` is</span>
+<span class="sd">    True, the function calls the `sbatch` function with the given arguments and</span>
+<span class="sd">    keyword options, which handles setting SLURM parameters and submitting the job.</span>
+<span class="sd">    When `submit` is False, the job is executed immediately using bash.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    submit : bool</span>
+<span class="sd">        If True, submit the job to SLURM using sbatch; if False, run the job locally via bash.</span>
+<span class="sd">    *args : tuple of str</span>
+<span class="sd">        Positional arguments representing the script and any additional command-line </span>
+<span class="sd">        arguments that should be passed to the job.</span>
+<span class="sd">    **kwargs : dict</span>
+<span class="sd">        Keyword arguments for job configuration. These are passed to the `sbatch` function</span>
+<span class="sd">        when submitting the job. They can include SLURM options (such as &#39;t&#39; for time, &#39;mem&#39; for memory,</span>
+<span class="sd">        etc.) as well as any special keys recognized by `sbatch` (e.g., &#39;clinput&#39; for standard input).</span>
+<span class="sd">    </span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    To submit a job to SLURM:</span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt;&gt; dojob(True, &#39;script.sh&#39;, &#39;arg1&#39;, &#39;arg2&#39;, t=&#39;01:00:00&#39;, mem=&#39;4G&#39;, N=&#39;1&#39;, c=&#39;4&#39;)</span>
+<span class="sd">    </span>
+<span class="sd">    To run the job locally via bash:</span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt;&gt; dojob(False, &#39;script.sh&#39;, &#39;arg1&#39;, &#39;arg2&#39;)</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">submit</span><span class="p">:</span>
+        <span class="n">sbatch</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">run</span><span class="p">(</span><span class="s1">&#39;bash&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
+
+
+
 <div class="viewcode-block" id="gmx">
 <a class="viewcode-back" href="../../reforge.html#reforge.cli.gmx">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">gmx</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">gmx_callable</span><span class="o">=</span><span class="s2">&quot;gmx_mpi&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>

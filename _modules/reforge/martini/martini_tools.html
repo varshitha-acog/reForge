@@ -309,19 +309,11 @@
 
 <div class="viewcode-block" id="insert_membrane">
 <a class="viewcode-back" href="../../../reforge.martini.html#reforge.martini.martini_tools.insert_membrane">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">insert_membrane</span><span class="p">(</span><span class="n">wdir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">insert_membrane</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Insert a membrane using the insane tool.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    wdir : str</span>
-<span class="sd">        Working directory.</span>
-<span class="sd">    **kwargs :</span>
-<span class="sd">        Additional parameters.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="n">cd</span><span class="p">(</span><span class="n">wdir</span><span class="p">):</span>
-        <span class="n">script</span> <span class="o">=</span> <span class="s2">&quot;reforge.martini.insane&quot;</span>
-        <span class="n">cli</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;python3 -m&quot;</span><span class="p">,</span> <span class="n">script</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    <span class="n">script</span> <span class="o">=</span> <span class="s2">&quot;reforge.martini.insane3&quot;</span>
+    <span class="n">cli</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;python3 -m&quot;</span><span class="p">,</span> <span class="n">script</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 </pre></div>
 

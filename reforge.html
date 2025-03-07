@@ -64,6 +64,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#module-reforge.cli">reforge.cli module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.cli.run"><code class="docutils literal notranslate"><span class="pre">run()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.cli.sbatch"><code class="docutils literal notranslate"><span class="pre">sbatch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reforge.cli.dojob"><code class="docutils literal notranslate"><span class="pre">dojob()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.cli.gmx"><code class="docutils literal notranslate"><span class="pre">gmx()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.cli.change_directory"><code class="docutils literal notranslate"><span class="pre">change_directory()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.cli.from_wdir"><code class="docutils literal notranslate"><span class="pre">from_wdir()</span></code></a></li>
@@ -123,6 +124,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-reforge.mdm">reforge.mdm module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.mdm.fft_ccf"><code class="docutils literal notranslate"><span class="pre">fft_ccf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reforge.mdm.ccf"><code class="docutils literal notranslate"><span class="pre">ccf()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.mdm.covariance_matrix"><code class="docutils literal notranslate"><span class="pre">covariance_matrix()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.mdm.calc_and_save_covmats"><code class="docutils literal notranslate"><span class="pre">calc_and_save_covmats()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.mdm.perturbation_matrix"><code class="docutils literal notranslate"><span class="pre">perturbation_matrix()</span></code></a></li>
@@ -156,14 +158,29 @@
 <li class="toctree-l4"><a class="reference internal" href="#reforge.pdbtools.write_ndx"><code class="docutils literal notranslate"><span class="pre">write_ndx()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.pdbtools.update_bfactors"><code class="docutils literal notranslate"><span class="pre">update_bfactors()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.pdbtools.sort_uld"><code class="docutils literal notranslate"><span class="pre">sort_uld()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reforge.pdbtools.label_segments"><code class="docutils literal notranslate"><span class="pre">label_segments()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-reforge.plotting">reforge.plotting module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.init_figure"><code class="docutils literal notranslate"><span class="pre">init_figure()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.make_hist"><code class="docutils literal notranslate"><span class="pre">make_hist()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.make_plot"><code class="docutils literal notranslate"><span class="pre">make_plot()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.make_errorbar"><code class="docutils literal notranslate"><span class="pre">make_errorbar()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.set_ax_parameters"><code class="docutils literal notranslate"><span class="pre">set_ax_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.make_heatmap"><code class="docutils literal notranslate"><span class="pre">make_heatmap()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.plot_figure"><code class="docutils literal notranslate"><span class="pre">plot_figure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.pull_data"><code class="docutils literal notranslate"><span class="pre">pull_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.set_ax_parameters"><code class="docutils literal notranslate"><span class="pre">set_ax_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.set_hm_parameters"><code class="docutils literal notranslate"><span class="pre">set_hm_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.grid_labels"><code class="docutils literal notranslate"><span class="pre">grid_labels()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.plot_dfi"><code class="docutils literal notranslate"><span class="pre">plot_dfi()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.plot_pdfi"><code class="docutils literal notranslate"><span class="pre">plot_pdfi()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.plot_rmsf"><code class="docutils literal notranslate"><span class="pre">plot_rmsf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.plot_rmsd"><code class="docutils literal notranslate"><span class="pre">plot_rmsd()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.plot_dci"><code class="docutils literal notranslate"><span class="pre">plot_dci()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.plot_asym"><code class="docutils literal notranslate"><span class="pre">plot_asym()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.plot_pert"><code class="docutils literal notranslate"><span class="pre">plot_pert()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.plot_segment_dci"><code class="docutils literal notranslate"><span class="pre">plot_segment_dci()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.plot_segment_asym"><code class="docutils literal notranslate"><span class="pre">plot_segment_asym()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.response_1"><code class="docutils literal notranslate"><span class="pre">response_1()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.response_2"><code class="docutils literal notranslate"><span class="pre">response_2()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.response_2_2d"><code class="docutils literal notranslate"><span class="pre">response_2_2d()</span></code></a></li>
@@ -171,9 +188,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.response"><code class="docutils literal notranslate"><span class="pre">response()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.make_1d_data"><code class="docutils literal notranslate"><span class="pre">make_1d_data()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.make_2d_data"><code class="docutils literal notranslate"><span class="pre">make_2d_data()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.make_heatmap"><code class="docutils literal notranslate"><span class="pre">make_heatmap()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.make_plot"><code class="docutils literal notranslate"><span class="pre">make_plot()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.make_plot_t"><code class="docutils literal notranslate"><span class="pre">make_plot_t()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.make_heatmap_td"><code class="docutils literal notranslate"><span class="pre">make_heatmap_td()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.make_plot_td"><code class="docutils literal notranslate"><span class="pre">make_plot_td()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.make_plot_t_td"><code class="docutils literal notranslate"><span class="pre">make_plot_t_td()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.make_plot_t_2d"><code class="docutils literal notranslate"><span class="pre">make_plot_t_2d()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.animate_1d"><code class="docutils literal notranslate"><span class="pre">animate_1d()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.plotting.animate_2d"><code class="docutils literal notranslate"><span class="pre">animate_2d()</span></code></a></li>
@@ -498,6 +515,7 @@
 <li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.gmxmd.GmxSystem.gmx"><code class="docutils literal notranslate"><span class="pre">GmxSystem.gmx()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.gmxmd.GmxSystem.prepare_files"><code class="docutils literal notranslate"><span class="pre">GmxSystem.prepare_files()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.gmxmd.GmxSystem.make_cg_structure"><code class="docutils literal notranslate"><span class="pre">GmxSystem.make_cg_structure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.gmxmd.GmxSystem.make_box"><code class="docutils literal notranslate"><span class="pre">GmxSystem.make_box()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.gmxmd.GmxSystem.make_cg_topology"><code class="docutils literal notranslate"><span class="pre">GmxSystem.make_cg_topology()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.gmxmd.GmxSystem.make_gro_file"><code class="docutils literal notranslate"><span class="pre">GmxSystem.make_gro_file()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.gmxmd.GmxSystem.solvate"><code class="docutils literal notranslate"><span class="pre">GmxSystem.solvate()</span></code></a></li>
@@ -514,6 +532,7 @@
 <li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.gmxmd.GmxRun.mdpp"><code class="docutils literal notranslate"><span class="pre">GmxRun.mdpp()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.gmxmd.GmxRun.mdrun"><code class="docutils literal notranslate"><span class="pre">GmxRun.mdrun()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.gmxmd.GmxRun.trjconv"><code class="docutils literal notranslate"><span class="pre">GmxRun.trjconv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.gmxmd.GmxRun.convert_tpr"><code class="docutils literal notranslate"><span class="pre">GmxRun.convert_tpr()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.gmxmd.GmxRun.rmsf"><code class="docutils literal notranslate"><span class="pre">GmxRun.rmsf()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.gmxmd.GmxRun.rmsd"><code class="docutils literal notranslate"><span class="pre">GmxRun.rmsd()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.gmxmd.GmxRun.rdf"><code class="docutils literal notranslate"><span class="pre">GmxRun.rdf()</span></code></a></li>
@@ -532,6 +551,7 @@
 <li class="toctree-l3"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem"><code class="docutils literal notranslate"><span class="pre">MDSystem</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.NUC_RESNAMES"><code class="docutils literal notranslate"><span class="pre">MDSystem.NUC_RESNAMES</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.chains"><code class="docutils literal notranslate"><span class="pre">MDSystem.chains</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.segments"><code class="docutils literal notranslate"><span class="pre">MDSystem.segments</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.sort_input_pdb"><code class="docutils literal notranslate"><span class="pre">MDSystem.sort_input_pdb()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.clean_pdb_mm"><code class="docutils literal notranslate"><span class="pre">MDSystem.clean_pdb_mm()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.clean_pdb_gmx"><code class="docutils literal notranslate"><span class="pre">MDSystem.clean_pdb_gmx()</span></code></a></li>
@@ -543,6 +563,7 @@
 <li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.martinize_proteins_en"><code class="docutils literal notranslate"><span class="pre">MDSystem.martinize_proteins_en()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.martinize_nucleotides"><code class="docutils literal notranslate"><span class="pre">MDSystem.martinize_nucleotides()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.martinize_rna"><code class="docutils literal notranslate"><span class="pre">MDSystem.martinize_rna()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.insert_membrane"><code class="docutils literal notranslate"><span class="pre">MDSystem.insert_membrane()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.find_resolved_ions"><code class="docutils literal notranslate"><span class="pre">MDSystem.find_resolved_ions()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.count_resolved_ions"><code class="docutils literal notranslate"><span class="pre">MDSystem.count_resolved_ions()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.get_mean_sem"><code class="docutils literal notranslate"><span class="pre">MDSystem.get_mean_sem()</span></code></a></li>
@@ -628,6 +649,7 @@
 <li class="toctree-l3"><a class="reference internal" href="reforge.rfgmath.html#reforge.rfgmath.rpymath.sfft_ccf"><code class="docutils literal notranslate"><span class="pre">sfft_ccf()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="reforge.rfgmath.html#reforge.rfgmath.rpymath.pfft_ccf"><code class="docutils literal notranslate"><span class="pre">pfft_ccf()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="reforge.rfgmath.html#reforge.rfgmath.rpymath.gfft_ccf"><code class="docutils literal notranslate"><span class="pre">gfft_ccf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.rfgmath.html#reforge.rfgmath.rpymath.gfft_ccf_auto"><code class="docutils literal notranslate"><span class="pre">gfft_ccf_auto()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="reforge.rfgmath.html#reforge.rfgmath.rpymath.fft_ccf"><code class="docutils literal notranslate"><span class="pre">fft_ccf()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="reforge.rfgmath.html#reforge.rfgmath.rpymath.ccf"><code class="docutils literal notranslate"><span class="pre">ccf()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="reforge.rfgmath.html#reforge.rfgmath.rpymath.gfft_conv"><code class="docutils literal notranslate"><span class="pre">gfft_conv()</span></code></a></li>
@@ -736,6 +758,43 @@ Date: YYYY-MM-DD</p>
 </dl>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sbatch</span><span class="p">(</span><span class="s1">&#39;script.sh&#39;</span><span class="p">,</span> <span class="s1">&#39;arg1&#39;</span><span class="p">,</span> <span class="s1">&#39;arg2&#39;</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="s1">&#39;01:00:00&#39;</span><span class="p">,</span> <span class="n">mem</span><span class="o">=</span><span class="s1">&#39;4G&#39;</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;4&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reforge.cli.dojob">
+<span class="sig-prename descclassname"><span class="pre">reforge.cli.</span></span><span class="sig-name descname"><span class="pre">dojob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">submit</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/cli.html#dojob"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.cli.dojob" title="Link to this definition"></a></dt>
+<dd><p>Submit or run a job based on the ‘submit’ flag.</p>
+<p>This function provides a simple interface to either submit a job to SLURM
+(using the ‘sbatch’ command) or to run it locally via bash. When <cite>submit</cite> is
+True, the function calls the <cite>sbatch</cite> function with the given arguments and
+keyword options, which handles setting SLURM parameters and submitting the job.
+When <cite>submit</cite> is False, the job is executed immediately using bash.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>submit</strong> (<em>bool</em>) – If True, submit the job to SLURM using sbatch; if False, run the job locally via bash.</p></li>
+<li><p><strong>*args</strong> (<em>tuple of str</em>) – Positional arguments representing the script and any additional command-line
+arguments that should be passed to the job.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Keyword arguments for job configuration. These are passed to the <cite>sbatch</cite> function
+when submitting the job. They can include SLURM options (such as ‘t’ for time, ‘mem’ for memory,
+etc.) as well as any special keys recognized by <cite>sbatch</cite> (e.g., ‘clinput’ for standard input).</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>To submit a job to SLURM:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dojob</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;script.sh&#39;</span><span class="p">,</span> <span class="s1">&#39;arg1&#39;</span><span class="p">,</span> <span class="s1">&#39;arg2&#39;</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="s1">&#39;01:00:00&#39;</span><span class="p">,</span> <span class="n">mem</span><span class="o">=</span><span class="s1">&#39;4G&#39;</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;4&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To run the job locally via bash:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dojob</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;script.sh&#39;</span><span class="p">,</span> <span class="s1">&#39;arg1&#39;</span><span class="p">,</span> <span class="s1">&#39;arg2&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -1218,15 +1277,20 @@ filtering file names and recursively retrieving file paths from directories.</p>
 Date: YYYY-MM-DD</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="reforge.io.read_positions">
-<span class="sig-prename descclassname"><span class="pre">reforge.io.</span></span><span class="sig-name descname"><span class="pre">read_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_range=(0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">10000000)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/io.html#read_positions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.io.read_positions" title="Link to this definition"></a></dt>
-<dd><p>Read and return positions from an MDAnalysis trajectory.</p>
+<span class="sig-prename descclassname"><span class="pre">reforge.io.</span></span><span class="sig-name descname"><span class="pre">read_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e=10000000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/io.html#read_positions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.io.read_positions" title="Link to this definition"></a></dt>
+<dd><p>Extract and return positions from an MDAnalysis trajectory.</p>
+<p>This function reads the positions for a specified atom group from the
+trajectory stored in an MDAnalysis Universe. It extracts frames starting
+from index <cite>b</cite> up to index <cite>e</cite>, sampling every <cite>sample_rate</cite> frames, and
+returns the coordinates in a flattened, contiguous 2D array.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>MDAnalysis Universe</em>) – The MDAnalysis Universe containing the trajectory.</p></li>
-<li><p><strong>ag</strong> (<em>MDAnalysis AtomGroup</em>) – The atom group from which to extract positions.</p></li>
-<li><p><strong>time_range</strong> (<em>tuple, optional</em>) – The beginning and ending times (default is (0, 10000000)).</p></li>
-<li><p><strong>sample_rate</strong> (<em>int, optional</em>) – Sampling rate (default is 1).</p></li>
+<li><p><strong>u</strong> (<em>MDAnalysis.Universe</em>) – The MDAnalysis Universe containing the trajectory.</p></li>
+<li><p><strong>ag</strong> (<em>MDAnalysis.AtomGroup</em>) – The atom group from which to extract positions.</p></li>
+<li><p><strong>b</strong> (<em>int, optional</em>) – The starting frame index (default is 0).</p></li>
+<li><p><strong>e</strong> (<em>int, optional</em>) – The ending frame index (default is 10000000).</p></li>
+<li><p><strong>sample_rate</strong> (<em>int, optional</em>) – The sampling rate for frames (default is 1, meaning every frame is used).</p></li>
 <li><p><strong>dtype</strong> (<em>data-type, optional</em>) – The data type for the returned array (default is np.float32).</p></li>
 </ul>
 </dd>
@@ -1242,26 +1306,8 @@ position coordinates.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="reforge.io.read_velocities">
-<span class="sig-prename descclassname"><span class="pre">reforge.io.</span></span><span class="sig-name descname"><span class="pre">read_velocities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_range=(0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">10000000)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/io.html#read_velocities"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.io.read_velocities" title="Link to this definition"></a></dt>
-<dd><p>Read and return velocities from an MDAnalysis trajectory.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>MDAnalysis Universe</em>) – The MDAnalysis Universe containing the trajectory.</p></li>
-<li><p><strong>ag</strong> (<em>MDAnalysis AtomGroup</em>) – The atom group from which to extract velocities.</p></li>
-<li><p><strong>time_range</strong> (<em>tuple, optional</em>) – The beginning and ending times (default is (0, 10000000)).</p></li>
-<li><p><strong>sample_rate</strong> (<em>int, optional</em>) – Sampling rate (default is 1).</p></li>
-<li><p><strong>dtype</strong> (<em>data-type, optional</em>) – The data type for the returned array (default is np.float32).</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A contiguous 2D array with shape (n_coords, n_frames) containing flattened
-velocity vectors.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>np.ndarray</p>
-</dd>
-</dl>
+<span class="sig-prename descclassname"><span class="pre">reforge.io.</span></span><span class="sig-name descname"><span class="pre">read_velocities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e=10000000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_rate=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/io.html#read_velocities"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.io.read_velocities" title="Link to this definition"></a></dt>
+<dd><p>Saimilar to the previous. Read and return velocities from an MDAnalysis trajectory.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1871,6 +1917,12 @@ based on the specified mode:</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="reforge.mdm.ccf">
+<span class="sig-prename descclassname"><span class="pre">reforge.mdm.</span></span><span class="sig-name descname"><span class="pre">ccf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/mdm.html#ccf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.mdm.ccf" title="Link to this definition"></a></dt>
+<dd><p>Similar to the previous. Unified wrapper for calculating cross-correlations.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="reforge.mdm.covariance_matrix">
 <span class="sig-prename descclassname"><span class="pre">reforge.mdm.</span></span><span class="sig-name descname"><span class="pre">covariance_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">positions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float64'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/mdm.html#covariance_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.mdm.covariance_matrix" title="Link to this definition"></a></dt>
 <dd><p>Compute the covariance matrix from trajectory positions.</p>
@@ -1913,12 +1965,12 @@ segments.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="reforge.mdm.perturbation_matrix">
-<span class="sig-prename descclassname"><span class="pre">reforge.mdm.</span></span><span class="sig-name descname"><span class="pre">perturbation_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cov_mat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float64'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/mdm.html#perturbation_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.mdm.perturbation_matrix" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">reforge.mdm.</span></span><span class="sig-name descname"><span class="pre">perturbation_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">covmat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float64'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/mdm.html#perturbation_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.mdm.perturbation_matrix" title="Link to this definition"></a></dt>
 <dd><p>Compute the perturbation matrix from a covariance matrix.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>cov_mat</strong> (<em>np.ndarray</em>) – The covariance matrix.</p></li>
+<li><p><strong>covmat</strong> (<em>np.ndarray</em>) – The covariance matrix.</p></li>
 <li><p><strong>dtype</strong> (<em>data-type, optional</em>) – Desired data type (default is np.float64).</p></li>
 </ul>
 </dd>
@@ -1933,12 +1985,12 @@ segments.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="reforge.mdm.td_perturbation_matrix">
-<span class="sig-prename descclassname"><span class="pre">reforge.mdm.</span></span><span class="sig-name descname"><span class="pre">td_perturbation_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cov_mat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float64'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/mdm.html#td_perturbation_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.mdm.td_perturbation_matrix" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">reforge.mdm.</span></span><span class="sig-name descname"><span class="pre">td_perturbation_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">covmat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float64'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/mdm.html#td_perturbation_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.mdm.td_perturbation_matrix" title="Link to this definition"></a></dt>
 <dd><p>Compute the block-wise (td) perturbation matrix from a covariance matrix.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>cov_mat</strong> (<em>np.ndarray</em>) – The covariance matrix.</p></li>
+<li><p><strong>covmat</strong> (<em>np.ndarray</em>) – The covariance matrix.</p></li>
 <li><p><strong>dtype</strong> (<em>data-type, optional</em>) – Desired data type (default is np.float64).</p></li>
 </ul>
 </dd>
@@ -1990,7 +2042,7 @@ segments.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="reforge.mdm.group_molecule_dci">
-<span class="sig-prename descclassname"><span class="pre">reforge.mdm.</span></span><span class="sig-name descname"><span class="pre">group_molecule_dci</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pert_mat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">asym</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/mdm.html#group_molecule_dci"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.mdm.group_molecule_dci" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">reforge.mdm.</span></span><span class="sig-name descname"><span class="pre">group_molecule_dci</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pert_mat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">asym</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/mdm.html#group_molecule_dci"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.mdm.group_molecule_dci" title="Link to this definition"></a></dt>
 <dd><p>Calculate the DCI between groups of atoms and the remainder of the molecule.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2237,15 +2289,21 @@ Date: 2025-02-27</p>
 <dd></dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="reforge.pdbtools.AtomList.residues">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">residues</span></span><a class="headerlink" href="#reforge.pdbtools.AtomList.residues" title="Link to this definition"></a></dt>
+<dd><p>Group atoms by residue and return an AtomListCollection.</p>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="reforge.pdbtools.AtomList.chains">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">chains</span></span><a class="headerlink" href="#reforge.pdbtools.AtomList.chains" title="Link to this definition"></a></dt>
 <dd><p>Group atoms by chain identifier and return an AtomListCollection.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="reforge.pdbtools.AtomList.residues">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">residues</span></span><a class="headerlink" href="#reforge.pdbtools.AtomList.residues" title="Link to this definition"></a></dt>
-<dd><p>Group atoms by residue and return an AtomListCollection.</p>
+<dt class="sig sig-object py" id="reforge.pdbtools.AtomList.segments">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">segments</span></span><a class="headerlink" href="#reforge.pdbtools.AtomList.segments" title="Link to this definition"></a></dt>
+<dd><p>Group atoms by segid identifier and return an AtomListCollection.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2568,6 +2626,12 @@ Implementation is missing; please provide definitions for read_b_factors and upd
 <dd><p>Sort a list of characters: uppercase, then lowercase, then digits.</p>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="reforge.pdbtools.label_segments">
+<span class="sig-prename descclassname"><span class="pre">reforge.pdbtools.</span></span><span class="sig-name descname"><span class="pre">label_segments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_pdb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_pdb</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/pdbtools.html#label_segments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.pdbtools.label_segments" title="Link to this definition"></a></dt>
+<dd><p>Label segments based on something</p>
+</dd></dl>
+
 </section>
 <section id="module-reforge.plotting">
 <span id="reforge-plotting-module"></span><h2>reforge.plotting module<a class="headerlink" href="#module-reforge.plotting" title="Link to this heading"></a></h2>
@@ -2587,6 +2651,15 @@ params - list of kwargs dictionary for the ax</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="reforge.plotting.make_plot">
+<span class="sig-prename descclassname"><span class="pre">reforge.plotting.</span></span><span class="sig-name descname"><span class="pre">make_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/plotting.html#make_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.plotting.make_plot" title="Link to this definition"></a></dt>
+<dd><p>ax - matplotlib ax object
+xs - list of x coords
+ys - list of y coords
+params - list of kwargs dictionary for the ax</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="reforge.plotting.make_errorbar">
 <span class="sig-prename descclassname"><span class="pre">reforge.plotting.</span></span><span class="sig-name descname"><span class="pre">make_errorbar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/plotting.html#make_errorbar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.plotting.make_errorbar" title="Link to this definition"></a></dt>
 <dd><p>ax - matplotlib ax object
@@ -2597,16 +2670,82 @@ params - list of kwargs dictionary for the ax</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="reforge.plotting.set_ax_parameters">
-<span class="sig-prename descclassname"><span class="pre">reforge.plotting.</span></span><span class="sig-name descname"><span class="pre">set_ax_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Time</span> <span class="pre">(s)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Amplitude'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axtitle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Axtitle'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/plotting.html#set_ax_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.plotting.set_ax_parameters" title="Link to this definition"></a></dt>
-<dd><p>ax - matplotlib ax object</p>
-</dd></dl>
+<dt class="sig sig-object py" id="reforge.plotting.make_heatmap">
+<span class="sig-prename descclassname"><span class="pre">reforge.plotting.</span></span><span class="sig-name descname"><span class="pre">make_heatmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/plotting.html#make_heatmap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.plotting.make_heatmap" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="reforge.plotting.plot_figure">
 <span class="sig-prename descclassname"><span class="pre">reforge.plotting.</span></span><span class="sig-name descname"><span class="pre">plot_figure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figpath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'png/test.png'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/plotting.html#plot_figure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.plotting.plot_figure" title="Link to this definition"></a></dt>
 <dd><p>Finish plotting.</p>
 </dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reforge.plotting.pull_data">
+<span class="sig-prename descclassname"><span class="pre">reforge.plotting.</span></span><span class="sig-name descname"><span class="pre">pull_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metric</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/plotting.html#pull_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.plotting.pull_data" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reforge.plotting.set_ax_parameters">
+<span class="sig-prename descclassname"><span class="pre">reforge.plotting.</span></span><span class="sig-name descname"><span class="pre">set_ax_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axtitle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/plotting.html#set_ax_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.plotting.set_ax_parameters" title="Link to this definition"></a></dt>
+<dd><p>ax - matplotlib ax object</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reforge.plotting.set_hm_parameters">
+<span class="sig-prename descclassname"><span class="pre">reforge.plotting.</span></span><span class="sig-name descname"><span class="pre">set_hm_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mdsys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axtitle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/plotting.html#set_hm_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.plotting.set_hm_parameters" title="Link to this definition"></a></dt>
+<dd><p>ax - matplotlib ax object</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reforge.plotting.grid_labels">
+<span class="sig-prename descclassname"><span class="pre">reforge.plotting.</span></span><span class="sig-name descname"><span class="pre">grid_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mdsys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/plotting.html#grid_labels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.plotting.grid_labels" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reforge.plotting.plot_dfi">
+<span class="sig-prename descclassname"><span class="pre">reforge.plotting.</span></span><span class="sig-name descname"><span class="pre">plot_dfi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mdsys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/plotting.html#plot_dfi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.plotting.plot_dfi" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reforge.plotting.plot_pdfi">
+<span class="sig-prename descclassname"><span class="pre">reforge.plotting.</span></span><span class="sig-name descname"><span class="pre">plot_pdfi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mdsys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/plotting.html#plot_pdfi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.plotting.plot_pdfi" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reforge.plotting.plot_rmsf">
+<span class="sig-prename descclassname"><span class="pre">reforge.plotting.</span></span><span class="sig-name descname"><span class="pre">plot_rmsf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mdsys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/plotting.html#plot_rmsf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.plotting.plot_rmsf" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reforge.plotting.plot_rmsd">
+<span class="sig-prename descclassname"><span class="pre">reforge.plotting.</span></span><span class="sig-name descname"><span class="pre">plot_rmsd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mdsys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/plotting.html#plot_rmsd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.plotting.plot_rmsd" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reforge.plotting.plot_dci">
+<span class="sig-prename descclassname"><span class="pre">reforge.plotting.</span></span><span class="sig-name descname"><span class="pre">plot_dci</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mdsys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/plotting.html#plot_dci"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.plotting.plot_dci" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reforge.plotting.plot_asym">
+<span class="sig-prename descclassname"><span class="pre">reforge.plotting.</span></span><span class="sig-name descname"><span class="pre">plot_asym</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mdsys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/plotting.html#plot_asym"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.plotting.plot_asym" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reforge.plotting.plot_pert">
+<span class="sig-prename descclassname"><span class="pre">reforge.plotting.</span></span><span class="sig-name descname"><span class="pre">plot_pert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mdsys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/plotting.html#plot_pert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.plotting.plot_pert" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reforge.plotting.plot_segment_dci">
+<span class="sig-prename descclassname"><span class="pre">reforge.plotting.</span></span><span class="sig-name descname"><span class="pre">plot_segment_dci</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mdsys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/plotting.html#plot_segment_dci"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.plotting.plot_segment_dci" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reforge.plotting.plot_segment_asym">
+<span class="sig-prename descclassname"><span class="pre">reforge.plotting.</span></span><span class="sig-name descname"><span class="pre">plot_segment_asym</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mdsys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/plotting.html#plot_segment_asym"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.plotting.plot_segment_asym" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="reforge.plotting.response_1">
@@ -2644,18 +2783,18 @@ params - list of kwargs dictionary for the ax</p>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="reforge.plotting.make_heatmap">
-<span class="sig-prename descclassname"><span class="pre">reforge.plotting.</span></span><span class="sig-name descname"><span class="pre">make_heatmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'png/heatmap.png'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/plotting.html#make_heatmap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.plotting.make_heatmap" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="reforge.plotting.make_heatmap_td">
+<span class="sig-prename descclassname"><span class="pre">reforge.plotting.</span></span><span class="sig-name descname"><span class="pre">make_heatmap_td</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'png/heatmap.png'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/plotting.html#make_heatmap_td"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.plotting.make_heatmap_td" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="reforge.plotting.make_plot">
-<span class="sig-prename descclassname"><span class="pre">reforge.plotting.</span></span><span class="sig-name descname"><span class="pre">make_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datas</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'png/test.png'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/plotting.html#make_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.plotting.make_plot" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="reforge.plotting.make_plot_td">
+<span class="sig-prename descclassname"><span class="pre">reforge.plotting.</span></span><span class="sig-name descname"><span class="pre">make_plot_td</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datas</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'png/test.png'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/plotting.html#make_plot_td"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.plotting.make_plot_td" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="reforge.plotting.make_plot_t">
-<span class="sig-prename descclassname"><span class="pre">reforge.plotting.</span></span><span class="sig-name descname"><span class="pre">make_plot_t</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datas</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'png/test.png'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/plotting.html#make_plot_t"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.plotting.make_plot_t" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="reforge.plotting.make_plot_t_td">
+<span class="sig-prename descclassname"><span class="pre">reforge.plotting.</span></span><span class="sig-name descname"><span class="pre">make_plot_t_td</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datas</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'png/test.png'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/plotting.html#make_plot_t_td"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.plotting.make_plot_t_td" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">

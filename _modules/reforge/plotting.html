@@ -76,8 +76,10 @@
            <div itemprop="articleBody">
              
   <h1>Source code for reforge.plotting</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.animation</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">animation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">reforge</span><span class="w"> </span><span class="kn">import</span> <span class="n">io</span>
 
 <span class="c1">##########################</span>
 <span class="c1">## Plotting ##</span>
@@ -114,6 +116,8 @@
 
 
 
+<div class="viewcode-block" id="make_plot">
+<a class="viewcode-back" href="../../reforge.html#reforge.plotting.make_plot">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">make_plot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    ax - matplotlib ax object</span>
@@ -124,7 +128,8 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">params</span><span class="p">:</span>
         <span class="n">params</span> <span class="o">=</span> <span class="p">[{}</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xs</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">param</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">param</span><span class="p">)</span></div>
+
 
 
 <div class="viewcode-block" id="make_errorbar">
@@ -145,31 +150,11 @@
 
 
 
+<div class="viewcode-block" id="make_heatmap">
+<a class="viewcode-back" href="../../reforge.html#reforge.plotting.make_heatmap">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">make_heatmap</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
-
-
-<div class="viewcode-block" id="set_ax_parameters">
-<a class="viewcode-back" href="../../reforge.html#reforge.plotting.set_ax_parameters">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">set_ax_parameters</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;Time (s)&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;Amplitude&quot;</span><span class="p">,</span> <span class="n">axtitle</span><span class="o">=</span><span class="s2">&quot;Axtitle&quot;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    ax - matplotlib ax object</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Set axis labels and title with larger font sizes</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">axtitle</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
-    <span class="c1"># Customize tick parameters</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span>
-        <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;major&quot;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;in&quot;</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">1.5</span>
-    <span class="p">)</span>
-    <span class="c1"># Increase spine width for a bolder look</span>
-    <span class="k">for</span> <span class="n">spine</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">spines</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-        <span class="n">spine</span><span class="o">.</span><span class="n">set_linewidth</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span>
-    <span class="c1"># Add a legend with custom font size and no frame</span>
-    <span class="n">legend</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="c1"># Optionally, add gridlines</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span></div>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">img</span></div>
 
 
 
@@ -181,6 +166,261 @@
     <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">figpath</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="pull_data">
+<a class="viewcode-back" href="../../reforge.html#reforge.plotting.pull_data">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">pull_data</span><span class="p">(</span><span class="n">metric</span><span class="p">):</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">pull_files</span><span class="p">(</span><span class="n">mdsys</span><span class="o">.</span><span class="n">datdir</span><span class="p">,</span> <span class="n">metric</span><span class="p">)</span>
+    <span class="n">datas</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span> <span class="k">if</span> <span class="s1">&#39;_av&#39;</span> <span class="ow">in</span> <span class="n">file</span><span class="p">]</span>
+    <span class="n">errs</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span> <span class="k">if</span> <span class="s1">&#39;_err&#39;</span> <span class="ow">in</span> <span class="n">file</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">datas</span><span class="p">,</span> <span class="n">errs</span></div>
+
+
+
+<div class="viewcode-block" id="set_ax_parameters">
+<a class="viewcode-back" href="../../reforge.html#reforge.plotting.set_ax_parameters">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_ax_parameters</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axtitle</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ax - matplotlib ax object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Set axis labels and title with larger font sizes</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">axtitle</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    <span class="c1"># Customize tick parameters</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">labelbottom</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">labeltop</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">line_positions</span><span class="p">,</span> <span class="n">label_positions</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">grid_labels</span><span class="p">(</span><span class="n">mdsys</span><span class="p">)</span>
+    <span class="n">max_line_pos</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">line_positions</span><span class="p">)</span>
+    <span class="c1"># Add vertical lines</span>
+    <span class="k">for</span> <span class="n">line_pos</span><span class="p">,</span> <span class="n">label_pos</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">line_positions</span><span class="p">,</span> <span class="n">label_positions</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">line_pos</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">label_pos</span><span class="o">/</span><span class="n">max_line_pos</span><span class="o">-</span><span class="mf">0.008</span><span class="p">,</span> <span class="mf">1.03</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span> 
+            <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span> 
+    <span class="k">for</span> <span class="n">spine</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">spines</span><span class="o">.</span><span class="n">values</span><span class="p">():</span> <span class="c1"># Increase spine width for a bolder look</span>
+        <span class="n">spine</span><span class="o">.</span><span class="n">set_linewidth</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span>
+    <span class="n">legend</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># Add a legend with custom font size and no frame</span>
+   <span class="c1"># Autoscale the view to the data</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">relim</span><span class="p">()</span>         <span class="c1"># Recalculate limits based on current artists</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">autoscale_view</span><span class="p">()</span>  <span class="c1"># Update the view to the recalculated limits</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">margins</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># Remove padding around the data</span></div>
+
+
+
+<div class="viewcode-block" id="set_hm_parameters">
+<a class="viewcode-back" href="../../reforge.html#reforge.plotting.set_hm_parameters">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_hm_parameters</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">mdsys</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axtitle</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ax - matplotlib ax object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Set axis labels and title with larger font sizes</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">axtitle</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    <span class="c1"># Customize tick parameters</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">labelbottom</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">labeltop</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">line_positions</span><span class="p">,</span> <span class="n">label_positions</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">grid_labels</span><span class="p">(</span><span class="n">mdsys</span><span class="p">)</span>
+    <span class="n">max_line_pos</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">line_positions</span><span class="p">)</span>
+    <span class="c1"># Add grid</span>
+    <span class="k">for</span> <span class="n">line_pos</span><span class="p">,</span> <span class="n">label_pos</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">line_positions</span><span class="p">,</span> <span class="n">label_positions</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">line_pos</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">line_pos</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">label_pos</span><span class="o">/</span><span class="n">max_line_pos</span><span class="o">-</span><span class="mf">0.008</span><span class="p">,</span> <span class="mf">1.01</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span> 
+            <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span> 
+        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">1.01</span><span class="p">,</span> <span class="mf">0.992</span><span class="o">-</span><span class="n">label_pos</span><span class="o">/</span><span class="n">max_line_pos</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span> 
+            <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span> 
+    <span class="k">for</span> <span class="n">spine</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">spines</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="n">spine</span><span class="o">.</span><span class="n">set_linewidth</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span>
+    <span class="n">legend</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+   <span class="c1"># Autoscale the view to the data</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">relim</span><span class="p">()</span>         <span class="c1"># Recalculate limits based on current artists</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">autoscale_view</span><span class="p">()</span>  <span class="c1"># Update the view to the recalculated limits</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">margins</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># Remove padding around the data</span></div>
+
+
+
+<div class="viewcode-block" id="grid_labels">
+<a class="viewcode-back" href="../../reforge.html#reforge.plotting.grid_labels">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">grid_labels</span><span class="p">(</span><span class="n">mdsys</span><span class="p">):</span>
+    <span class="n">atoms</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">pdb2atomlist</span><span class="p">(</span><span class="n">mdsys</span><span class="o">.</span><span class="n">solupdb</span><span class="p">)</span>
+    <span class="n">backbone_anames</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;BB&quot;</span><span class="p">]</span>
+    <span class="n">bb</span> <span class="o">=</span> <span class="n">atoms</span><span class="o">.</span><span class="n">mask</span><span class="p">(</span><span class="n">backbone_anames</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+    <span class="n">bb</span><span class="o">.</span><span class="n">renum</span><span class="p">()</span> <span class="c1"># Renumber atids form 0, needed to mask numpy arrays</span>
+    <span class="n">groups</span> <span class="o">=</span> <span class="n">bb</span><span class="o">.</span><span class="n">segments</span><span class="o">.</span><span class="n">atids</span> <span class="c1"># mask for the arrays</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">segids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">segids</span> <span class="ow">in</span> <span class="n">bb</span><span class="o">.</span><span class="n">segments</span><span class="o">.</span><span class="n">segids</span><span class="p">]</span>
+    <span class="n">line_positions</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">]</span>
+    <span class="n">line_positions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">groups</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">label_positions</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">group</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">line_positions</span><span class="p">,</span> <span class="n">label_positions</span><span class="p">,</span> <span class="n">labels</span></div>
+
+
+
+<div class="viewcode-block" id="plot_dfi">
+<a class="viewcode-back" href="../../reforge.html#reforge.plotting.plot_dfi">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_dfi</span><span class="p">(</span><span class="n">mdsys</span><span class="p">):</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Plotting DFI&quot;</span><span class="p">)</span>
+    <span class="c1"># Pulling data</span>
+    <span class="n">datas</span><span class="p">,</span> <span class="n">errs</span> <span class="o">=</span> <span class="n">pull_data</span><span class="p">(</span><span class="s1">&#39;dfi*&#39;</span><span class="p">)</span>
+    <span class="n">param</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lw&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">}</span>
+    <span class="n">xs</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datas</span><span class="p">]</span>
+    <span class="n">datas</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datas</span><span class="p">]</span>
+    <span class="n">errs</span> <span class="o">=</span> <span class="p">[</span><span class="n">err</span> <span class="k">for</span> <span class="n">err</span> <span class="ow">in</span> <span class="n">errs</span><span class="p">]</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="n">param</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datas</span><span class="p">]</span>
+    <span class="c1"># Plotting</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">init_figure</span><span class="p">(</span><span class="n">grid</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">axsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+    <span class="n">make_errorbar</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">datas</span><span class="p">,</span> <span class="n">errs</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+    <span class="n">set_ax_parameters</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Residue&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;DFI&#39;</span><span class="p">)</span>
+    <span class="n">plot_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">figname</span><span class="o">=</span><span class="n">mdsys</span><span class="o">.</span><span class="n">sysname</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">figpath</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">mdsys</span><span class="o">.</span><span class="n">pngdir</span><span class="si">}</span><span class="s1">/dfi.png&#39;</span><span class="p">,)</span></div>
+
+
+
+<div class="viewcode-block" id="plot_pdfi">
+<a class="viewcode-back" href="../../reforge.html#reforge.plotting.plot_pdfi">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_pdfi</span><span class="p">(</span><span class="n">mdsys</span><span class="p">):</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Plotting %DFI&quot;</span><span class="p">)</span>
+    <span class="c1"># Pulling data</span>
+    <span class="n">datas</span><span class="p">,</span> <span class="n">errs</span> <span class="o">=</span> <span class="n">pull_data</span><span class="p">(</span><span class="s1">&#39;dfi*&#39;</span><span class="p">)</span>
+    <span class="n">param</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lw&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">}</span>
+    <span class="n">xs</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datas</span><span class="p">]</span>
+    <span class="n">datas</span> <span class="o">=</span> <span class="p">[</span><span class="n">percentile</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datas</span><span class="p">]</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="n">param</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datas</span><span class="p">]</span>
+    <span class="c1"># Plotting</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">init_figure</span><span class="p">(</span><span class="n">grid</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">axsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+    <span class="n">make_plot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">datas</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+    <span class="n">set_ax_parameters</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Residue&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;%DFI&#39;</span><span class="p">)</span>
+    <span class="n">plot_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">figname</span><span class="o">=</span><span class="n">mdsys</span><span class="o">.</span><span class="n">sysname</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">figpath</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">mdsys</span><span class="o">.</span><span class="n">pngdir</span><span class="si">}</span><span class="s1">/pdfi.png&#39;</span><span class="p">,)</span></div>
+
+
+
+<div class="viewcode-block" id="plot_rmsf">
+<a class="viewcode-back" href="../../reforge.html#reforge.plotting.plot_rmsf">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_rmsf</span><span class="p">(</span><span class="n">mdsys</span><span class="p">):</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Plotting RMSF&quot;</span><span class="p">)</span>
+    <span class="c1"># Pulling data</span>
+    <span class="n">datas</span><span class="p">,</span> <span class="n">errs</span> <span class="o">=</span> <span class="n">pull_data</span><span class="p">(</span><span class="s1">&#39;rmsf*&#39;</span><span class="p">)</span>
+    <span class="n">xs</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datas</span><span class="p">]</span>
+    <span class="n">datas</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="o">*</span><span class="mi">10</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datas</span><span class="p">]</span>
+    <span class="n">errs</span> <span class="o">=</span> <span class="p">[</span><span class="n">err</span><span class="o">*</span><span class="mi">10</span> <span class="k">for</span> <span class="n">err</span> <span class="ow">in</span> <span class="n">errs</span><span class="p">]</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;lw&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">}</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datas</span><span class="p">]</span>
+    <span class="c1"># Plotting</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">init_figure</span><span class="p">(</span><span class="n">grid</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">axsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+    <span class="n">make_errorbar</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">datas</span><span class="p">,</span> <span class="n">errs</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+    <span class="n">set_ax_parameters</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Residue&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;RMSF (Angstrom)&#39;</span><span class="p">)</span>
+    <span class="n">plot_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">figname</span><span class="o">=</span><span class="n">mdsys</span><span class="o">.</span><span class="n">sysname</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">figpath</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">mdsys</span><span class="o">.</span><span class="n">pngdir</span><span class="si">}</span><span class="s1">/rmsf.png&#39;</span><span class="p">,)</span></div>
+
+
+
+<div class="viewcode-block" id="plot_rmsd">
+<a class="viewcode-back" href="../../reforge.html#reforge.plotting.plot_rmsd">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_rmsd</span><span class="p">(</span><span class="n">mdsys</span><span class="p">):</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Plotting RMSD&quot;</span><span class="p">)</span>
+    <span class="c1"># Pulling data</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">pull_files</span><span class="p">(</span><span class="n">mdsys</span><span class="o">.</span><span class="n">mddir</span><span class="p">,</span> <span class="s1">&#39;rmsd*npy&#39;</span><span class="p">)</span>
+    <span class="n">datas</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">]</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">]</span>
+    <span class="n">xs</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-3</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datas</span><span class="p">]</span>
+    <span class="n">ys</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">10</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datas</span><span class="p">]</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;lw&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;label&#39;</span><span class="p">:</span><span class="n">label</span><span class="p">}</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">]</span>
+    <span class="c1"># Plotting</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">init_figure</span><span class="p">(</span><span class="n">grid</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">axsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+    <span class="n">make_plot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (ns)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;RMSD (Angstrom)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">plot_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">figname</span><span class="o">=</span><span class="n">mdsys</span><span class="o">.</span><span class="n">sysname</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="p">,</span> <span class="n">figpath</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">mdsys</span><span class="o">.</span><span class="n">pngdir</span><span class="si">}</span><span class="s1">/rmsd.png&#39;</span><span class="p">,)</span></div>
+
+
+
+<div class="viewcode-block" id="plot_dci">
+<a class="viewcode-back" href="../../reforge.html#reforge.plotting.plot_dci">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_dci</span><span class="p">(</span><span class="n">mdsys</span><span class="p">):</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Plotting DCI&quot;</span><span class="p">)</span>
+    <span class="c1"># Pulling data</span>
+    <span class="n">datas</span><span class="p">,</span> <span class="n">errs</span> <span class="o">=</span> <span class="n">pull_data</span><span class="p">(</span><span class="s1">&#39;dci*&#39;</span><span class="p">)</span>
+    <span class="n">param</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lw&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">}</span>
+    <span class="n">datas</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datas</span><span class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">datas</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># Plotting</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">init_figure</span><span class="p">(</span><span class="n">grid</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">axsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+    <span class="n">make_heatmap</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;bwr&#39;</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">set_hm_parameters</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Residue&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Residue&#39;</span><span class="p">)</span>
+    <span class="n">plot_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">figname</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mdsys</span><span class="o">.</span><span class="n">sysname</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2"> DCI&quot;</span><span class="p">,</span> <span class="n">figpath</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">mdsys</span><span class="o">.</span><span class="n">pngdir</span><span class="si">}</span><span class="s1">/dci.png&#39;</span><span class="p">,)</span></div>
+
+
+
+<div class="viewcode-block" id="plot_asym">
+<a class="viewcode-back" href="../../reforge.html#reforge.plotting.plot_asym">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_asym</span><span class="p">(</span><span class="n">mdsys</span><span class="p">):</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Plotting DCI asym&quot;</span><span class="p">)</span>
+    <span class="c1"># Pulling data</span>
+    <span class="n">datas</span><span class="p">,</span> <span class="n">errs</span> <span class="o">=</span> <span class="n">pull_data</span><span class="p">(</span><span class="s1">&#39;asym*&#39;</span><span class="p">)</span>
+    <span class="n">param</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lw&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">}</span>
+    <span class="n">datas</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datas</span><span class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">datas</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># Plotting</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">init_figure</span><span class="p">(</span><span class="n">grid</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">axsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+    <span class="n">make_heatmap</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;bwr&#39;</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">set_hm_parameters</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Residue&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Residue&#39;</span><span class="p">)</span>
+    <span class="n">plot_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">figname</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mdsys</span><span class="o">.</span><span class="n">sysname</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2"> DCI-ASYM&quot;</span><span class="p">,</span> <span class="n">figpath</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">mdsys</span><span class="o">.</span><span class="n">pngdir</span><span class="si">}</span><span class="s1">/asym.png&#39;</span><span class="p">,)</span></div>
+
+
+
+<div class="viewcode-block" id="plot_pert">
+<a class="viewcode-back" href="../../reforge.html#reforge.plotting.plot_pert">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_pert</span><span class="p">(</span><span class="n">mdsys</span><span class="p">):</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Plotting pertmat&quot;</span><span class="p">)</span>
+    <span class="c1"># Pulling data</span>
+    <span class="n">datas</span><span class="p">,</span> <span class="n">errs</span> <span class="o">=</span> <span class="n">pull_data</span><span class="p">(</span><span class="s1">&#39;pert*&#39;</span><span class="p">)</span>
+    <span class="n">param</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lw&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">}</span>
+    <span class="n">datas</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datas</span><span class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">datas</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># Plotting</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">init_figure</span><span class="p">(</span><span class="n">grid</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">axsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+    <span class="n">make_heatmap</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;bwr&#39;</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">set_hm_parameters</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Residue&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Residue&#39;</span><span class="p">)</span>
+    <span class="n">plot_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">figname</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mdsys</span><span class="o">.</span><span class="n">sysname</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2"> PertMat&quot;</span><span class="p">,</span> <span class="n">figpath</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">mdsys</span><span class="o">.</span><span class="n">pngdir</span><span class="si">}</span><span class="s1">/pert.png&#39;</span><span class="p">,)</span></div>
+
+
+
+<div class="viewcode-block" id="plot_segment_dci">
+<a class="viewcode-back" href="../../reforge.html#reforge.plotting.plot_segment_dci">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_segment_dci</span><span class="p">(</span><span class="n">mdsys</span><span class="p">,</span> <span class="n">segid</span><span class="p">):</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Plotting </span><span class="si">%s</span><span class="s2"> DCI&quot;</span><span class="p">,</span> <span class="n">segid</span><span class="p">)</span>
+    <span class="c1"># Pulling data</span>
+    <span class="n">datas</span><span class="p">,</span> <span class="n">errs</span> <span class="o">=</span> <span class="n">pull_data</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;gdci_</span><span class="si">{</span><span class="n">segid</span><span class="si">}</span><span class="s1">*&#39;</span><span class="p">)</span>
+    <span class="n">param</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lw&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">}</span>
+    <span class="n">xs</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datas</span><span class="p">]</span>
+    <span class="n">datas</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datas</span><span class="p">]</span>
+    <span class="n">errs</span> <span class="o">=</span> <span class="p">[</span><span class="n">err</span> <span class="k">for</span> <span class="n">err</span> <span class="ow">in</span> <span class="n">errs</span><span class="p">]</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="n">param</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datas</span><span class="p">]</span> 
+    <span class="c1"># Plotting</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">init_figure</span><span class="p">(</span><span class="n">grid</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">axsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+    <span class="n">make_errorbar</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">datas</span><span class="p">,</span> <span class="n">errs</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+    <span class="n">set_ax_parameters</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Residue&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;DCI&#39;</span><span class="p">)</span>
+    <span class="n">plot_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">figname</span><span class="o">=</span><span class="n">mdsys</span><span class="o">.</span><span class="n">sysname</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">segid</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> 
+        <span class="n">figpath</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">mdsys</span><span class="o">.</span><span class="n">pngdir</span><span class="si">}</span><span class="s1">/gdci_</span><span class="si">{</span><span class="n">segid</span><span class="si">}</span><span class="s1">.png&#39;</span><span class="p">,)</span></div>
+
+
+
+<div class="viewcode-block" id="plot_segment_asym">
+<a class="viewcode-back" href="../../reforge.html#reforge.plotting.plot_segment_asym">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_segment_asym</span><span class="p">(</span><span class="n">mdsys</span><span class="p">,</span> <span class="n">segid</span><span class="p">):</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Plotting </span><span class="si">%s</span><span class="s2"> ASYM&quot;</span><span class="p">,</span> <span class="n">segid</span><span class="p">)</span>
+    <span class="c1"># Pulling data</span>
+    <span class="n">datas</span><span class="p">,</span> <span class="n">errs</span> <span class="o">=</span> <span class="n">pull_data</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;gasym_</span><span class="si">{</span><span class="n">segid</span><span class="si">}</span><span class="s1">*&#39;</span><span class="p">)</span>
+    <span class="n">param</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lw&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">}</span>
+    <span class="n">xs</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datas</span><span class="p">]</span>
+    <span class="n">datas</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datas</span><span class="p">]</span>
+    <span class="n">errs</span> <span class="o">=</span> <span class="p">[</span><span class="n">err</span> <span class="k">for</span> <span class="n">err</span> <span class="ow">in</span> <span class="n">errs</span><span class="p">]</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="n">param</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datas</span><span class="p">]</span> 
+    <span class="c1"># Plotting</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">init_figure</span><span class="p">(</span><span class="n">grid</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">axsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+    <span class="n">make_errorbar</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">datas</span><span class="p">,</span> <span class="n">errs</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+    <span class="n">set_ax_parameters</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Residue&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;DCI-ASYM&#39;</span><span class="p">)</span>
+    <span class="n">plot_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">figname</span><span class="o">=</span><span class="n">mdsys</span><span class="o">.</span><span class="n">sysname</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">segid</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> 
+        <span class="n">figpath</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">mdsys</span><span class="o">.</span><span class="n">pngdir</span><span class="si">}</span><span class="s1">/gasym_</span><span class="si">{</span><span class="n">segid</span><span class="si">}</span><span class="s1">.png&#39;</span><span class="p">,)</span></div>
 
 
 
@@ -301,9 +541,9 @@
 
 
 
-<div class="viewcode-block" id="make_heatmap">
-<a class="viewcode-back" href="../../reforge.html#reforge.plotting.make_heatmap">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">make_heatmap</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;png/heatmap.png&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="make_heatmap_td">
+<a class="viewcode-back" href="../../reforge.html#reforge.plotting.make_heatmap_td">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_heatmap_td</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;png/heatmap.png&quot;</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Making a heatmap&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
     <span class="n">img</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
@@ -330,9 +570,9 @@
 
 
 
-<div class="viewcode-block" id="make_plot">
-<a class="viewcode-back" href="../../reforge.html#reforge.plotting.make_plot">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">make_plot</span><span class="p">(</span><span class="n">datas</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;png/test.png&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="make_plot_td">
+<a class="viewcode-back" href="../../reforge.html#reforge.plotting.make_plot_td">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_plot_td</span><span class="p">(</span><span class="n">datas</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;png/test.png&quot;</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Making a plot&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
     <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
@@ -367,9 +607,9 @@
 
 
 
-<div class="viewcode-block" id="make_plot_t">
-<a class="viewcode-back" href="../../reforge.html#reforge.plotting.make_plot_t">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">make_plot_t</span><span class="p">(</span><span class="n">datas</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;png/test.png&quot;</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.2</span><span class="p">):</span>
+<div class="viewcode-block" id="make_plot_t_td">
+<a class="viewcode-back" href="../../reforge.html#reforge.plotting.make_plot_t_td">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_plot_t_td</span><span class="p">(</span><span class="n">datas</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;png/test.png&quot;</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.2</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Making a plot&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
     <span class="c1"># residues = [9, 14, 761, 839, 982, 985, ]</span>
     <span class="n">resp_residues</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>
