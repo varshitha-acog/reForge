@@ -145,22 +145,22 @@ and keyword arguments to the SLURM scheduler.</p>
         <span class="nb">print</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">readline</span><span class="p">(),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Hello I am run mdrun_1 of system mutant_2
-Hello I am run mdrun_2 of system mutant_3
-Hello I am run mdrun_3 of system mutant_0
-Hello I am run mdrun_0 of system mutant_1
-Hello I am run mdrun_2 of system mutant_2
-Hello I am run mdrun_0 of system mutant_2
-Hello I am run mdrun_1 of system mutant_0
-Hello I am run mdrun_3 of system mutant_2
-Hello I am run mdrun_0 of system mutant_3
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Hello I am run mdrun_0 of system mutant_1
 Hello I am run mdrun_2 of system mutant_0
-Hello I am run mdrun_2 of system mutant_1
+Hello I am run mdrun_2 of system mutant_3
+Hello I am run mdrun_1 of system mutant_2
+Hello I am run mdrun_0 of system mutant_2
 Hello I am run mdrun_3 of system mutant_1
+Hello I am run mdrun_2 of system mutant_1
 Hello I am run mdrun_1 of system mutant_3
+Hello I am run mdrun_3 of system mutant_0
+Hello I am run mdrun_0 of system mutant_3
+Hello I am run mdrun_1 of system mutant_0
 Hello I am run mdrun_1 of system mutant_1
-Hello I am run mdrun_0 of system mutant_0
+Hello I am run mdrun_3 of system mutant_2
 Hello I am run mdrun_3 of system mutant_3
+Hello I am run mdrun_0 of system mutant_0
+Hello I am run mdrun_2 of system mutant_2
 </pre></div>
 </div>
 <p>For convenience, dojob will either submit or run the script based on its first argument.
@@ -171,7 +171,7 @@ In this case, we do not want to sbatch the script.</p>
         <span class="n">dojob</span><span class="p">(</span><span class="n">submit</span><span class="p">,</span> <span class="s1">&#39;hello.sh&#39;</span><span class="p">,</span> <span class="n">mdrun</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">mem</span><span class="o">=</span><span class="s1">&#39;50M&#39;</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="s1">&#39;00:00:01&#39;</span><span class="p">,</span> <span class="n">partition</span><span class="o">=</span><span class="s1">&#39;htc&#39;</span><span class="p">,</span> <span class="n">qos</span><span class="o">=</span><span class="s1">&#39;public&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.064 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.175 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-hello-world-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/eeee61acd5da20db911a57d702aa0157/hello_world.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">hello_world.ipynb</span></code></a></p>

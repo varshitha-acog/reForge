@@ -226,6 +226,16 @@ of the system energy with respect to positions.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="reforge.rfgmath.rcmath.covmat">
+<span class="sig-prename descclassname"><span class="pre">reforge.rfgmath.rcmath.</span></span><span class="sig-name descname"><span class="pre">covmat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#reforge.rfgmath.rcmath.covmat" title="Link to this definition"></a></dt>
+<dd><p>Naive mimicing of:</p>
+<blockquote>
+<div><p>covmat = np.cov(centered_positions, rowvar=True, dtype=np.float64)</p>
+</div></blockquote>
+<p>Much slower, as expected.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="reforge.rfgmath.rcmath.hessian">
 <span class="sig-prename descclassname"><span class="pre">reforge.rfgmath.rcmath.</span></span><span class="sig-name descname"><span class="pre">hessian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spring_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#reforge.rfgmath.rcmath.hessian" title="Link to this definition"></a></dt>
 <dd><p>Calculate the position-position Hessian matrix from a coordinate matrix.</p>
@@ -253,7 +263,7 @@ where n is derived from the input coordinate matrix.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="reforge.rfgmath.rcmath.perturbation_matrix">
-<span class="sig-prename descclassname"><span class="pre">reforge.rfgmath.rcmath.</span></span><span class="sig-name descname"><span class="pre">perturbation_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">covariance_matrix</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#reforge.rfgmath.rcmath.perturbation_matrix" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">reforge.rfgmath.rcmath.</span></span><span class="sig-name descname"><span class="pre">perturbation_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">covariance_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#reforge.rfgmath.rcmath.perturbation_matrix" title="Link to this definition"></a></dt>
 <dd><p>Compute a perturbation matrix from a covariance matrix.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -263,6 +273,30 @@ are the numbers of residues in two systems.</p>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>perturbation_matrix</strong> – A normalized perturbation matrix of shape (m, n). Each element represents the aggregated
 perturbation computed from the directional components of the corresponding 3x3 block.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray of double, 2D</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reforge.rfgmath.rcmath.perturbation_matrix_iso">
+<span class="sig-prename descclassname"><span class="pre">reforge.rfgmath.rcmath.</span></span><span class="sig-name descname"><span class="pre">perturbation_matrix_iso</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ccf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#reforge.rfgmath.rcmath.perturbation_matrix_iso" title="Link to this definition"></a></dt>
+<dd><p>Calculate the perturbation matrix from a covariance (or Hessian) matrix using block-wise norms.</p>
+<p>The input covariance matrix ‘ccf’ is expected to have shape (3*m, 3*n). For each block (i,j),
+the perturbation value is computed as the square root of the sum of the squares of the corresponding
+3x3 block elements.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ccf</strong> (<em>ndarray of double, 2D</em>) – Input covariance matrix with shape (3*m, 3*n).</p></li>
+<li><p><strong>normalize</strong> (<em>bool, optional</em>) – If True, the output perturbation matrix is normalized so that the total sum of its elements equals 1
+(default is True).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>perturbation_matrix</strong> – An (m, n) matrix of perturbation values computed from the blocks of ccf.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>ndarray of double, 2D</p>
@@ -294,23 +328,23 @@ represents the cumulative perturbation contribution from directional projections
 <dl class="py function">
 <dt class="sig sig-object py" id="reforge.rfgmath.rcmath.td_perturbation_matrix">
 <span class="sig-prename descclassname"><span class="pre">reforge.rfgmath.rcmath.</span></span><span class="sig-name descname"><span class="pre">td_perturbation_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ccf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#reforge.rfgmath.rcmath.td_perturbation_matrix" title="Link to this definition"></a></dt>
-<dd><p>Calculate the perturbation matrix from a covariance (or Hessian) matrix using block-wise norms.</p>
-<p>The input covariance matrix ‘ccf’ is expected to have shape (3*m, 3*n). For each block (i,j),
+<dd><p>Calculate the time-dependent perturbation matrix from a td-correlation matrix using block-wise norms.</p>
+<p>The input covariance matrix ‘ccf’ is expected to have shape (3*m, 3*n, nt). For each block (i,j, it),
 the perturbation value is computed as the square root of the sum of the squares of the corresponding
 3x3 block elements.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ccf</strong> (<em>ndarray of double, 2D</em>) – Input covariance matrix with shape (3*m, 3*n).</p></li>
+<li><p><strong>ccf</strong> (<em>ndarray of double, 3D</em>) – Input covariance matrix with shape (3*m, 3*n, nt).</p></li>
 <li><p><strong>normalize</strong> (<em>bool, optional</em>) – If True, the output perturbation matrix is normalized so that the total sum of its elements equals 1
 (default is True).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>perturbation_matrix</strong> – An (m, n) matrix of perturbation values computed from the blocks of ccf.</p>
+<dd class="field-even"><p><strong>perturbation_matrix</strong> – An (m, n, nt) matrix of perturbation values computed from the blocks of ccf.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>ndarray of double, 2D</p>
+<dd class="field-odd"><p>ndarray of double, 3D</p>
 </dd>
 </dl>
 </dd></dl>

@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:30.925** total execution time for 2 files **from all galleries**:
+**00:59.401** total execution time for 2 files **from all galleries**:
 
 .. container::
 
@@ -33,7 +33,7 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_go_protein.py` (``../examples/go_protein.py``)
-     - 00:30.925
+     - 00:59.401
      - 0.0
    * - :ref:`sphx_glr_auto_examples_hello_world.py` (``../examples/hello_world.py``)
      - 00:00.000
