@@ -24,7 +24,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Getting started" href="getting_started.html" /> 
+    <link rel="next" title="Why use reForge?" href="why.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -47,8 +47,8 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="why.html">Why use reForge?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">reForge API</a></li>
 </ul>
@@ -96,36 +96,31 @@ public use under the GNU V3 License.</p>
 <p>In a nutshell, the key components of reForge are:</p>
 <ul class="simple">
 <li><p><strong>Python package for Molecular Dynamics:</strong>
-Easy to use workflows for set-up, multiple MD runs and analysis of large biomolecular systems.</p></li>
+Easy to use workflows for set-up, MD simulation and analysis of large biomolecular systems.</p></li>
+<li><p><strong>User friendly:</strong>
+One of the motivations behind reForge was to provide a user- and beginner-friendly interface
+for managing potentially hundreds or thousands of MD simulations. Examples of basic workflows
+can be found here <a class="reference external" href="https://github.com/DanYev/reforge/tree/main/workflows">workflows</a>.</p></li>
 <li><p><strong>Optimized Mathematical Routines:</strong>
-High-performance functions written in Cython and CUDA for computing Hessian matrices, perturbation
-matrices, and other advanced mathematical operations.</p></li>
-<li><p><strong>GPU-Based Analysis Utilities:</strong>
-Tools that leverage GPU acceleration for simulation and analysis tasks, significantly reducing
+Tools that leverage GPU and Cython acceleration for analysis tasks, significantly reducing
 computation times.</p></li>
-<li><p><strong>Profiling Tools:</strong>
-Decorators and utilities for memory and time profiling to ensure optimal performance during
-computations.</p></li>
 </ul>
 </section>
 <section id="for-new-users">
 <h2>For New Users<a class="headerlink" href="#for-new-users" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p><strong>Learn the Basics:</strong>
-Familiarize yourself with shell scripting, git, and Python. Essential packages include
-<a class="reference external" href="https://numpy.org/">NumPy</a>, <a class="reference external" href="https://cython.org/">Cython</a>, and <a class="reference external" href="https://cupy.dev/">CuPy</a>.</p></li>
+Familiarize yourself with the basics of shell scripting, SLURM, git, and Python.</p></li>
 <li><p><strong>Understand the Fundamentals:</strong>
 Get a grasp of object-oriented programming and high-performance computing concepts to make the
 most of reForge’s capabilities.</p></li>
 <li><p><strong>Explore the Documentation:</strong>
 Skim through the available documentation and examples provided within the package to learn about
 the various tools and workflows.</p></li>
-<li><p><strong>unit conventions:</strong>
-reforge uses si units throughout (e.g., angles in radians) to maintain consistency in calculations.</p></li>
 </ul>
 </section>
 <section id="for-developers">
-<h2>for developers<a class="headerlink" href="#for-developers" title="Link to this heading"></a></h2>
+<h2>For Developers<a class="headerlink" href="#for-developers" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p><strong>contribution guidelines:</strong>
 if you plan to contribute to reforge, please refer to the developer documentation for coding
@@ -134,7 +129,7 @@ standards, testing procedures, and version control guidelines.</p></li>
 an extensive suite of tests and detailed documentation accompanies the package to ensure
 reliability and maintainability.</p></li>
 <li><p><strong>community and support:</strong>
-contributions are welcome! please check the gitlab repository for issues, feature requests, and
+contributions are welcome! please check the github repository for issues, feature requests, and
 further discussion.</p></li>
 </ul>
 </section>
@@ -148,10 +143,6 @@ packages such as Cython, NumPy, CuPy, GROMACS, OpenMM, Vermouth and MDAnalysis.<
 <h2>Indices and Tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#running-the-tutorial">Running the Tutorial</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="why.html">Why use reForge?</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="why.html#need-to-simulate-a-large-biomolecular-complex-or-many">Need to simulate a large biomolecular complex? Or many?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="why.html#python-based">Python-based</a></li>
@@ -160,6 +151,12 @@ packages such as Cython, NumPy, CuPy, GROMACS, OpenMM, Vermouth and MDAnalysis.<
 <li class="toctree-l2"><a class="reference internal" href="why.html#for-new-users">For new users</a></li>
 <li class="toctree-l2"><a class="reference internal" href="why.html#acknowledgements">Acknowledgements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="why.html#indices-and-tables">Indices and Tables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#testing-the-setup">Testing the setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#running-the-examples">Running the Examples</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Examples</a></li>
@@ -176,7 +173,7 @@ packages such as Cython, NumPy, CuPy, GROMACS, OpenMM, Vermouth and MDAnalysis.<
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="getting_started.html" class="btn btn-neutral float-right" title="Getting started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="why.html" class="btn btn-neutral float-right" title="Why use reForge?" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

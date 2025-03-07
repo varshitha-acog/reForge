@@ -16,12 +16,11 @@ from pathlib import Path
 import os
 import time
 
-
 #%%
 # One of the motivations behind reForge was to provide a user- and beginner-friendly interface
 # for managing potentially hundreds or thousands of MD simulations without having to switch 
-# between multiple scripts and constantly rewriting them—all while staying within Python.
-# This is exactly what the 'cli' module is designed for.
+# between multiple scripts and constantly rewriting them—all while staying within comfort of Python.
+# This is what the 'cli' module is for:
 from reforge.cli import run, sbatch, dojob
 
 #%%

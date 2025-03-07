@@ -29,7 +29,7 @@ Requirements:
 
 Author: DY
 
-.. GENERATED FROM PYTHON SOURCE LINES 14-20
+.. GENERATED FROM PYTHON SOURCE LINES 14-19
 
 .. code-block:: Python
 
@@ -45,15 +45,14 @@ Author: DY
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 21-25
+.. GENERATED FROM PYTHON SOURCE LINES 20-24
 
 One of the motivations behind reForge was to provide a user- and beginner-friendly interface
 for managing potentially hundreds or thousands of MD simulations without having to switch 
-between multiple scripts and constantly rewriting them—all while staying within Python.
-This is exactly what the 'cli' module is designed for.
+between multiple scripts and constantly rewriting them—all while staying within comfort of Python.
+This is what the 'cli' module is for:
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-27
+.. GENERATED FROM PYTHON SOURCE LINES 24-26
 
 .. code-block:: Python
 
@@ -66,12 +65,12 @@ This is exactly what the 'cli' module is designed for.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 28-30
+.. GENERATED FROM PYTHON SOURCE LINES 27-29
 
 The idea is very simple: suppose you have "n" mutants and you need to perform "n" independent runs 
 for each mutant to achieve sufficient sampling.
 
-.. GENERATED FROM PYTHON SOURCE LINES 30-33
+.. GENERATED FROM PYTHON SOURCE LINES 29-32
 
 .. code-block:: Python
 
@@ -85,11 +84,11 @@ for each mutant to achieve sufficient sampling.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 34-35
+.. GENERATED FROM PYTHON SOURCE LINES 33-34
 
 The functions run, sbatch, and dojob allow you to execute the same script for all cases:
 
-.. GENERATED FROM PYTHON SOURCE LINES 35-39
+.. GENERATED FROM PYTHON SOURCE LINES 34-38
 
 .. code-block:: Python
 
@@ -104,11 +103,11 @@ The functions run, sbatch, and dojob allow you to execute the same script for al
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-41
+.. GENERATED FROM PYTHON SOURCE LINES 39-40
 
 Alternatively, you can call run like this:
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-45
+.. GENERATED FROM PYTHON SOURCE LINES 40-44
 
 .. code-block:: Python
 
@@ -123,12 +122,12 @@ Alternatively, you can call run like this:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 46-48
+.. GENERATED FROM PYTHON SOURCE LINES 45-47
 
 Alternatively, you can sbatch a script. This command passes all positional arguments to the script 
 and keyword arguments to the SLURM scheduler.
 
-.. GENERATED FROM PYTHON SOURCE LINES 48-53
+.. GENERATED FROM PYTHON SOURCE LINES 47-52
 
 .. code-block:: Python
 
@@ -144,11 +143,11 @@ and keyword arguments to the SLURM scheduler.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-55
+.. GENERATED FROM PYTHON SOURCE LINES 53-54
 
 By default, output is written to "slurm_jobs/output_file" and "slurm_jobs/error_file".
 
-.. GENERATED FROM PYTHON SOURCE LINES 55-61
+.. GENERATED FROM PYTHON SOURCE LINES 54-60
 
 .. code-block:: Python
 
@@ -186,12 +185,12 @@ By default, output is written to "slurm_jobs/output_file" and "slurm_jobs/error_
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-64
+.. GENERATED FROM PYTHON SOURCE LINES 61-63
 
 For convenience, dojob will either submit or run the script based on its first argument.
 In this case, we do not want to sbatch the script.
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-68
+.. GENERATED FROM PYTHON SOURCE LINES 63-67
 
 .. code-block:: Python
 

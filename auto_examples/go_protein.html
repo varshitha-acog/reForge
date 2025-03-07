@@ -48,8 +48,8 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../why.html">Why use reForge?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="hello_world.html">Hello World!</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Simple CG Protein</a></li>
@@ -110,7 +110,7 @@ directory) and the root directory <em>‘test’</em> within <em>‘systems’</
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">mdsys</span> <span class="o">=</span> <span class="n">GmxSystem</span><span class="p">(</span><span class="n">sysdir</span><span class="o">=</span><span class="s1">&#39;systems&#39;</span><span class="p">,</span> <span class="n">sysname</span><span class="o">=</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Next, prepare the necessary files by calling <em>prepare_files()</em>.</p>
+<p>Next, prepare the necessary file and directories by calling <em>prepare_files()</em>.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">mdsys</span><span class="o">.</span><span class="n">prepare_files</span><span class="p">()</span>
 
 <span class="c1"># List the files in the system&#39;s root directory:</span>
@@ -151,11 +151,7 @@ splits <em>mdsys.inpdb</em> into separate chains and moves protein and RNA/DNA f
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">mdsys</span><span class="o">.</span><span class="n">split_chains</span><span class="p">()</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt>Coarse-grain the proteins using <em>martinize2</em> (by Martini) with the following parameters:</dt><dd><p><em>go_eps</em> = 10.0, <em>go_low</em> = 0.3, <em>go_up</em> = 1.0,
-<em>p</em> = “backbone”, <em>pf</em> = 500, <em>append</em> = False</p>
-</dd>
-</dl>
+<p>Coarse-grain the proteins using <em>martinize2</em> (by Martini):</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">mdsys</span><span class="o">.</span><span class="n">martinize_proteins_go</span><span class="p">(</span><span class="n">go_eps</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">go_low</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">go_up</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="s2">&quot;backbone&quot;</span><span class="p">,</span> <span class="n">pf</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -191,13 +187,9 @@ splits <em>mdsys.inpdb</em> into separate chains and moves protein and RNA/DNA f
 </div>
 <p>Combine all topology and structure files.
 The method <em>make_cg_topology()</em> uses GROMACS’s <em>gmx pdb2gmx</em> module to create the simulation box.
-(See online documentation for details.)
-It returns the CG topology as <em>mdsys.systop</em> (i.e. “mdsys.top”).</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">mdsys</span><span class="o">.</span><span class="n">make_cg_topology</span><span class="p">()</span>
-
-<span class="c1"># The method *make_cg_structure()* creates the CG structure.</span>
-<span class="c1"># Here, *bt* = &#39;dodecahedron&#39; and *d* = &#39;1.2&#39;; it returns *mdsys.solupdb* (i.e. &quot;solute.pdb&quot;).</span>
-<span class="n">mdsys</span><span class="o">.</span><span class="n">make_cg_structure</span><span class="p">(</span><span class="n">bt</span><span class="o">=</span><span class="s1">&#39;dodecahedron&#39;</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="s1">&#39;1.2&#39;</span><span class="p">)</span>
+(See online documentation for details.)</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">mdsys</span><span class="o">.</span><span class="n">make_cg_topology</span><span class="p">()</span> <span class="c1"># It returns the CG topology as *mdsys.systop* (i.e. &quot;system.top&quot;).</span>
+<span class="n">mdsys</span><span class="o">.</span><span class="n">make_cg_structure</span><span class="p">(</span><span class="n">bt</span><span class="o">=</span><span class="s1">&#39;dodecahedron&#39;</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="s1">&#39;1.2&#39;</span><span class="p">)</span> <span class="c1"># Returns *mdsys.solupdb* (i.e. &quot;solute.pdb&quot;).</span>
 </pre></div>
 </div>
 <p>Add solvent and neutralize the system’s charge.</p>
@@ -207,7 +199,7 @@ It returns the CG topology as <em>mdsys.systop</em> (i.e. “mdsys.top”).</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-pytb notranslate"><div class="highlight"><pre><span></span><span class="gt">Traceback (most recent call last):</span>
-  File <span class="nb">&quot;/home/mywsl/cgtools/docs/examples/go_protein.py&quot;</span>, line <span class="m">77</span>, in <span class="n">&lt;module&gt;</span>
+  File <span class="nb">&quot;/home/mywsl/cgtools/docs/examples/go_protein.py&quot;</span>, line <span class="m">71</span>, in <span class="n">&lt;module&gt;</span>
 <span class="w">    </span><span class="n">mdsys</span><span class="o">.</span><span class="n">solvate</span><span class="p">(</span><span class="n">cp</span><span class="o">=</span><span class="n">mdsys</span><span class="o">.</span><span class="n">solupdb</span><span class="p">,</span> <span class="n">cs</span><span class="o">=</span><span class="n">solvent</span><span class="p">)</span>
   File <span class="nb">&quot;/home/mywsl/cgtools/reforge/mdsystem/gmxmd.py&quot;</span>, line <span class="m">248</span>, in <span class="n">solvate</span>
 <span class="w">    </span><span class="bp">self</span><span class="o">.</span><span class="n">gmx</span><span class="p">(</span><span class="s2">&quot;solvate&quot;</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">systop</span><span class="p">,</span> <span class="n">o</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">syspdb</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -238,7 +230,7 @@ periodic boundary conditions. This is done with GROMACS’s <em>trjconv</em> mod
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">mdsys</span><span class="o">.</span><span class="n">gmx</span><span class="p">(</span><span class="s2">&quot;trjconv&quot;</span><span class="p">,</span> <span class="n">clinput</span><span class="o">=</span><span class="s1">&#39;0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">mdsys</span><span class="o">.</span><span class="n">syspdb</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">mdsys</span><span class="o">.</span><span class="n">syspdb</span><span class="p">,</span> <span class="n">pbc</span><span class="o">=</span><span class="s1">&#39;atom&#39;</span><span class="p">,</span> <span class="n">ur</span><span class="o">=</span><span class="s1">&#39;compact&#39;</span><span class="p">,</span> <span class="n">o</span><span class="o">=</span><span class="s2">&quot;viz.pdb&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 30.693 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 30.925 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-go-protein-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/d519d4482f471d8e7e15f65f44a10fca/go_protein.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">go_protein.ipynb</span></code></a></p>

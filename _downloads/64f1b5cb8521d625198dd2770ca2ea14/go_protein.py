@@ -19,11 +19,11 @@ from reforge.mdsystem.gmxmd import GmxSystem, GmxRun
 #%%
 # First, we need to initialize an instance of *GmxSystem*, which will handle path management
 # and the necessary files. This instance uses the parent directory *'systems'* (relative to the current
-# directory) and the root directory *'test'* within *'systems'* for the system.
+# directory) and the root directory *'test'* within *'systems'* for the system. 
 mdsys = GmxSystem(sysdir='systems', sysname='test')
 
 #%%
-# Next, prepare the necessary files by calling *prepare_files()*.
+# Next, prepare the necessary file and directories by calling *prepare_files()*.
 mdsys.prepare_files()
 
 # List the files in the system's root directory:
@@ -43,9 +43,7 @@ print(mdsys.inpdb)
 mdsys.split_chains()
 
 #%%
-# Coarse-grain the proteins using *martinize2* (by Martini) with the following parameters:
-#     *go_eps* = 10.0, *go_low* = 0.3, *go_up* = 1.0,
-#     *p* = "backbone", *pf* = 500, *append* = False
+# Coarse-grain the proteins using *martinize2* (by Martini):
 mdsys.martinize_proteins_go(go_eps=10.0, go_low=0.3, go_up=1.0, p="backbone", pf=500, append=False)
 
 #%%
@@ -64,12 +62,8 @@ for f in mdsys.cgdir.iterdir():
 # Combine all topology and structure files.
 # The method *make_cg_topology()* uses GROMACS's *gmx pdb2gmx* module to create the simulation box.
 # (See online documentation for details.)
-# It returns the CG topology as *mdsys.systop* (i.e. "mdsys.top").
-mdsys.make_cg_topology()
-
-# The method *make_cg_structure()* creates the CG structure.
-# Here, *bt* = 'dodecahedron' and *d* = '1.2'; it returns *mdsys.solupdb* (i.e. "solute.pdb").
-mdsys.make_cg_structure(bt='dodecahedron', d='1.2')
+mdsys.make_cg_topology() # It returns the CG topology as *mdsys.systop* (i.e. "system.top").
+mdsys.make_cg_structure(bt='dodecahedron', d='1.2') # Returns *mdsys.solupdb* (i.e. "solute.pdb").
 
 #%% 
 # Add solvent and neutralize the system's charge.
