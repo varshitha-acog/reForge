@@ -1,7 +1,7 @@
 reForge
 ==============================
 
-    Documentation is here https://github.com/DanYev/reforge.git
+    Documentation and instructions are here https://danyev.github.io/reForge/
 
 ### Copyright
 
