@@ -63,7 +63,8 @@ for f in mdsys.cgdir.iterdir():
 # The method *make_cg_topology()* uses GROMACS's *gmx pdb2gmx* module to create the simulation box.
 # (See online documentation for details.)
 mdsys.make_cg_topology() # It returns the CG topology as *mdsys.systop* (i.e. "system.top").
-mdsys.make_cg_structure(bt='dodecahedron', d='1.2') # Returns *mdsys.solupdb* (i.e. "solute.pdb").
+mdsys.make_cg_structure() # Returns *mdsys.solupdb* (i.e. "solute.pdb").
+mdsys.make_box(d='1.0', bt='dodecahedron')
 
 #%% 
 # Add solvent and neutralize the system's charge.
