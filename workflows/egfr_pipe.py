@@ -46,8 +46,8 @@ def setup_cg_protein_membrane(sysdir, sysname):
     # mdsys.get_go_maps(append=True)
 
     # # 1.3. COARSE-GRAINING. Done separately for each chain. If don't want to split some of them, it needs to be done manually. 
-    mdsys.martinize_proteins_en(ef=700, el=0.0, eu=0.9, p='backbone', pf=500, append=True)  # Martini + Elastic network FF 
-    # mdsys.martinize_proteins_go(go_eps=9.414, go_low=0.3, go_up=1.1, p='backbone', pf=500, append=True) # Martini + Go-network FF
+    # mdsys.martinize_proteins_en(ef=700, el=0.0, eu=0.9, p='backbone', pf=500, append=True)  # Martini + Elastic network FF 
+    mdsys.martinize_proteins_go(go_eps=9.414, go_low=0.3, go_up=1.1, p='backbone', pf=500, append=True) # Martini + Go-network FF
     mdsys.make_cg_topology(add_resolved_ions=False, prefix='chain') # CG topology. Returns mdsys.systop ("mdsys.top") file
     mdsys.make_cg_structure() # CG topology. Returns mdsys.solupdb ("solute.pdb") file
     label_segments(in_pdb=mdsys.solupdb, out_pdb=mdsys.solupdb) # label the segments in the CG PDB file 
@@ -128,7 +128,7 @@ def make_ndx(sysdir, sysname, **kwargs):
 
 def trjconv(sysdir, sysname, runname, **kwargs):
     kwargs.setdefault('b', 0) # in ps
-    kwargs.setdefault('dt', 1000) # in ps
+    kwargs.setdefault('dt', 200) # in ps
     kwargs.setdefault('e', 5000000) # in ps
     mdrun = GmxRun(sysdir, sysname, runname)
     k = 1 # NDX groups: 0.System 1.Solute 2.Backbone 3.Solvent 4.Not water 5-.Chains
@@ -136,11 +136,12 @@ def trjconv(sysdir, sysname, runname, **kwargs):
     mdrun.trjconv(clinput=f'{k}\n {k}\n {k}\n', s='md.tpr', f='md.xtc', n=mdrun.sysndx, o='conv.xtc',  
        pbc='nojump', **kwargs)
     mdrun.trjconv(clinput='0\n0\n0\n', s='conv.tpr', f='conv.xtc', o='mdc.xtc', fit='rot+trans', center='')
+    mdrun.trjconv(clinput='0\n0\n0\n', s='conv.tpr', f='conv.xtc', o='mdc.pdb', fit='rot+trans', center='', e=0)
     clean_dir(mdrun.rundir)
     
 
 def rms_analysis(sysdir, sysname, runname, **kwargs):
-    kwargs.setdefault('b',  50000) # in ps
+    kwargs.setdefault('b',  500000) # in ps
     kwargs.setdefault('dt', 200) # in ps
     kwargs.setdefault('e', 10000000) # in ps
     mdrun = GmxRun(sysdir, sysname, runname)
@@ -151,7 +152,7 @@ def rms_analysis(sysdir, sysname, runname, **kwargs):
     
 def cluster(sysdir, sysname, runname, **kwargs):
     mdrun = GmxRun(sysdir, sysname, runname)
-    b = 100000
+    b = 500000
     mdrun.cluster(clinput=f'1\n 1\n', b=b, dt=1000, cutoff=0.15, method='gromos', 
         cl='clusters.pdb', clndx='cluster.ndx', av='yes')
     mdrun.extract_cluster()
@@ -163,7 +164,7 @@ def cov_analysis(sysdir, sysname, runname):
     u = mda.Universe(mdrun.str, mdrun.trj, in_memory=True)
     ag = u.atoms.select_atoms("name BB or name BB1 or name BB3")
     # Begin at 'b' picoseconds, end at 'e', split into 'n' parts, sample each 'sample_rate' frame
-    mdrun.get_covmats(u, ag, b=500000, e=10000000, n=25, sample_rate=1, outtag='covmat') 
+    mdrun.get_covmats(u, ag, b=500000, e=10000000, n=45, sample_rate=1, outtag='covmat') 
     mdrun.get_pertmats()
     mdrun.get_dfi(outtag='dfi')
     mdrun.get_dci(outtag='dci', asym=False)
@@ -198,7 +199,7 @@ def tdlrt_analysis(sysdir, sysname, runname):
     positions = io.read_positions(u, ag, b=b, e=e, sample_rate=sample_rate),  
     # velocities = io.read_velocities(u, ag, b=b, e=e, sample_rate=sample_rate,)
     # CALC CCF # CCF params FRAME_DT=200 ps
-    corr = mdm.ccf(positions, positions, ntmax=ntmax, n=5, mode='gpu', center=True, dtype=np.float32)
+    corr = mdm.ccf(positions, positions, ntmax=ntmax, n=45, mode='gpu', center=True, dtype=np.float32)
     corr_file = mdrun.lrtdir / 'corr_pp.npy'
     np.save(corr_file, corr)
 

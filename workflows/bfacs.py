@@ -64,7 +64,7 @@ def dci_pdbs(system):
  
 if __name__ == "__main__":
     sysdir = 'systems' 
-    sysname = 'egfr'
+    sysname = 'egfr_go'
     system = gmxmd.GmxSystem(sysdir, sysname)
     make_pdb(system, 'dfi')
     make_pdb(system, 'rmsf')

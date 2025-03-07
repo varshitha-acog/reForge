@@ -198,6 +198,6 @@ def make_nm_animation(coords, eval, evec, mode_index, outfile='png/nma.mp4'):
 
 if __name__ == '__main__':
     sysdir = 'systems' 
-    sysname = 'egfr'
+    sysname = 'egfr_go'
     mdsys = MDSystem(sysdir, sysname)
     make_2d_animation(mdsys)

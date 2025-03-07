@@ -255,7 +255,7 @@ def plot_all_segments(mdsys):
     
 if __name__ == '__main__':
     sysdir = 'systems' 
-    sysname = 'egfr'
+    sysname = 'egfr_go'
     mdsys = MDSystem(sysdir, sysname)
     plot_rmsf(mdsys)
     plot_rmsd(mdsys)    
