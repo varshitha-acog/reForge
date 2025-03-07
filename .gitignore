@@ -16,7 +16,6 @@ __pycache__
 .DS_Store
 *.err
 *.out
-*.pdb
 *.pdf
 *.egg*
 *.ndx
