@@ -12,20 +12,6 @@ Then reForge is the right tool. If offers a (*almost*) pain-free setup for Marti
 
 - Kind of like here (https://www.nature.com/articles/s41467-024-53098-4)
 
-Why Use reForge?
-================
-
-Need to simulate a large biomolecular complex? Or even many?
--------------------------------------------------------------
-
-reForge is the right tool. It offers a hassle-free setup for Martini+CG *Protein*, *RNA*, and *Lipid* complexes.
-
-.. image:: img/reforge_ribosome.png
-   :alt: reForge Ribosome
-   :scale: 50 %
-
-For example, see this work on complex simulations:
-<https://www.nature.com/articles/s41467-024-53098-4>
 
 Python-Based
 ------------
