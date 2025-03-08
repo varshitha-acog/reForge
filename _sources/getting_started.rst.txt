@@ -89,7 +89,7 @@ If the above fails, try requesting more memory, remove the environment, and star
     mamba env list
     mamba remove -n reforge --all
 
-If the installation was successful, restart the shell (or quit the interactive session by typing exit) 
+If the installation was successful, restart the shell (or quit the interactive session by typing *exit*) 
 and run the tests. You can find the log in *tests/sl_output.out*
 
 .. code-block:: bash
