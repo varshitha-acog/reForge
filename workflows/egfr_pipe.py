@@ -191,15 +191,15 @@ def tdlrt_analysis(sysdir, sysname, runname):
     mdrun = GmxRun(sysdir, sysname, runname) 
     b = 500000
     e = 10000000
-    sample_rate = 10
+    sample_rate = 1
     ntmax = 100 # how many frames to save
     # Reading trajectory
     u = mda.Universe(mdrun.str, mdrun.trj, in_memory=True)
     ag = u.atoms.select_atoms("name BB")
     positions = io.read_positions(u, ag, b=b, e=e, sample_rate=sample_rate),  
     # velocities = io.read_velocities(u, ag, b=b, e=e, sample_rate=sample_rate,)
-    # CALC CCF # CCF params FRAME_DT=200 ps
-    corr = mdm.ccf(positions, positions, ntmax=ntmax, n=45, mode='gpu', center=True, dtype=np.float32)
+    # CALC CCF # CCF params FRAME_DT=20 ps
+    corr = mdm.ccf(positions, positions, ntmax=ntmax, n=10, mode='gpu', center=True, dtype=np.float32)
     corr_file = mdrun.lrtdir / 'corr_pp.npy'
     np.save(corr_file, corr)
 
