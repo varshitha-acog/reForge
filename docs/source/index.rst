@@ -7,30 +7,28 @@ Overview of reForge Package
 ---------------------------
 
 
-   The reForge source code is hosted on GitLab at: https://github.com/DanYev/reforge
+   The reForge source code is hosted on GitHub at: https://github.com/DanYev/reforge
 
-The reForge Python package provides a comprehensive suite of utilities designed for MD
-simulations, analysis, and data processing workflows. It features optimized mathematical routines, 
-GPU‐accelerated computations, and a variety of helper tools to streamline file I/O and data manipulation. 
-Developed to support advanced research projects in simulation and analysis, reForge is available for 
-public use under the GNU V3 License.
+
+The reForge Python package offers a set of tools for MD simulations, analysis, and data processing. 
+It includes optimized math routines, GPU-accelerated computations, and various helper tools to make 
+simulation setup and data handling easier. Created to aid advanced research in simulation and analysis, 
+reForge is available to the public under the GNU V3 License.
 
 What's in reForge?
 ------------------
 
-In a nutshell, the key components of reForge are:
+Here are the main features of reForge:
 
 - **Python package for Molecular Dynamics:**  
-  Easy to use workflows for set-up, MD simulation and analysis of large biomolecular systems.
+  Provides easy-to-use workflows for setting up, running, and analyzing MD simulations of large biomolecular systems.
 
-- **User friendly:**  
-  One of the motivations behind reForge was to provide a user- and beginner-friendly interface
-  for managing potentially hundreds or thousands of MD simulations. Examples of basic workflows
-  can be found here `workflows <https://github.com/DanYev/reforge/tree/main/workflows>`_.
+- **User-friendly Interface:**  
+  Designed to be accessible for both beginners and advanced users, making it easier to manage numerous MD simulations. 
+  Check out some basic workflows here: `workflows <https://github.com/DanYev/reforge/tree/main/workflows>`_.
 
 - **Optimized Mathematical Routines:**  
-  Tools that leverage GPU and Cython acceleration for analysis tasks, significantly reducing 
-  computation times.
+  Utilizes GPU and Cython acceleration to speed up analysis tasks, significantly reducing computation times.
 
 
 For New Users
@@ -47,11 +45,12 @@ For New Users
   Skim through the available documentation and examples provided within the package to learn about 
   the various tools and workflows.
 
+
 For Developers
 --------------
 
 - **contribution guidelines:**  
-  if you plan to contribute to reforge, please refer to the developer documentation for coding 
+  if you plan to contribute to reForge, please refer to the developer documentation for coding 
   standards, testing procedures, and version control guidelines.
 
 - **testing and documentation:**  
@@ -65,7 +64,7 @@ For Developers
 Acknowledgements
 ----------------
 
-The reForge package is maintained by **[Your Name or Your Organization]**. 
+The reForge package is maintained by ****. 
 This project is inspired by and builds upon multiple excellent open-source 
 packages such as Cython, NumPy, CuPy, GROMACS, OpenMM, Vermouth and MDAnalysis. 
 
