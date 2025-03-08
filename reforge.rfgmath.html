@@ -264,7 +264,8 @@ where n is derived from the input coordinate matrix.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="reforge.rfgmath.rcmath.perturbation_matrix">
 <span class="sig-prename descclassname"><span class="pre">reforge.rfgmath.rcmath.</span></span><span class="sig-name descname"><span class="pre">perturbation_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">covariance_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#reforge.rfgmath.rcmath.perturbation_matrix" title="Link to this definition"></a></dt>
-<dd><p>Compute a perturbation matrix from a covariance matrix.</p>
+<dd><p>Compute a perturbation matrix from a covariance matrix. Same as the old one but no need
+to specify resnum and works with rectangular matrices</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>covariance_matrix</strong> (<em>ndarray of double, 2D</em>) – A covariance matrix computed from positional data with shape (3*m, 3*n), where m and n

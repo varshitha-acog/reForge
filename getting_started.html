@@ -51,8 +51,9 @@
 <li class="toctree-l1"><a class="reference internal" href="why.html">Why use reForge?</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#testing-the-setup">Testing the setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#testing-the-setup">Testing the Setup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#running-the-examples">Running the Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#for-sol-and-phx-users">For SOL and PHX Users</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Examples</a></li>
@@ -87,11 +88,20 @@
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h1>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
-<p>The “installation” of reForge consists of including the reforge project directory
-in your Python path, and making sure that you have all the needed dependencies.
-All of the packages that reforge depends on can be installed with conda and/or pip.</p>
-<ol class="arabic simple">
-<li><p><strong>Clone the repository:</strong></p></li>
+<p>The “installation” of reForge consists of including the reForge project directory
+in your Python path and ensuring that you have all the necessary dependencies.
+All the packages that reForge depends on can be installed with conda and/or pip.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>For users of SOL and PHX clusters:
+For more detailed instructions, scroll down the page.</p>
+</div>
+<ol class="arabic">
+<li><p><strong>Clone the repository:</strong></p>
+<blockquote>
+<div><p>This will create the directory “reforge” in your current directory.</p>
+</div></blockquote>
+</li>
 </ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/DanYev/reforge.git
 </pre></div>
@@ -99,50 +109,71 @@ All of the packages that reforge depends on can be installed with conda and/or p
 <ol class="arabic simple" start="2">
 <li><p><strong>Install the virtual environment:</strong></p></li>
 </ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>module<span class="w"> </span>load<span class="w"> </span>mamba
-mamba<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>reforge<span class="w"> </span>--file<span class="w"> </span>environment.yml
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>reforge
+conda<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>reforge<span class="w"> </span>--file<span class="w"> </span>environment.yml
 <span class="nb">source</span><span class="w"> </span>activate<span class="w"> </span>reforge
 </pre></div>
 </div>
 <ol class="arabic simple" start="3">
-<li><p><strong>Include reforge in your Python path OR install it via pip:</strong></p></li>
+<li><p><strong>Include reForge in your Python path OR install it via pip:</strong></p></li>
 </ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:path/to/reforge/repository
 <span class="c1"># or</span>
-pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="w"> </span><span class="c1"># from the reforge repository directory</span>
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="w"> </span><span class="c1"># from the reForge repository directory</span>
 </pre></div>
 </div>
 </section>
 <section id="testing-the-setup">
-<h2>Testing the setup<a class="headerlink" href="#testing-the-setup" title="Link to this heading"></a></h2>
-<p>From the reforge repository directory, you can run the tests with the following command:</p>
+<h2>Testing the Setup<a class="headerlink" href="#testing-the-setup" title="Link to this heading"></a></h2>
+<p>From the reForge repository directory, you can run the tests with the following command:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>path/to/reforge/repository
 bash<span class="w"> </span>run_tests.sh<span class="w"> </span>--all
-</pre></div>
-</div>
-<p>For users of SOL and PHX clusters, you first need to initiate the interactive session with GPU support or
-better - submit a job to the GPU queue:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>path/to/reforge/repository
-sbatch<span class="w"> </span>run_tests.sh<span class="w"> </span>--all
 </pre></div>
 </div>
 </section>
 <section id="running-the-examples">
 <h2>Running the Examples<a class="headerlink" href="#running-the-examples" title="Link to this heading"></a></h2>
 <p>At the moment, the coarse-grained examples can only be run with GROMACS. OpenMM support is in active development.
-Thus, to run the tutorials, you need to have GROMACS installed on your system.</p>
+Thus, to run the tutorials, you need to have GROMACS installed on your system.
+Some basic examples can be found here: <a class="reference external" href="https://github.com/DanYev/cgtools/tree/main/docs/examples">examples</a>,
+and will be updated as the project progresses.</p>
+</section>
+<section id="for-sol-and-phx-users">
+<h2>For SOL and PHX Users<a class="headerlink" href="#for-sol-and-phx-users" title="Link to this heading"></a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>For users of SOL and PHX clusters!!! Last time I checked, some versions of GROMACS
-were not working properly on the SOL and PHX clusters. The current setup is tested with
-the following versions:</p>
+<p>Please read this carefully before proceeding! Start with a clean shell and DO NOT activate
+any environments or interactive sessions unless stated in the instructions. Run the commands EXACTLY
+as they are in the instructions. Starting an interactive session or running commands
+with “bash” instead of “source” (.) initiates a new, separate shell process with
+different environment variables and may break the dependencies.</p>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>module<span class="w"> </span>load<span class="w"> </span>gromacs-2023.3-openmpi-cuda-qx<span class="w"> </span><span class="c1"># for PHX</span>
-module<span class="w"> </span>load<span class="w"> </span>gromacs/2023.4-gpu-mpi<span class="w"> </span><span class="c1"># for SOL</span>
+<p>The first step is the same - we need to clone the repository,
+which will create the directory “reforge” in your current directory and download the GitHub repository.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/DanYev/reforge.git
 </pre></div>
 </div>
-<p>Some basic examples can be found here <a class="reference external" href="https://github.com/DanYev/cgtools/tree/main/docs/examples">examples</a>,
-and will be updated as the project progresses.</p>
+<p>Go to the downloaded directory, start a session with enough memory, and run the installation script:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>reforge
+interactive<span class="w"> </span>--mem<span class="w"> </span>16G
+.<span class="w"> </span>scripts/installation_phx_sol.sh
+</pre></div>
+</div>
+<p>If the above fails, try requesting more memory, remove the environment, and start over:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>deactivate
+mamba<span class="w"> </span>env<span class="w"> </span>list
+mamba<span class="w"> </span>remove<span class="w"> </span>-n<span class="w"> </span>reforge<span class="w"> </span>--all
+</pre></div>
+</div>
+<p>If the installation was successful, restart the shell (or quit the interactive session by typing exit)
+and run the tests. You can find the log in tests/sl_output.out</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>reforge
+.<span class="w"> </span>scripts/phx_md_load.sh<span class="w"> </span><span class="c1"># on PHX</span>
+.<span class="w"> </span>scripts/sol_md_load.sh<span class="w"> </span><span class="c1"># on SOL</span>
+sbatch<span class="w"> </span>run_tests.sh<span class="w"> </span>--all
+</pre></div>
+</div>
+<p>If the above does not work for you or some of the tests fail, email me at <a class="reference external" href="mailto:dyangali&#37;&#52;&#48;asu&#46;edu">dyangali<span>&#64;</span>asu<span>&#46;</span>edu</a></p>
 </section>
 </section>
 
