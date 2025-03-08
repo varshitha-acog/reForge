@@ -118,21 +118,26 @@ directory) and the root directory <em>‘test’</em> within <em>‘systems’</
     <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/mywsl/reforge/docs/examples/systems/test/water.gro
-/home/mywsl/reforge/docs/examples/systems/test/system.top
-/home/mywsl/reforge/docs/examples/systems/test/cgpdb
-/home/mywsl/reforge/docs/examples/systems/test/mdp
-/home/mywsl/reforge/docs/examples/systems/test/map
-/home/mywsl/reforge/docs/examples/systems/test/nucleotides
-/home/mywsl/reforge/docs/examples/systems/test/png
-/home/mywsl/reforge/docs/examples/systems/test/protein.top
-/home/mywsl/reforge/docs/examples/systems/test/proteins
-/home/mywsl/reforge/docs/examples/systems/test/1btl.pdb
-/home/mywsl/reforge/docs/examples/systems/test/topol
-/home/mywsl/reforge/docs/examples/systems/test/solute.pdb
-/home/mywsl/reforge/docs/examples/systems/test/atommass.dat
-/home/mywsl/reforge/docs/examples/systems/test/inpdb.pdb
-/home/mywsl/reforge/docs/examples/systems/test/data
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/scratch/dyangali/reforge/docs/examples/systems/test/nucleotides
+/scratch/dyangali/reforge/docs/examples/systems/test/atommass.dat
+/scratch/dyangali/reforge/docs/examples/systems/test/system.ndx
+/scratch/dyangali/reforge/docs/examples/systems/test/proteins
+/scratch/dyangali/reforge/docs/examples/systems/test/png
+/scratch/dyangali/reforge/docs/examples/systems/test/viz.pdb
+/scratch/dyangali/reforge/docs/examples/systems/test/1btl.pdb
+/scratch/dyangali/reforge/docs/examples/systems/test/water.gro
+/scratch/dyangali/reforge/docs/examples/systems/test/mdout.mdp
+/scratch/dyangali/reforge/docs/examples/systems/test/topol
+/scratch/dyangali/reforge/docs/examples/systems/test/protein.top
+/scratch/dyangali/reforge/docs/examples/systems/test/data
+/scratch/dyangali/reforge/docs/examples/systems/test/solute.pdb
+/scratch/dyangali/reforge/docs/examples/systems/test/system.pdb
+/scratch/dyangali/reforge/docs/examples/systems/test/system.gro
+/scratch/dyangali/reforge/docs/examples/systems/test/inpdb.pdb
+/scratch/dyangali/reforge/docs/examples/systems/test/mdp
+/scratch/dyangali/reforge/docs/examples/systems/test/map
+/scratch/dyangali/reforge/docs/examples/systems/test/cgpdb
+/scratch/dyangali/reforge/docs/examples/systems/test/system.top
 </pre></div>
 </div>
 <p>Sort chains and atoms in the input PDB file to avoid future conflicts.
@@ -142,8 +147,8 @@ This creates a file (named <em>inpdb.pdb</em>) that can later be accessed as <em
 <span class="nb">print</span><span class="p">(</span><span class="n">mdsys</span><span class="o">.</span><span class="n">inpdb</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Chains and atoms sorted, renamed and saved to /home/mywsl/reforge/docs/examples/systems/test/inpdb.pdb
-/home/mywsl/reforge/docs/examples/systems/test/inpdb.pdb
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Chains and atoms sorted, renamed and saved to /scratch/dyangali/reforge/docs/examples/systems/test/inpdb.pdb
+/scratch/dyangali/reforge/docs/examples/systems/test/inpdb.pdb
 </pre></div>
 </div>
 <p>Although there are multiple chains in this case, the <em>split_chains()</em> method
@@ -162,19 +167,19 @@ splits <em>mdsys.inpdb</em> into separate chains and moves protein and RNA/DNA f
     <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/mywsl/reforge/docs/examples/systems/test/topol/martini_RNA.itp
-/home/mywsl/reforge/docs/examples/systems/test/topol/martini_v3.0.0_rna.itp
-/home/mywsl/reforge/docs/examples/systems/test/topol/martini_v3.0.0_ions_v1.itp
-/home/mywsl/reforge/docs/examples/systems/test/topol/chain_A.itp
-/home/mywsl/reforge/docs/examples/systems/test/topol/go_atomtypes.itp
-/home/mywsl/reforge/docs/examples/systems/test/topol/martini_ions.itp
-/home/mywsl/reforge/docs/examples/systems/test/topol/go_nbparams.itp
-/home/mywsl/reforge/docs/examples/systems/test/topol/martini_v3.0.0_solvents_v1.itp
-/home/mywsl/reforge/docs/examples/systems/test/topol/martini_v3.0.0_phospholipids_v1.itp
-/home/mywsl/reforge/docs/examples/systems/test/topol/martini_v3.0.0.itp
-/home/mywsl/reforge/docs/examples/systems/test/topol/martini_v3.0.0_small_molecules_v2.itp
-/home/mywsl/reforge/docs/examples/systems/test/topol/martini_v3.0.0_nucleobases_v1.itp
-/home/mywsl/reforge/docs/examples/systems/test/topol/martini_v3.0.0_sugars_v2.itp
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/scratch/dyangali/reforge/docs/examples/systems/test/topol/martini_v3.0.0_solvents_v1.itp
+/scratch/dyangali/reforge/docs/examples/systems/test/topol/martini_v3.0.0_small_molecules_v2.itp
+/scratch/dyangali/reforge/docs/examples/systems/test/topol/go_nbparams.itp
+/scratch/dyangali/reforge/docs/examples/systems/test/topol/martini_v3.0.0_ions_v1.itp
+/scratch/dyangali/reforge/docs/examples/systems/test/topol/martini_v3.0.0.itp
+/scratch/dyangali/reforge/docs/examples/systems/test/topol/chain_A.itp
+/scratch/dyangali/reforge/docs/examples/systems/test/topol/go_atomtypes.itp
+/scratch/dyangali/reforge/docs/examples/systems/test/topol/martini_v3.0.0_phospholipids_v1.itp
+/scratch/dyangali/reforge/docs/examples/systems/test/topol/martini_RNA.itp
+/scratch/dyangali/reforge/docs/examples/systems/test/topol/martini_v3.0.0_rna.itp
+/scratch/dyangali/reforge/docs/examples/systems/test/topol/martini_ions.itp
+/scratch/dyangali/reforge/docs/examples/systems/test/topol/martini_v3.0.0_sugars_v2.itp
+/scratch/dyangali/reforge/docs/examples/systems/test/topol/martini_v3.0.0_nucleobases_v1.itp
 </pre></div>
 </div>
 <p>Check the coarse-grained structure in the <em>cgdir</em> directory.</p>
@@ -182,7 +187,7 @@ splits <em>mdsys.inpdb</em> into separate chains and moves protein and RNA/DNA f
     <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/mywsl/reforge/docs/examples/systems/test/cgpdb/chain_A.pdb
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/scratch/dyangali/reforge/docs/examples/systems/test/cgpdb/chain_A.pdb
 </pre></div>
 </div>
 <p>Combine all topology and structure files.
@@ -191,23 +196,6 @@ The method <em>make_cg_topology()</em> uses GROMACS’s <em>gmx pdb2gmx</em> mod
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">mdsys</span><span class="o">.</span><span class="n">make_cg_topology</span><span class="p">()</span> <span class="c1"># It returns the CG topology as *mdsys.systop* (i.e. &quot;system.top&quot;).</span>
 <span class="n">mdsys</span><span class="o">.</span><span class="n">make_cg_structure</span><span class="p">()</span> <span class="c1"># Returns *mdsys.solupdb* (i.e. &quot;solute.pdb&quot;).</span>
 <span class="n">mdsys</span><span class="o">.</span><span class="n">make_box</span><span class="p">(</span><span class="n">d</span><span class="o">=</span><span class="s1">&#39;1.0&#39;</span><span class="p">,</span> <span class="n">bt</span><span class="o">=</span><span class="s1">&#39;dodecahedron&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="sphx-glr-script-out highlight-pytb notranslate"><div class="highlight"><pre><span></span><span class="gt">Traceback (most recent call last):</span>
-  File <span class="nb">&quot;/home/mywsl/reforge/docs/examples/go_protein.py&quot;</span>, line <span class="m">67</span>, in <span class="n">&lt;module&gt;</span>
-<span class="w">    </span><span class="n">mdsys</span><span class="o">.</span><span class="n">make_box</span><span class="p">(</span><span class="n">d</span><span class="o">=</span><span class="s1">&#39;1.0&#39;</span><span class="p">,</span> <span class="n">bt</span><span class="o">=</span><span class="s1">&#39;dodecahedron&#39;</span><span class="p">)</span>
-  File <span class="nb">&quot;/home/mywsl/reforge/reforge/mdsystem/gmxmd.py&quot;</span>, line <span class="m">146</span>, in <span class="n">make_box</span>
-<span class="w">    </span><span class="n">cli</span><span class="o">.</span><span class="n">gmx</span><span class="p">(</span><span class="s2">&quot;editconf&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">solupdb</span><span class="p">,</span> <span class="n">o</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">solupdb</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-  File <span class="nb">&quot;/home/mywsl/reforge/reforge/cli.py&quot;</span>, line <span class="m">184</span>, in <span class="n">gmx</span>
-<span class="w">    </span><span class="n">sp</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span> <span class="nb">input</span><span class="o">=</span><span class="n">clinput</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">cltext</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-  File <span class="nb">&quot;/home/mywsl/miniconda3/envs/reforge/lib/python3.12/subprocess.py&quot;</span>, line <span class="m">550</span>, in <span class="n">run</span>
-<span class="w">    </span><span class="k">with</span> <span class="n">Popen</span><span class="p">(</span><span class="o">*</span><span class="n">popenargs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">as</span> <span class="n">process</span><span class="p">:</span>
-<span class="w">         </span><span class="pm">^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>
-  File <span class="nb">&quot;/home/mywsl/miniconda3/envs/reforge/lib/python3.12/subprocess.py&quot;</span>, line <span class="m">1028</span>, in <span class="n">__init__</span>
-<span class="w">    </span><span class="bp">self</span><span class="o">.</span><span class="n">_execute_child</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">executable</span><span class="p">,</span> <span class="n">preexec_fn</span><span class="p">,</span> <span class="n">close_fds</span><span class="p">,</span>
-  File <span class="nb">&quot;/home/mywsl/miniconda3/envs/reforge/lib/python3.12/subprocess.py&quot;</span>, line <span class="m">1963</span>, in <span class="n">_execute_child</span>
-<span class="w">    </span><span class="k">raise</span> <span class="n">child_exception_type</span><span class="p">(</span><span class="n">errno_num</span><span class="p">,</span> <span class="n">err_msg</span><span class="p">,</span> <span class="n">err_filename</span><span class="p">)</span>
-<span class="gr">FileNotFoundError</span>: <span class="n">[Errno 2] No such file or directory: &#39;gmx_mpi&#39;</span>
 </pre></div>
 </div>
 <p>Add solvent and neutralize the system’s charge.</p>
@@ -229,7 +217,7 @@ periodic boundary conditions. This is done with GROMACS’s <em>trjconv</em> mod
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">mdsys</span><span class="o">.</span><span class="n">gmx</span><span class="p">(</span><span class="s2">&quot;trjconv&quot;</span><span class="p">,</span> <span class="n">clinput</span><span class="o">=</span><span class="s1">&#39;0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">mdsys</span><span class="o">.</span><span class="n">syspdb</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">mdsys</span><span class="o">.</span><span class="n">syspdb</span><span class="p">,</span> <span class="n">pbc</span><span class="o">=</span><span class="s1">&#39;atom&#39;</span><span class="p">,</span> <span class="n">ur</span><span class="o">=</span><span class="s1">&#39;compact&#39;</span><span class="p">,</span> <span class="n">o</span><span class="o">=</span><span class="s2">&quot;viz.pdb&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.094 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 5.063 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-go-protein-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/d519d4482f471d8e7e15f65f44a10fca/go_protein.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">go_protein.ipynb</span></code></a></p>

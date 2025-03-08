@@ -90,7 +90,7 @@
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
 <p>The “installation” of reForge consists of including the reForge project directory
 in your Python path and ensuring that you have all the necessary dependencies.
-All the packages that reForge depends on can be installed with conda and/or pip.</p>
+All the packages that reForge depends on, except for GROMACS, can be installed with conda and/or pip.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>For users of SOL and PHX clusters:
@@ -166,14 +166,14 @@ mamba<span class="w"> </span>remove<span class="w"> </span>-n<span class="w"> </
 </pre></div>
 </div>
 <p>If the installation was successful, restart the shell (or quit the interactive session by typing exit)
-and run the tests. You can find the log in tests/sl_output.out</p>
+and run the tests. You can find the log in <em>tests/sl_output.out</em></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>reforge
 .<span class="w"> </span>scripts/phx_md_load.sh<span class="w"> </span><span class="c1"># on PHX</span>
 .<span class="w"> </span>scripts/sol_md_load.sh<span class="w"> </span><span class="c1"># on SOL</span>
 sbatch<span class="w"> </span>run_tests.sh<span class="w"> </span>--all
 </pre></div>
 </div>
-<p>If the above does not work for you or some of the tests fail, email me at <a class="reference external" href="mailto:dyangali&#37;&#52;&#48;asu&#46;edu">dyangali<span>&#64;</span>asu<span>&#46;</span>edu</a></p>
+<p>If the above does not work for you, or some of the tests fail, email me at <a class="reference external" href="mailto:dyangali&#37;&#52;&#48;asu&#46;edu">dyangali<span>&#64;</span>asu<span>&#46;</span>edu</a></p>
 </section>
 </section>
 
