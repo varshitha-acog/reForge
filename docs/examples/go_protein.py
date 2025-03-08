@@ -44,7 +44,7 @@ mdsys.split_chains()
 
 #%%
 # Coarse-grain the proteins using *martinize2* (by Martini):
-mdsys.martinize_proteins_go(go_eps=10.0, go_low=0.3, go_up=1.0, p="backbone", pf=500, append=False)
+mdsys.martinize_proteins_go(go_eps=10.0, go_low=0.3, go_up=1.0, p="backbone", pf=500, append=True)
 
 #%%
 # Inspect the generated topology files. The topology should include the main protein topology file
