@@ -4,13 +4,13 @@ Getting Started
 Installation
 ------------
 
-The "installation" of reForge consists of including the reforge project directory 
-in your Python path and making sure that you have all the needed dependencies.
-All of the packages that reforge depends on can be installed with conda and/or pip.
+The "installation" of reForge consists of including the reForge project directory 
+in your Python path and ensuring that you have all the necessary dependencies.
+All the packages that reForge depends on, except for GROMACS, can be installed with conda and/or pip.
 
 .. warning::
 
-    For users of SOL and PHX clusters!!! 
+    For users of SOL and PHX clusters:
     For more detailed instructions, scroll down the page.
 
 1. **Clone the repository:**
@@ -29,18 +29,18 @@ All of the packages that reforge depends on can be installed with conda and/or p
     conda env create -n reforge --file environment.yml
     source activate reforge
 
-3. **Include reforge in your Python path OR install it via pip:**
+3. **Include reForge in your Python path OR install it via pip:**
 
 .. code-block:: bash
 
     export PYTHONPATH=$PYTHONPATH:path/to/reforge/repository
     # or
-    pip install -e . # from the reforge repository directory     
+    pip install -e . # from the reForge repository directory     
 
-Testing the setup 
+Testing the Setup 
 -----------------
 
-From the reforge repository directory, you can run the tests with the following command:
+From the reForge repository directory, you can run the tests with the following command:
 
 .. code-block:: bash
 
@@ -52,17 +52,17 @@ Running the Examples
 
 At the moment, the coarse-grained examples can only be run with GROMACS. OpenMM support is in active development. 
 Thus, to run the tutorials, you need to have GROMACS installed on your system.
-Some basic examples can be found here `examples <https://github.com/DanYev/cgtools/tree/main/docs/examples>`_, 
+Some basic examples can be found here: `examples <https://github.com/DanYev/cgtools/tree/main/docs/examples>`_, 
 and will be updated as the project progresses.
 
-For SOL and PHX users
+For SOL and PHX Users
 ---------------------
 
 .. warning::
 
     Please read this carefully before proceeding! Start with a clean shell and DO NOT activate 
-    any environments or interactive sessions unless it is stated in the instructions. Run the commands EXACTLY 
-    the way it is in the instructions. Starting an interactive session or running commands 
+    any environments or interactive sessions unless stated in the instructions. Run the commands EXACTLY 
+    as they are in the instructions. Starting an interactive session or running commands 
     with "bash" instead of "source" (.) initiates a new, separate shell process with  
     different environment variables and may break the dependencies.
 
