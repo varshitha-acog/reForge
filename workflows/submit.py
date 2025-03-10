@@ -165,19 +165,25 @@ sysdir = 'systems'
 sysnames = ['egfr_go'] # 1btl 8aw3
 runs = ['mdrun_1', 'mdrun_2', ] 
 
-
-# setup(submit=False, mem='4G')
+##############
+setup(submit=False, mem='4G')
+##############
 # md(submit=True, ntomp=8, mem='4G', q='grp_sozkan', p='general', t='04-00:00:00',)
 # extend(submit=True, ntomp=8, mem='2G', q='grp_sozkan', p='general', t='03-00:00:00',)
+##############
 # trjconv(submit=True)
+##############
 # rms_analysis(submit=True)
 # cov_analysis(submit=True)
-tdlrt_analysis(submit=True, mem='128G', G=1)
-# nm_analysis(submit=False, mem='32G', G=1)
+# tdlrt_analysis(submit=True, mem='128G', G=1)
+##############
 # get_averages(submit=True, mem='64G')
 # get_td_averages(submit=True, mem='90G')
+##############
+# nm_analysis(submit=False, mem='32G', G=1)
 # cluster(submit=False)
 # sysjob('make_ndx', submit=False)
 # runjob('runjob', submit=True, mem='16G')
+##############
 # plot(submit=False)
 # animate(submit=True, mem='80G')

@@ -135,8 +135,8 @@ def trjconv(sysdir, sysname, runname, **kwargs):
     mdrun.convert_tpr(clinput=f'{k}\n {k}\n', s='md.tpr', n=mdrun.sysndx, o='conv.tpr')
     mdrun.trjconv(clinput=f'{k}\n {k}\n {k}\n', s='md.tpr', f='md.xtc', n=mdrun.sysndx, o='conv.xtc',  
        pbc='nojump', **kwargs)
-    mdrun.trjconv(clinput='0\n0\n0\n', s='conv.tpr', f='conv.xtc', o='mdc.xtc', fit='rot+trans', center='')
-    mdrun.trjconv(clinput='0\n0\n0\n', s='conv.tpr', f='conv.xtc', o='mdc.pdb', fit='rot+trans', center='', e=0)
+    mdrun.trjconv(clinput='0\n0\n0\n', s='conv.tpr', f='conv.xtc', o='mdc.xtc', fit='rot+trans')
+    mdrun.trjconv(clinput='0\n0\n0\n', s='conv.tpr', f='conv.xtc', o='mdc.pdb', fit='rot+trans', e=0)
     clean_dir(mdrun.rundir)
     
 
@@ -196,7 +196,7 @@ def tdlrt_analysis(sysdir, sysname, runname):
     # Reading trajectory
     u = mda.Universe(mdrun.str, mdrun.trj, in_memory=True)
     ag = u.atoms.select_atoms("name BB")
-    positions = io.read_positions(u, ag, b=b, e=e, sample_rate=sample_rate),  
+    positions = io.read_positions(u, ag, b=b, e=e, sample_rate=sample_rate)
     # velocities = io.read_velocities(u, ag, b=b, e=e, sample_rate=sample_rate,)
     # CALC CCF # CCF params FRAME_DT=20 ps
     corr = mdm.ccf(positions, positions, ntmax=ntmax, n=10, mode='gpu', center=True, dtype=np.float32)

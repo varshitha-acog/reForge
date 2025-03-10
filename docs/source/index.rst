@@ -11,7 +11,7 @@ Overview of reForge Package
 
 
 The reForge Python package offers a set of tools for MD simulations, analysis, and data processing. 
-It includes optimized math routines, GPU-accelerated computations, and various helper tools to make 
+It includes optimized mathematical routines, GPU-accelerated computations, and various helper tools to make 
 simulation setup and data handling easier. Created to aid advanced research in simulation and analysis, 
 reForge is available to the public under the GNU V3 License.
 

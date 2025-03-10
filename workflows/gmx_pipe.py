@@ -69,7 +69,7 @@ def setup_cg_protein_rna(sysdir, sysname):
 
     # 1.5. Need index files to make selections with GROMACS. Very annoying but wcyd. Order:
     # 1.System 2.Solute 3.Backbone 4.Solvent 5...chains. Can add custom groups using AtomList.write_to_ndx()
-    mdsys.make_sys_ndx(backbone_atoms=["BB", "BB1", "BB3"])
+    mdsys.make_system_ndx(backbone_atoms=["BB", "BB1", "BB3"])
    
       
 def setup_cg_protein_membrane(sysdir, sysname):

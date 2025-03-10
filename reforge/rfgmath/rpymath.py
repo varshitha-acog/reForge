@@ -172,9 +172,10 @@ def gfft_ccf(x, y, ntmax=None, center=True, dtype=None):
     counts = cp.arange(nt, nt - ntmax, -1, dtype=dtype) ** -1
     counts = counts[None, :]
     corr = cp.zeros((nx, ny, ntmax), dtype=dtype)
+    logger.debug(f"{nx}, {ny}, {nt}, {ntmax}, {counts.shape}")
     for i in range(nx):
         corr[i] = cp.fft.ifft(x_f[i, None, :] * cp.conj(y_f), axis=-1).real[:, :ntmax] * counts
-    return corr
+    return corr.get()
 
 
 @memprofit
@@ -217,13 +218,11 @@ def gfft_ccf_auto(x, y, ntmax=None, center=True, buffer_c=0.95, dtype=None):
     arr_gpu = cp.empty(nxmax * ny * ntmax, dtype=dtype) # Flat is way faster
     counts = cp.arange(nt, nt - ntmax, -1, dtype=dtype) ** -1
     counts = counts[None, :]
-    logger.info(f"{counts.shape}")
     # Calculating CCF for full sweeps:
     for sw in range(n_sweeps):
         logger.debug("Sweep number %s", sw)
         for i in range(nxmax):
             temp_res = cp.fft.ifft(x_f[i, None, :] * cp.conj(y_f), axis=-1).real[:, :ntmax] * counts # shape (ny, ntmax)
-            logger.info(f"{temp_res.shape}")
             offset = i * (ny * ntmax) # Compute the offset into the flat array for this block
             arr_gpu[offset: offset + (ny * ntmax)] = temp_res.reshape(-1) # result.reshape(-1) gives a 1D view
         mem_pool = cp.get_default_memory_pool()
