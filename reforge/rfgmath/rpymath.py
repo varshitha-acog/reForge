@@ -175,7 +175,7 @@ def gfft_ccf(x, y, ntmax=None, center=True, dtype=None):
     logger.debug(f"{nx}, {ny}, {nt}, {ntmax}, {counts.shape}")
     for i in range(nx):
         corr[i] = cp.fft.ifft(x_f[i, None, :] * cp.conj(y_f), axis=-1).real[:, :ntmax] * counts
-    return corr.get()
+    return corr
 
 
 @memprofit
