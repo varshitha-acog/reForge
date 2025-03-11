@@ -56,7 +56,7 @@ def setup_cg_protein_membrane(sysdir, sysname):
     # Option 'dm' shifts the membrane along z-axis
     mdsys.insert_membrane(
         f=mdsys.solupdb, o=mdsys.sysgro, p=mdsys.systop, 
-        x=15, y=15, z=30, dm=10, 
+        x=15, y=15, z=30, dm=0, 
         u='POPC:1', l='POPC:1', sol='W',
     )
 
@@ -128,8 +128,8 @@ def make_ndx(sysdir, sysname, **kwargs):
 
 def trjconv(sysdir, sysname, runname, **kwargs):
     kwargs.setdefault('b', 0) # in ps
-    kwargs.setdefault('dt', 200) # in ps
-    kwargs.setdefault('e', 5000000) # in ps
+    kwargs.setdefault('dt', 1000) # in ps
+    kwargs.setdefault('e', 3000000) # in ps
     mdrun = GmxRun(sysdir, sysname, runname)
     k = 1 # NDX groups: 0.System 1.Solute 2.Backbone 3.Solvent 4.Not water 5-.Chains
     mdrun.convert_tpr(clinput=f'{k}\n {k}\n', s='md.tpr', n=mdrun.sysndx, o='conv.tpr')
@@ -164,7 +164,7 @@ def cov_analysis(sysdir, sysname, runname):
     u = mda.Universe(mdrun.str, mdrun.trj, in_memory=True)
     ag = u.atoms.select_atoms("name BB or name BB1 or name BB3")
     # Begin at 'b' picoseconds, end at 'e', split into 'n' parts, sample each 'sample_rate' frame
-    mdrun.get_covmats(u, ag, b=500000, e=10000000, n=45, sample_rate=1, outtag='covmat') 
+    mdrun.get_covmats(u, ag, b=500000, e=3000000, n=25, sample_rate=1, outtag='covmat') 
     mdrun.get_pertmats()
     mdrun.get_dfi(outtag='dfi')
     mdrun.get_dci(outtag='dci', asym=False)
@@ -190,7 +190,7 @@ def tdlrt_analysis(sysdir, sysname, runname):
     logger.setLevel(logging.DEBUG)
     mdrun = GmxRun(sysdir, sysname, runname) 
     b = 500000
-    e = 10000000
+    e = 3000000
     sample_rate = 1
     ntmax = 100 # how many frames to save
     # Reading trajectory
