@@ -61,7 +61,8 @@ def setup_cg_protein_rna(sysdir, sysname):
     mdsys.martinize_rna(ef=200, el=0.3, eu=1.2, p='backbone', pf=500, append=True) # Martini RNA FF 
     mdsys.make_cg_topology() # CG topology. Returns mdsys.systop ("mdsys.top") file
     mdsys.make_cg_structure() # CG structure. Returns mdsys.solupdb ("solute.pdb") file
-    
+    mdsys.make_box(d='1.2', bt='dodecahedron')
+
     # 1.4. Coarse graining is *hopefully* done. Need to add solvent and ions
     solvent = os.path.join(mdsys.wdir, 'water.gro')
     mdsys.solvate(cp=mdsys.solupdb, cs=solvent) # all kwargs go to gmx solvate command
@@ -170,21 +171,17 @@ def make_ndx(sysdir, sysname, **kwargs):
     mdsys.make_sys_ndx(backbone_atoms=["BB", "BB1", "BB3"])
 
 
-def trjconv(sysdir, sysname, runname, fit='rot+trans', **kwargs):
+def trjconv(sysdir, sysname, runname, **kwargs):
     kwargs.setdefault('b', 0) # in ps
     kwargs.setdefault('dt', 200) # in ps
     kwargs.setdefault('e', 10000000) # in ps
     mdrun = GmxRun(sysdir, sysname, runname)
     k = 1 # NDX groups: 0.System 1.Solute 2.Backbone 3.Solvent 4.Not water 5-.Chains
-    # mdrun.trjconv(clinput=f'0\n', s='md.tpr', f='md.xtc', o='viz.pdb', n=mdrun.sysndx, dt=100000)
-    # mdrun.trjconv(clinput=f'{k}\n {k}\n {k}\n', s='md.tpr', f='md.xtc', o='mdc.pdb', n=mdrun.sysndx, 
-    #     center='yes', pbc='cluster', ur='compact', e=0)
     mdrun.convert_tpr(clinput=f'{k}\n {k}\n', s='md.tpr', n=mdrun.sysndx, o='conv.tpr')
     mdrun.trjconv(clinput=f'{k}\n {k}\n {k}\n', s='md.tpr', f='md.xtc', n=mdrun.sysndx, o='conv.xtc',  
        pbc='nojump', **kwargs)
-    # mdrun.trjconv(clinput='0\n 0\n', s='conv.tpr', f='conv.xtc', o='mdc.xtc', pbc='nojump')
-    if fit:
-        mdrun.trjconv(clinput='0\n0\n0\n', s='conv.tpr', f='conv.xtc', o='mdc.xtc', fit=fit, center='')
+    mdrun.trjconv(clinput='0\n0\n0\n', s='conv.tpr', f='conv.xtc', o='mdc.xtc', fit='rot+trans')
+    mdrun.trjconv(clinput='0\n0\n0\n', s='conv.tpr', f='conv.xtc', o='mdc.pdb', fit='rot+trans', e=0)
     clean_dir(mdrun.rundir)
     
 
@@ -207,14 +204,15 @@ def cluster(sysdir, sysname, runname, **kwargs):
 
 def cov_analysis(sysdir, sysname, runname):
     mdrun = GmxRun(sysdir, sysname, runname) 
-    # u = mda.Universe(mdrun.str, mdrun.trj, in_memory=True)
-    # ag = u.atoms.select_atoms("name BB or name BB1 or name BB3")
-    # clean_dir(mdrun.covdir, '*npy')
-    # mdrun.get_covmats(u, ag, sample_rate=1, b=50000, e=1000000, n=4, outtag='covmat') #  Begin at b picoseconds, end at e, sample each frame
-    # mdrun.get_pertmats()
-    # mdrun.get_dfi(outtag='dfi')
-    # mdrun.get_dci(outtag='dci', asym=False)
-    # mdrun.get_dci(outtag='asym', asym=True)
+    clean_dir(mdrun.covdir, '*npy')
+    u = mda.Universe(mdrun.str, mdrun.trj, in_memory=True)
+    ag = u.atoms.select_atoms("name BB or name BB1 or name BB3")
+    # Begin at 'b' picoseconds, end at 'e', split into 'n' parts, sample each 'sample_rate' frame
+    mdrun.get_covmats(u, ag, b=1000000, e=5000000, n=40, sample_rate=1, outtag='covmat') 
+    mdrun.get_pertmats()
+    mdrun.get_dfi(outtag='dfi')
+    mdrun.get_dci(outtag='dci', asym=False)
+    mdrun.get_dci(outtag='asym', asym=True)
     # Calc DCI between segments
     atoms = io.pdb2atomlist(mdrun.solupdb)
     backbone_anames = ["BB"]
@@ -222,26 +220,31 @@ def cov_analysis(sysdir, sysname, runname):
     bb.renum() # Renumber atids form 0, needed to mask numpy arrays
     groups = bb.segments.atids # mask for the arrays
     labels = [segids[0] for segids in bb.segments.segids]
-    print(labels)
-    exit()
-    mdrun.get_group_dci(groups=groups, labels=labels, asym=False)
+    mdrun.get_group_dci(groups=groups, labels=labels, asym=False, outtag='dci')
+    mdrun.get_group_dci(groups=groups, labels=labels, asym=False, transpose=True, outtag='tdci')
+    mdrun.get_group_dci(groups=groups, labels=labels, asym=True, outtag='asym')
     # clean_dir(mdrun.covdir, 'covmat*')
 
 
 def tdlrt_analysis(sysdir, sysname, runname):
+    # WARNING! The computation can potentially be VERY VERY memory extensive.
+    # Estimate the size of the output before running this function.
+    # Dumping the whole trajectory can in theory output terabytes of data and will crash in practice.
+    # In such cases, request more memory, bigger GPU, or do it segment by segment.
+    logger.setLevel(logging.DEBUG)
     mdrun = GmxRun(sysdir, sysname, runname) 
-    # CCF params FRAMEDT=20 ps
-    b = 0
-    e = 1000000
+    b = 500000
+    e = 3000000
     sample_rate = 1
-    ntmax = 1000 # how many frames to save
-    corr_file = os.path.join(mdrun.lrtdir, 'corr_pp.npy')
-    # CALC CCF
+    ntmax = 100 # how many frames to save
+    # Reading trajectory
     u = mda.Universe(mdrun.str, mdrun.trj, in_memory=True)
-    ag = u.atoms
-    positions = io.read_positions(u, ag, sample_rate=sample_rate, b=b, e=e) 
-    velocities = io.read_velocities(u, ag, sample_rate=sample_rate, b=b, e=e)
-    corr = mdm.ccf(positions, positions, ntmax=ntmax, n=10, mode='gpu', center=True)
+    ag = u.atoms.select_atoms("name BB")
+    positions = io.read_positions(u, ag, b=b, e=e, sample_rate=sample_rate)
+    # velocities = io.read_velocities(u, ag, b=b, e=e, sample_rate=sample_rate,)
+    # CALC CCF # CCF params FRAME_DT=20 ps
+    corr = mdm.ccf(positions, positions, ntmax=ntmax, n=10, mode='gpu', center=True, dtype=np.float32)
+    corr_file = mdrun.lrtdir / 'corr_pp.npy'
     np.save(corr_file, corr)
 
 

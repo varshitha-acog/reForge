@@ -576,7 +576,7 @@ class Topology:
         Parameters
         ----------
         atoms : list
-            List of atom objects.
+            List of PDB atom objects.
         anames : list of str, optional
             Atom names to include (default: ["BB1", "BB3"]).
         el : float, optional
@@ -591,16 +591,16 @@ class Topology:
         def get_distance(v1, v2):
             return np.linalg.norm(np.array(v1) - np.array(v2)) / 10.0
 
-        selected = [atom for atom in atoms if atom[4] in anames]
+        selected = [atom for atom in atoms if atom.name in anames]
         for a1 in selected:
             for a2 in selected:
-                if a2[0] - a1[0] > 3:
-                    v1 = (a1[5], a1[6], a1[7])
-                    v2 = (a2[5], a2[6], a2[7])
+                if a2.atid - a1.atid > 3:
+                    v1 = a1.vec
+                    v2 = a2.vec
                     d = get_distance(v1, v2)
                     if el < d < eu:
-                        comment = f"{a1[3]}{a1[2]}-{a2[3]}{a2[2]}"
-                        self.elnet.append([[a1[0], a2[0]], [6, d, ef], comment])
+                        comment = f"{a1.resname}{a1.name}-{a2.resname}{a2.name}"
+                        self.elnet.append([[a1.atid, a2.atid], [6, d, ef], comment])
 
     def from_sequence(self, sequence, secstruc=None):
         """Build topology from a given sequence.
