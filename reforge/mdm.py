@@ -160,6 +160,13 @@ def perturbation_matrix(covmat, dtype=np.float64):
     return pertmat
 
 
+def perturbation_matrix_iso(covmat, dtype=np.float64):
+    """Compute the perturbation matrix from a covariance matrix"""
+    covmat = covmat.astype(np.float64)
+    pertmat = rcmath.perturbation_matrix_iso(covmat)
+    return pertmat    
+
+
 def td_perturbation_matrix(covmat, dtype=np.float64):
     """Compute the block-wise (td) perturbation matrix from a covariance matrix.
 
@@ -212,7 +219,7 @@ def dci(pert_mat, asym=False):
     np.ndarray
         The DCI matrix.
     """
-    dci_val = pert_mat * pert_mat.shape[0] / np.sum(pert_mat, axis=-1, keepdims=True)
+    dci_val = pert_mat / np.average(pert_mat, axis=-1, keepdims=True)
     if asym:
         dci_val = dci_val - dci_val.T
     return dci_val
@@ -292,7 +299,7 @@ def group_group_dci(pert_mat, groups=None, asym=False):
 ## Elastic Network Model (ENM)
 ##############################################################
 
-def hessian(vecs, cutoff, spring_constant, dd):
+def hessian(vecs, cutoff, spring_constant=1e3, dd=0):
     """Compute the Hessian matrix using an elastic network model.
 
     Parameters

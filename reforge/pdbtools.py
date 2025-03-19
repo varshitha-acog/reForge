@@ -466,7 +466,10 @@ class AtomList(list):
     def write_ndx(self, filename, header="[ group ]", append=False, wrap=15):
         """Write the atom IDs to a GROMACS .ndx file."""
         mode = "a" if append else "w"
-        atids = [str(atid) for atid in self.atids]
+        if len(self.atids) > 99999:
+            atids = [str(idx+1) for idx in range(len(self.atids))]
+        else:
+            atids = [str(atid) for atid in self.atids]
         with open(filename, mode, encoding="utf-8") as f:
             f.write(header + "\n")
             for i in range(0, len(self), wrap):
@@ -763,7 +766,7 @@ def clean_pdb(in_pdb, out_pdb, add_missing_atoms=False, add_hydrogens=False, pH=
     except ImportError as e:
         raise ImportError("PDBFixer or OpenMM not available") from e
     print("Processing %s" % in_pdb, file=sys.stderr)
-    pdb = PDBFixer(filename=in_pdb)
+    pdb = PDBFixer(filename=str(in_pdb))
     print("Removing heterogens and checking for missing residues...", file=sys.stderr)
     pdb.removeHeterogens(False)
     pdb.findMissingResidues()
