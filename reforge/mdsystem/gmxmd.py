@@ -447,6 +447,8 @@ class GmxRun(MDRun):
         kwargs.setdefault("deffnm", "md")
         kwargs.setdefault("nsteps", "-2")
         kwargs.setdefault("ntomp", "8")
+        kwargs.setdefault("pin", "on")
+        kwargs.setdefault("pinstride", "1")
         self.gmx('mdrun', **kwargs)
 
     def trjconv(self, clinput=None, **kwargs):

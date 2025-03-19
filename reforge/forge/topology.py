@@ -570,7 +570,7 @@ class Topology:
             resid += 1
         logging.info("Finished nucleic acid topology construction.")
 
-    def elastic_network(self, atoms, anames: List[str] = None, el: float = 0.5, eu: float = 1.2, ef: float = 200):
+    def elastic_network(self, atoms, anames: List[str] = None, el: float = 0.5, eu: float = 1.1, ef: float = 500):
         """Construct an elastic network between selected atoms.
 
         Parameters
