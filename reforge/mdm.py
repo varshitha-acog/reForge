@@ -219,7 +219,7 @@ def dci(pert_mat, asym=False):
     np.ndarray
         The DCI matrix.
     """
-    dci_val = pert_mat * pert_mat.shape[0] / np.sum(pert_mat, axis=-1, keepdims=True)
+    dci_val = pert_mat / np.average(pert_mat, axis=-1, keepdims=True)
     if asym:
         dci_val = dci_val - dci_val.T
     return dci_val

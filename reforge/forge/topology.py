@@ -599,7 +599,7 @@ class Topology:
                     v2 = a2.vec
                     d = get_distance(v1, v2)
                     if el < d < eu:
-                        comment = f"{a1.resname}{a1.name}-{a2.resname}{a2.name}"
+                        comment = f"{a1.resname}{a1.atid}-{a2.resname}{a2.atid}"
                         self.elnet.append([[a1.atid, a2.atid], [6, d, ef], comment])
 
     def from_sequence(self, sequence, secstruc=None):
