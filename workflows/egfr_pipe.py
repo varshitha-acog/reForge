@@ -117,7 +117,7 @@ def md(sysdir, sysname, runname, ntomp):
 
 def extend(sysdir, sysname, runname, ntomp):    
     mdsys = GmxSystem(sysdir, sysname)
-    mdrun = mdsys.initmd(runname)
+    mdrun = GmxRun(sysdir, sysname, runname)
     mdrun.mdrun(deffnm='md', cpi='md.cpt', ntomp=ntomp, nsteps=-2) 
 
 
