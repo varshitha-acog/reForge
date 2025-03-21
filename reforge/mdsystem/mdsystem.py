@@ -394,7 +394,7 @@ class MDSystem:
         np.save(file_mean, mean)
         np.save(file_err, sem)
 
-    def get_td_averages(self, fname, loop=True):
+    def get_td_averages(self, pattern, loop=True):
         """Calculates time-dependent averages from a set of numpy files.
 
         Parameters
@@ -406,7 +406,7 @@ class MDSystem:
             numpy.ndarray: The time-dependent average.
         """
         logger.info("Getting time-dependent averages")
-        files = io.pull_files(self.mddir, fname)
+        files = io.pull_files(self.mddir, pattern)
         if loop:
             logger.info("Processing %s", files[0])
             average = np.load(files[0])
@@ -418,7 +418,8 @@ class MDSystem:
         else:
             arrays = [np.load(f) for f in files]
             average = np.average(arrays, axis=0)
-        np.save(self.datdir / fname, average)
+        out_file = self.datdir / f"{pattern.split('*')[0]}_av.npy"     
+        np.save(out_file, average)
         logger.info("Done!")
         return average
 
