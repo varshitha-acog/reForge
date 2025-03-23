@@ -223,8 +223,8 @@ class Martini30RNA(NucleicForceField):
         # RNA backbone atoms: tuple of (atom id, type, name, charge group, charge, mass)
         self.bb_atoms = [
             (0, "Q1n", "BB1", 1, -1, 72),
-            (1, "C6", "BB2", 1, 0, 60),
-            (2, "N2", "BB3", 1, 0, 60),
+            (1, "N2", "BB2", 1, 0, 60),
+            (2, "N4", "BB3", 1, 0, 60),
         ]
         self.bb_bonds = [
             [(0, 1), (1, 0.350, 25000), ("BB1-BB2")],
