@@ -122,7 +122,8 @@ class GmxSystem(MDSystem):
         logger.info("Merging CG PDB files into a single solute PDB...")
         with cd(self.root):
             cg_pdb_files = [p.name for p in self.cgdir.iterdir()]
-            cg_pdb_files = pdbtools.sort_uld(cg_pdb_files)
+            # cg_pdb_files = pdbtools.sort_uld(cg_pdb_files)
+            cg_pdb_files = sort_for_gmx(cg_pdb_files)
             cg_pdb_files = [self.cgdir / fname for fname in cg_pdb_files]
             all_atoms = AtomList()
             for file in cg_pdb_files:
@@ -158,7 +159,8 @@ class GmxSystem(MDSystem):
         """
         logger.info("Writing system topology...")
         itp_files = [p.name for p in self.topdir.glob(f'{prefix}*itp')]
-        itp_files = pdbtools.sort_uld(itp_files)
+        # itp_files = pdbtools.sort_uld(itp_files)
+        itp_files = sort_for_gmx(itp_files)
         with self.systop.open("w") as f:
             # Include section
             f.write('#define GO_VIRT"\n')
@@ -642,3 +644,11 @@ class GmxRun(MDRun):
                 o=str(self.rmsdir / f"rmsf_{chain}.xvg"),
                 **kwargs,
             )
+
+
+#######################
+def sort_for_gmx(data):
+    return sorted(data, key=lambda x: (
+    0 if x.split('_')[1][0].isupper() else 1 if x.split('_')[1][0].islower() else 2,
+    x.split('_')[1]
+))    
