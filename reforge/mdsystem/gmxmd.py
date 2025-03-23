@@ -294,7 +294,7 @@ class GmxSystem(MDSystem):
         backbone.write_ndx(self.sysndx, header="[ Backbone ]", append=True, wrap=15)
         solvent.write_ndx(self.sysndx, header="[ Solvent ]", append=True, wrap=15)
         not_water.write_ndx(self.sysndx, header="[ Not_Water ]", append=True, wrap=15)
-        chids = sorted(set(solute.chids))
+        chids = self.chains
         for chid in chids:
             chain = solute.mask(chid, mode="chid")
             chain.write_ndx(self.sysndx, header=f"[ chain_{chid} ]", append=True, wrap=15)
@@ -502,7 +502,7 @@ class GmxRun(MDRun):
         npy_file = self.rmsdir / "rmsd.npy"
         kwargs.setdefault("s", self.str)
         kwargs.setdefault("f", self.trj)
-        kwargs.setdefault("o", str(xvg_file))
+        kwargs.setdefault("o", xvg_file)
         kwargs.setdefault("xvg", "none")
         self.gmx('rms', clinput=clinput, **kwargs)
         io.xvg2npy(xvg_file, npy_file, usecols=[0, 1])
@@ -611,18 +611,18 @@ class GmxRun(MDRun):
             - res: Whether to output per-residue RMSF (default: "no").
             - fit: Whether to fit the trajectory (default: "yes").
         """
-        kwargs.setdefault("f", self.trj)
         kwargs.setdefault("s", self.str)
+        kwargs.setdefault("f", self.trj)
         kwargs.setdefault("n", self.sysndx)
-        kwargs.setdefault("res", "no")
+        kwargs.setdefault("res", "yes")
         kwargs.setdefault("fit", "yes")
+        kwargs.setdefault("xvg", "none")
         for idx, chain in enumerate(self.chains):
-            idx = idx + 1
-            cli.gmx('rmsf',
-                clinput=f"{idx}\n{idx}\n",
-                o=str(self.rmsdir / f"rmsf_{chain}.xvg"),
-                **kwargs,
-            )
+            idx = idx + 5
+            xvg_file = self.rmsdir / f"rmsf_{chain}.xvg"
+            npy_file = self.rmsdir / f"rmsf_{chain}.npy"
+            self.gmx('rmsf', clinput=f"{idx}\n{idx}\n", o=xvg_file, **kwargs)
+            io.xvg2npy(xvg_file, npy_file, usecols=[1])
 
     def get_rmsd_by_chain(self, **kwargs):
         """Calculates RMSD for each chain in the system using GROMACS rmsd.
@@ -634,16 +634,17 @@ class GmxRun(MDRun):
             - s: Structure file.
             - n: Index file.
         """
-        kwargs.setdefault("f", self.trj)
         kwargs.setdefault("s", self.str)
+        kwargs.setdefault("f", self.trj)
         kwargs.setdefault("n", self.sysndx)
+        kwargs.setdefault("fit", "rot+trans")
+        kwargs.setdefault("xvg", "none")
         for idx, chain in enumerate(self.chains):
-            idx = idx + 1
-            cli.gmx('rms',
-                clinput=f"{idx}\n",
-                o=str(self.rmsdir / f"rmsf_{chain}.xvg"),
-                **kwargs,
-            )
+            idx = idx + 5
+            xvg_file = self.rmsdir / f"rmsd_{chain}.xvg"
+            npy_file = self.rmsdir / f"rmsd_{chain}.npy"
+            self.gmx('rms', clinput=f"{idx}\n{idx}\n", o=xvg_file, **kwargs)
+            io.xvg2npy(xvg_file, npy_file, usecols=[1])
 
 
 #######################
