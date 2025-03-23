@@ -619,8 +619,8 @@ class GmxRun(MDRun):
         kwargs.setdefault("xvg", "none")
         for idx, chain in enumerate(self.chains):
             idx = idx + 5
-            xvg_file = self.rmsdir / f"rmsf_{chain}.xvg"
-            npy_file = self.rmsdir / f"rmsf_{chain}.npy"
+            xvg_file = self.rmsdir / f"crmsf_{chain}.xvg"
+            npy_file = self.rmsdir / f"crmsf_{chain}.npy"
             self.gmx('rmsf', clinput=f"{idx}\n{idx}\n", o=xvg_file, **kwargs)
             io.xvg2npy(xvg_file, npy_file, usecols=[1])
 
@@ -641,8 +641,8 @@ class GmxRun(MDRun):
         kwargs.setdefault("xvg", "none")
         for idx, chain in enumerate(self.chains):
             idx = idx + 5
-            xvg_file = self.rmsdir / f"rmsd_{chain}.xvg"
-            npy_file = self.rmsdir / f"rmsd_{chain}.npy"
+            xvg_file = self.rmsdir / f"crmsd_{chain}.xvg"
+            npy_file = self.rmsdir / f"crmsd_{chain}.npy"
             self.gmx('rms', clinput=f"{idx}\n{idx}\n", o=xvg_file, **kwargs)
             io.xvg2npy(xvg_file, npy_file, usecols=[1])
 
