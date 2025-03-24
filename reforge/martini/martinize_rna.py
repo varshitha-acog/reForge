@@ -46,15 +46,15 @@ def martinize_rna_parser():
     )
     parser.add_argument(
         "-merge",
-        default=True,
-        type=bool,
-        help="Merge separate chains if detected (default: True)",
+        default="yes",
+        type=str,
+        help="Merge separate chains if detected (default: yes)",
     )
     parser.add_argument(
         "-elastic",
-        default=False,
-        type=bool,
-        help="Add elastic network (default: False)",
+        default="no",
+        type=str,
+        help="Add elastic network (default: no)",
     )
     parser.add_argument(
         "-ef",
@@ -148,7 +148,7 @@ if __name__ == "__main__":
         start_idx += len(cg_atoms)
     structure.write_pdb(options.os)
     merged_topology = merge_topologies(topologies)
-    if options.elastic:
+    if options.elastic == 'yes':
         merged_topology.elastic_network(
             structure,
             anames=["BB1", "BB3"],
