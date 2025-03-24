@@ -167,9 +167,9 @@ def get_cg_bonds(inpdb, top):
     angles = BondList()
     dihs = BondList()
     for model in system:
-        bonds.extend(calc_bonds(model.atoms(), top.bonds + top.cons))
-        angles.extend(calc_angles(model.atoms(), top.angles))
-        dihs.extend(calc_dihedrals(model.atoms(), top.dihs))
+        bonds.extend(calc_bonds(model.atoms, top.bonds + top.cons))
+        angles.extend(calc_angles(model.atoms, top.angles))
+        dihs.extend(calc_dihedrals(model.atoms, top.dihs))
     print("Done!", file=sys.stderr)
     return bonds, angles, dihs
 

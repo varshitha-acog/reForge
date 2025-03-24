@@ -176,6 +176,7 @@ class Martini30RNA(NucleicForceField):
     Force field for Martini 3.0 RNA.
     """
     resnames = ["A", "C", "G", "U"]
+    alt_resnames = ["ADE", "CYT", "GUA", "URA"]
 
     bb_mapping = {
         "BB1": ("P", "OP1", "OP2", "O5'", "O3'", "O1P", "O2P"),
@@ -211,9 +212,13 @@ class Martini30RNA(NucleicForceField):
     }
     mapping = {
         "A": {**bb_mapping, **a_mapping},
+        "ADE": {**bb_mapping, **a_mapping},       
         "C": {**bb_mapping, **c_mapping},
+        "CYT": {**bb_mapping, **c_mapping},
         "G": {**bb_mapping, **g_mapping},
+        "GUA": {**bb_mapping, **g_mapping},
         "U": {**bb_mapping, **u_mapping},
+        "URA": {**bb_mapping, **u_mapping},
     }
 
     def __init__(self, directory="rna_reg", mol=RNA_SYSTEM, version="new"):

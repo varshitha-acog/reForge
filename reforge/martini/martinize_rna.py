@@ -52,9 +52,9 @@ def martinize_rna_parser():
     )
     parser.add_argument(
         "-elastic",
-        default="no",
+        default="yes",
         type=str,
-        help="Add elastic network (default: no)",
+        help="Add elastic network (default: yes)",
     )
     parser.add_argument(
         "-ef",
@@ -64,9 +64,9 @@ def martinize_rna_parser():
     )
     parser.add_argument(
         "-el",
-        default=0.5,
+        default=0.3,
         type=float,
-        help="Elastic network lower cutoff (default: 0.5 nm)",
+        help="Elastic network lower cutoff (default: 0.3 nm)",
     )
     parser.add_argument(
         "-eu",
