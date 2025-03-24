@@ -245,7 +245,7 @@ class Martini30RNA(NucleicForceField):
         self.bb_dihs = [
             [(0, 1, 0, 1), (1, 0.0, 25.0, 1), ("BB1-BB2-BB1n-BB2n")],
             [(-2, 0, 1, 0), (1, 0.0, 25.0, 1), ("BB2p-BB1-BB2-BB1n")],
-            [(-2, 0, 1, 2), (1, -112.0, 15.0, 1), ("BB2p-BB1-BB2-BB3n")],
+            [(-2, 0, 1, 2), (1, -112.0, 15.0, 1), ("BB2p-BB1-BB2-BB3")],
         ]
         self.bb_cons = []
         self.bb_excls = [[(0, 2), (), ("BB1-BB3")], [(2, 0), (), ("BB3-BB1n")]]

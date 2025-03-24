@@ -27,7 +27,7 @@ def get_distance(v1, v2):
     """
     v1 = np.array(v1)
     v2 = np.array(v2)
-    return np.linalg.norm(v1 - v2) / 10.0
+    return 0.1 * np.linalg.norm(v1 - v2) 
 
 
 def get_angle(v1, v2, v3):
