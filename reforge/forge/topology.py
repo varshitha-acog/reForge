@@ -589,8 +589,7 @@ class Topology:
         if anames is None:
             anames = ["BB1", "BB3"]
         def get_distance(v1, v2):
-            return np.linalg.norm(np.array(v1) - np.array(v2)) / 10.0
-
+            return 0.1 * np.linalg.norm(np.array(v1) - np.array(v2)) 
         selected = [atom for atom in atoms if atom.name in anames]
         for a1 in selected:
             for a2 in selected:

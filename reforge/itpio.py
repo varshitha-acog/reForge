@@ -239,7 +239,7 @@ def format_bonded_section(header: str, bonds: List[List]) -> List[str]:
     return lines
 
 
-def format_posres_section(atoms: List[Tuple], posres_fc=1000, 
+def format_posres_section(atoms: List[Tuple], posres_fc=500, 
                           selection: List[str] = None) -> List[str]:
     """Format the position restraints section.
 
@@ -248,9 +248,9 @@ def format_posres_section(atoms: List[Tuple], posres_fc=1000,
     atoms : List[Tuple]
         List of atom records.
     posres_fc : float, optional
-        Force constant for restraints. Default is 1000.
+        Force constant for restraints. Default is 500.
     selection : List[str], optional
-        Atom names to select. Defaults to ["BB1", "BB3", "SC1"] if not provided.
+        Atom names to select. Defaults to ["BB1", "BB2", "BB3", "SC1"] if not provided.
 
     Returns
     -------
@@ -258,7 +258,7 @@ def format_posres_section(atoms: List[Tuple], posres_fc=1000,
         A list of formatted lines.
     """
     if selection is None:
-        selection = ["BB1", "BB3", "SC1"]
+        selection = ["BB1", "BB2", "BB3", "SC1"]
     lines = [
         "\n#ifdef POSRES\n",
         f"#define POSRES_FC {posres_fc:.2f}\n",
