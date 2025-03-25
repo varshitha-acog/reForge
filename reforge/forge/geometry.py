@@ -142,9 +142,9 @@ def calc_dihedrals(atoms, dihs):
     quads = [(atoms[i - 1], atoms[j - 1], atoms[k - 1], atoms[l - 1])
              for i, j, k, l in conns]
     vecs_list = [(a1.vec, a2.vec, a3.vec, a4.vec) for a1, a2, a3, a4 in quads]
-    dihedral_values = [get_dihedral(*vecs) for vecs in vecs_list]
+    dihedrals = [get_dihedral(*vecs) for vecs in vecs_list]
     resnames = [a2.resname for a1, a2, a3, a4 in quads]
-    params = [[param[0], metric] + param[2:] for param, metric in zip(params, dihedral_values)]
+    params = [[param[0], metric] + param[2:] for param, metric in zip(params, dihedrals)]
     comms = [f"{resname} {comm}" for comm, resname in zip(comms, resnames)]
     result = list(zip(conns, params, comms))
     return BondList(result)
