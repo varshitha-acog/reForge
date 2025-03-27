@@ -269,7 +269,7 @@ class GmxSystem(MDSystem):
         kwargs.setdefault("neutral", "")
         self.gmx("grompp",
             f=self.mdpdir / "ions.mdp", c=self.syspdb, p=self.systop, o="ions.tpr")
-        self.gmx("genion", clinput=f"{solvent}\n",
+        self.gmx("genion", clinput=f"{solvent}\n", # clinput=f"{solvent}\n",
             s="ions.tpr", p=self.systop, o=self.syspdb, **kwargs)
         self.gmx("editconf", f=self.syspdb, o=self.sysgro)
         clean_dir(self.root, "ions.tpr")
