@@ -176,6 +176,7 @@ class Martini30RNA(NucleicForceField):
     Force field for Martini 3.0 RNA.
     """
     resnames = ["A", "C", "G", "U"]
+    alt_resnames = ["ADE", "CYT", "GUA", "URA"]
 
     bb_mapping = {
         "BB1": ("P", "OP1", "OP2", "O5'", "O3'", "O1P", "O2P"),
@@ -211,9 +212,13 @@ class Martini30RNA(NucleicForceField):
     }
     mapping = {
         "A": {**bb_mapping, **a_mapping},
+        "ADE": {**bb_mapping, **a_mapping},       
         "C": {**bb_mapping, **c_mapping},
+        "CYT": {**bb_mapping, **c_mapping},
         "G": {**bb_mapping, **g_mapping},
+        "GUA": {**bb_mapping, **g_mapping},
         "U": {**bb_mapping, **u_mapping},
+        "URA": {**bb_mapping, **u_mapping},
     }
 
     def __init__(self, directory="rna_reg", mol=RNA_SYSTEM, version="new"):
@@ -223,24 +228,25 @@ class Martini30RNA(NucleicForceField):
         # RNA backbone atoms: tuple of (atom id, type, name, charge group, charge, mass)
         self.bb_atoms = [
             (0, "Q1n", "BB1", 1, -1, 72),
-            (1, "C6", "BB2", 1, 0, 60),
-            (2, "N2", "BB3", 1, 0, 60),
+            (1, "N1", "BB2", 1, 0, 60),
+            (2, "N3", "BB3", 1, 0, 60),
         ]
         self.bb_bonds = [
-            [(0, 1), (1, 0.350, 25000), ("BB1-BB2")],
-            [(1, 2), (1, 0.239, 25000), ("BB2-BB3")],
+            [(0, 1), (1, 0.353, 18000), ("BB1-BB2")],
+            [(1, 2), (1, 0.241, 18000), ("BB2-BB3")],
             [(1, 0), (1, 0.378, 12000), ("BB2-BB1n")],
-            [(2, 0), (1, 0.412, 12000), ("BB3-BB1n")],
+            [(2, 0), (1, 0.414, 12000), ("BB3-BB1n")],
         ]
         self.bb_angles = [
-            [(0, 1, 0), (10, 110.0, 50), ("BB1-BB2-BB1n")],
-            [(1, 0, 1), (10, 121.0, 180), ("BB2-BB1n-BB2n")],
-            [(0, 1, 2), (10, 143.0, 300), ("BB1-BB2-BB3")],
+            [(0, 1, 0), (10, 115.0, 50), ("BB1-BB2-BB1n")],
+            [(1, 0, 1), (10, 123.0, 200), ("BB2-BB1n-BB2n")],
+            [(0, 1, 2), (10, 141.0, 400), ("BB1-BB2-BB3")],
         ]
         self.bb_dihs = [
-            [(0, 1, 0, 1), (1, 0.0, 25.0, 1), ("BB1-BB2-BB1n-BB2n")],
-            [(-2, 0, 1, 0), (1, 0.0, 25.0, 1), ("BB2p-BB1-BB2-BB1n")],
-            [(-2, 0, 1, 2), (1, -112.0, 15.0, 1), ("BB2p-BB1-BB2-BB3n")],
+            # [(0, 1, 0, 1), (1, 0.0, 12.0, 1), ("BB1-BB2-BB1n-BB2n")],  (3, 13, -7, -25, -6, 25, -2),
+            [(0, 1, 0, 1), (3, 13, -7, -25, -6, 25, 0), ("BB1-BB2-BB1n-BB2n")],  
+            [(-2, 0, 1, 0), (1, 0.0, 8.0, 1), ("BB2p-BB1-BB2-BB1n")],
+            [(-2, 0, 1, 2), (1, -112.0, 12.0, 1), ("BB2p-BB1-BB2-BB3")],
         ]
         self.bb_cons = []
         self.bb_excls = [[(0, 2), (), ("BB1-BB3")], [(2, 0), (), ("BB3-BB1n")]]

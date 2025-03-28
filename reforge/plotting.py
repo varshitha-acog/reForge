@@ -17,7 +17,10 @@ def init_figure(grid=(2, 3), axsize=(4, 4), **kwargs):
     ax_x, ax_y = axsize
     figsize = (ax_x * n, ax_y * m)
     fig, axes = plt.subplots(m, n, figsize=figsize, **kwargs)
-    return fig, axes
+    if grid == (1, 1):
+        return fig, axes
+    else:
+        return fig, axes.flatten()
 
 
 def make_hist(ax, datas, params=None):

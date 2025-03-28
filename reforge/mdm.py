@@ -107,8 +107,7 @@ def covariance_matrix(positions, dtype=np.float64):
 
 
 def calc_and_save_covmats(positions, outdir, n=1, outtag="covmat", dtype=np.float32):
-    """Calculate and save covariance matrices by splitting a trajectory into
-    segments.
+    """Calculate and save covariance matrices by splitting a trajectory into segments.
 
     Parameters
     ----------
@@ -135,6 +134,38 @@ def calc_and_save_covmats(positions, outdir, n=1, outtag="covmat", dtype=np.floa
         np.save(outfile, covmat)
         logger.info("Saved covariance matrix to %s", outfile)
 
+
+def calc_and_save_rmsf(positions, outdir, n=1, outtag="rmsf", dtype=np.float64):
+    """Calculate and save RMSF by splitting a trajectory into segments.
+
+    Parameters
+    ----------
+    positions : np.ndarray
+        Array of positions with shape (n_coords, n_frames).
+    outdir : str
+        Directory where the RMSF data will be saved.
+    n : int, optional
+        Number of segments to split the trajectory into (default is 1).
+    outtag : str, optional
+        Base tag for output file names (default is 'rmsf').
+    dtype : data-type, optional
+        Desired data type for covariance computation (default is np.float32).
+
+    Returns
+    -------
+    None
+    """
+    trajs = np.array_split(positions, n, axis=-1)
+    for idx, traj in enumerate(trajs, start=1):
+        logger.info("Processing segment %d", idx)
+        rmsf_comps = np.std(traj, axis=-1, dtype=dtype)
+        rmsf_comps_reshaped = np.reshape(rmsf_comps, (len(rmsf_comps)//3, 3))
+        rmsf_sq = np.sum(rmsf_comps_reshaped**2, axis=-1)
+        rmsf = np.sqrt(rmsf_sq)
+        outfile = os.path.join(outdir, f"{outtag}_{idx}.npy")
+        np.save(outfile, rmsf)
+        logger.info("Saved RMSF to %s", outfile)
+    logger.info("Done!")
 
 ##############################################################
 ## DFI / DCI Calculations

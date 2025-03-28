@@ -27,7 +27,7 @@ def get_distance(v1, v2):
     """
     v1 = np.array(v1)
     v2 = np.array(v2)
-    return np.linalg.norm(v1 - v2) / 10.0
+    return 0.1 * np.linalg.norm(v1 - v2) 
 
 
 def get_angle(v1, v2, v3):
@@ -142,9 +142,9 @@ def calc_dihedrals(atoms, dihs):
     quads = [(atoms[i - 1], atoms[j - 1], atoms[k - 1], atoms[l - 1])
              for i, j, k, l in conns]
     vecs_list = [(a1.vec, a2.vec, a3.vec, a4.vec) for a1, a2, a3, a4 in quads]
-    dihedral_values = [get_dihedral(*vecs) for vecs in vecs_list]
+    dihedrals = [get_dihedral(*vecs) for vecs in vecs_list]
     resnames = [a2.resname for a1, a2, a3, a4 in quads]
-    params = [[param[0], metric] + param[2:] for param, metric in zip(params, dihedral_values)]
+    params = [[param[0], metric] + param[2:] for param, metric in zip(params, dihedrals)]
     comms = [f"{resname} {comm}" for comm, resname in zip(comms, resnames)]
     result = list(zip(conns, params, comms))
     return BondList(result)
@@ -167,9 +167,9 @@ def get_cg_bonds(inpdb, top):
     angles = BondList()
     dihs = BondList()
     for model in system:
-        bonds.extend(calc_bonds(model.atoms(), top.bonds + top.cons))
-        angles.extend(calc_angles(model.atoms(), top.angles))
-        dihs.extend(calc_dihedrals(model.atoms(), top.dihs))
+        bonds.extend(calc_bonds(model.atoms, top.bonds + top.cons))
+        angles.extend(calc_angles(model.atoms, top.angles))
+        dihs.extend(calc_dihedrals(model.atoms, top.dihs))
     print("Done!", file=sys.stderr)
     return bonds, angles, dihs
 

@@ -401,10 +401,8 @@ class AtomList(list):
 
     def sort(self, key=None, reverse=False):
         """Sort the AtomList in place."""
-        def chain_sort_uld(x):
-            return (x.isdigit(), x.islower(), x.isupper(), x)
         if key is None:
-            key = lambda atom: (chain_sort_uld(atom.chid), atom.resid, atom.icode, atom.atid)
+            key = lambda atom: (sort_uld(atom.chid), atom.resid, atom.icode, atom.atid)
         super().sort(key=key, reverse=reverse)
 
     def mask(self, mask_vals, mode="name"):
