@@ -97,9 +97,9 @@ def test_perturbation_matrix():
     Returns:
         None
     """
-    m = 1000
+    m = 4000
     A = np.random.rand(3 * m, 3 * m)
-    covmat = (A + A.T) / 2
+    covmat = np.ascontiguousarray(0.5 * (A + A.T))
     legacy_result = rcmath.perturbation_matrix_old(covmat, m) * m**2
     new_result = rcmath.perturbation_matrix(covmat)
     par_result = rcmath.perturbation_matrix_par(covmat)
@@ -155,12 +155,12 @@ def test_perturbation_matrix_iso():
 
 
 def test_covmat():
-    m = 1000
-    nt = 1000
+    m = 500
+    nt = 4000
     x = np.random.rand(3*m, nt)
     ref = rpymath.covariance_matrix(x, dtype=np.float64)
     x -= np.average(x, axis=1, keepdims=True)
-    scov = rcmath.covmat(x)
+    # scov = rcmath.covmat(x)
     pcov = rcmath.pcovmat(x)
     np.testing.assert_allclose(ref, pcov, rtol=1e-6, atol=1e-6)
 
@@ -168,5 +168,6 @@ def test_covmat():
 if __name__ == '__main__':
     # pytest.main([__file__])
     # test_covmat()
-    test_perturbation_matrix()
+    # test_perturbation_matrix()
+    test_td_perturbation_matrix()
 
