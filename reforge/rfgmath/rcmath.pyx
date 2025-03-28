@@ -35,7 +35,7 @@ Date: YYYY-MM-DD
 import numpy as np
 cimport numpy as np
 cimport cython
-from cython.parallel import prange
+from cython.parallel import prange, threadid, parallel
 from libc.math cimport sqrt, pow
 from reforge.utils import timeit, memprofit
 
@@ -335,6 +335,9 @@ def perturbation_matrix(np.ndarray[double, ndim=2] covariance_matrix, bint norma
     return perturbation_matrix
 
 
+cdef extern from "omp.h":
+    int omp_get_max_threads()
+
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @timeit
@@ -356,14 +359,12 @@ def perturbation_matrix_par(np.ndarray[double, ndim=2] covariance_matrix, bint n
         A normalized perturbation matrix of shape (m, n). Each element represents the aggregated
         perturbation computed from the directional components of the corresponding 3x3 block.
     """
-    cdef int i, j, k, d
     cdef int m = covariance_matrix.shape[0] // 3
     cdef int n = covariance_matrix.shape[1] // 3
-    cdef double norm, sum_val, s
-    cdef np.ndarray[double, ndim=2] perturbation_matrix = np.zeros((m, n), dtype=np.float64)
     cdef np.ndarray[double, ndim=2] directions
-    cdef double f0, f1, f2
-    cdef double delta0, delta1, delta2
+    cdef int k, i, j
+    cdef double s, f0, f1, f2, delta0, delta1, delta2
+    cdef int tid 
 
     # Create and normalize an array of 7 directional vectors.
     directions = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1],
@@ -377,23 +378,47 @@ def perturbation_matrix_par(np.ndarray[double, ndim=2] covariance_matrix, bint n
         for d in range(3):
             directions[k, d] /= norm
 
-    for k in range(directions.shape[0]):
-        f0 = directions[k, 0]
-        f1 = directions[k, 1]
-        f2 = directions[k, 2]
+    # Allocate the final output array.
+    cdef int num_directions = directions.shape[0]
+    cdef np.ndarray[np.double_t, ndim=2] perturbation_matrix = np.zeros((m, n), dtype=np.float64)
+    
+    # Allocate a thread-local accumulation array.
+    cdef int num_threads = omp_get_max_threads()
+    print(num_threads)
+    cdef np.ndarray[np.double_t, ndim=3] local_acc = np.zeros((num_threads, m, n), dtype=np.float64)
+    
+    # Create typed memoryviews for fast access.
+    cdef double[:, :] directions_view = directions
+    cdef double[:, :] cov_view = covariance_matrix
+    cdef double[:, :] pert_view = perturbation_matrix
+    cdef double[:, :, :] local_acc_view = local_acc
+
+    # Parallel loop over directions.
+    for k in prange(num_directions, nogil=True, schedule='static'):
+        f0 = directions_view[k, 0]
+        f1 = directions_view[k, 1]
+        f2 = directions_view[k, 2]
+        # Get thread id to index into the local accumulator.
+        tid = threadid()
         for j in range(n):
             for i in range(m):
-                delta0 = (covariance_matrix[3*i,   3*j]   * f0 +
-                          covariance_matrix[3*i,   3*j+1] * f1 +
-                          covariance_matrix[3*i,   3*j+2] * f2)
-                delta1 = (covariance_matrix[3*i+1, 3*j]   * f0 +
-                          covariance_matrix[3*i+1, 3*j+1] * f1 +
-                          covariance_matrix[3*i+1, 3*j+2] * f2)
-                delta2 = (covariance_matrix[3*i+2, 3*j]   * f0 +
-                          covariance_matrix[3*i+2, 3*j+1] * f1 +
-                          covariance_matrix[3*i+2, 3*j+2] * f2)
+                delta0 = (cov_view[3*i,   3*j]   * f0 +
+                          cov_view[3*i,   3*j+1] * f1 +
+                          cov_view[3*i,   3*j+2] * f2)
+                delta1 = (cov_view[3*i+1, 3*j]   * f0 +
+                          cov_view[3*i+1, 3*j+1] * f1 +
+                          cov_view[3*i+1, 3*j+2] * f2)
+                delta2 = (cov_view[3*i+2, 3*j]   * f0 +
+                          cov_view[3*i+2, 3*j+1] * f1 +
+                          cov_view[3*i+2, 3*j+2] * f2)
                 s = sqrt(delta0*delta0 + delta1*delta1 + delta2*delta2)
-                perturbation_matrix[i, j] += s
+                local_acc_view[tid, i, j] += s
+
+    # Combine the thread-local results.
+    for i in range(m):
+        for j in range(n):
+            for k in range(num_threads):
+                pert_view[i, j] += local_acc_view[k, i, j]
 
     if normalize:
         sum_val = 0.0

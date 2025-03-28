@@ -97,13 +97,13 @@ def test_perturbation_matrix():
     Returns:
         None
     """
-    m = 200
+    m = 600
     A = np.random.rand(3 * m, 3 * m)
     covmat = (A + A.T) / 2
-    # legacy_result = rcmath.perturbation_matrix_old(covmat, m) * m**2
+    legacy_result = rcmath.perturbation_matrix_old(covmat, m) * m**2
     new_result = rcmath.perturbation_matrix(covmat)
     par_result = rcmath.perturbation_matrix_par(covmat)
-    np.testing.assert_allclose(par_result, new_result, rtol=1e-6, atol=1e-6)
+    np.testing.assert_allclose(legacy_result, new_result, rtol=1e-6, atol=1e-6)
 
 
 def test_td_perturbation_matrix():
