@@ -363,7 +363,7 @@ def perturbation_matrix_par(np.ndarray[double, ndim=2] covariance_matrix, bint n
     cdef int n = covariance_matrix.shape[1] // 3
     cdef np.ndarray[double, ndim=2] directions
     cdef int k, i, j
-    cdef double s, f0, f1, f2, delta0, delta1, delta2
+    cdef double sum_val, norm, f0, f1, f2, delta0, delta1, delta2
     cdef int tid 
 
     # Create and normalize an array of 7 directional vectors.
@@ -384,7 +384,6 @@ def perturbation_matrix_par(np.ndarray[double, ndim=2] covariance_matrix, bint n
     
     # Allocate a thread-local accumulation array.
     cdef int num_threads = omp_get_max_threads()
-    print(num_threads)
     cdef np.ndarray[np.double_t, ndim=3] local_acc = np.zeros((num_threads, m, n), dtype=np.float64)
     
     # Create typed memoryviews for fast access.
@@ -398,8 +397,7 @@ def perturbation_matrix_par(np.ndarray[double, ndim=2] covariance_matrix, bint n
         f0 = directions_view[k, 0]
         f1 = directions_view[k, 1]
         f2 = directions_view[k, 2]
-        # Get thread id to index into the local accumulator.
-        tid = threadid()
+        tid = threadid() # Get thread id to index into the local accumulator.
         for j in range(n):
             for i in range(m):
                 delta0 = (cov_view[3*i,   3*j]   * f0 +
@@ -411,25 +409,12 @@ def perturbation_matrix_par(np.ndarray[double, ndim=2] covariance_matrix, bint n
                 delta2 = (cov_view[3*i+2, 3*j]   * f0 +
                           cov_view[3*i+2, 3*j+1] * f1 +
                           cov_view[3*i+2, 3*j+2] * f2)
-                s = sqrt(delta0*delta0 + delta1*delta1 + delta2*delta2)
-                local_acc_view[tid, i, j] += s
-
-    # Combine the thread-local results.
-    for i in range(m):
-        for j in range(n):
-            for k in range(num_threads):
-                pert_view[i, j] += local_acc_view[k, i, j]
-
+                local_acc_view[tid, i, j] = sqrt(delta0*delta0 + delta1*delta1 + delta2*delta2)
+    
+    perturbation_matrix = np.sum(local_acc, axis=0)
     if normalize:
-        sum_val = 0.0
-        for i in range(m):
-            for j in range(n):
-                sum_val += perturbation_matrix[i, j]
-        if sum_val != 0.0:
-            norm = n * m / sum_val  
-            for i in range(m):
-                for j in range(n):
-                    perturbation_matrix[i, j] *= norm
+        sum_val = np.sum(perturbation_matrix)
+        perturbation_matrix *= n * m / sum_val
 
     return perturbation_matrix
 
