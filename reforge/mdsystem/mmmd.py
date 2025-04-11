@@ -25,12 +25,9 @@ import os
 import sys
 import importlib.resources
 import shutil
-
 import openmm as mm
 from openmm import app
 from openmm.unit import nanometer, molar
-
-# Local imports from reforge (only the needed modules)
 from reforge import pdbtools
 
 

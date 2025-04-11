@@ -461,13 +461,18 @@ class AtomList(list):
             for atom in self:
                 f.write(atom.to_pdb_line() + "\n")
 
-    def write_ndx(self, filename, header="[ group ]", append=False, wrap=15):
+    def write_ndx(self, filename, header="[ group ]", append=False, wrap=15): 
+        # TODO: works for now but need a fix for very large systems
         """Write the atom IDs to a GROMACS .ndx file."""
         mode = "a" if append else "w"
-        if len(self.atids) > 99999:
-            atids = [str(idx+1) for idx in range(len(self.atids))]
-        else:
-            atids = [str(atid) for atid in self.atids]
+        idx_0 = self.atids[0]
+        num_idx = len(self.atids)
+        atids = [str(idx_0 + idx) for idx in range(num_idx)]
+        # atids = [str(atid) for atid in self.atids]
+        # if len(self.atids) > 99999:
+        #     atids = [str(idx + 1) for idx in range(len(self.atids))]
+        # else:
+        #     atids = [str(atid) for atid in self.atids]
         with open(filename, mode, encoding="utf-8") as f:
             f.write(header + "\n")
             for i in range(0, len(self), wrap):
