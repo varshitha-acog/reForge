@@ -18,6 +18,7 @@ Author: DY
 Date: 2025-02-27
 """
 
+import importlib.resources
 from pathlib import Path
 import sys
 import shutil
@@ -37,6 +38,8 @@ class MDSystem:
     Most attributes are paths to files and directories needed to set up
     and run the MD simulation.
     """
+    MDATDIR = importlib.resources.files("reforge") / "martini" / "datdir"
+    MITPDIR = importlib.resources.files("reforge") / "martini" / "itp"
     NUC_RESNAMES = ["A", "C", "G", "U",
                     "RA3", "RA5", "RC3", "RC5", 
                     "RG3", "RG5", "RU3", "RU5",]
@@ -69,7 +72,6 @@ class MDSystem:
         self.pngdir = self.root / "png"
         self.pdbdir = self.root / "pdb"
 
-
     @property
     def chains(self):
         """Retrieves and returns a sorted list of chain identifiers from the
@@ -88,6 +90,32 @@ class MDSystem:
         atoms = io.pdb2atomlist(self.inpdb)
         segments = pdbtools.sort_uld(set(atoms.segids))
         return segments
+
+    def prepare_files(self):
+        """Prepares the simulation by creating necessary directories and copying input files.
+
+        The method:
+          - Creates directories for proteins, nucleotides, topologies, maps, mdp files,
+            coarse-grained PDBs, GRO files, MD runs, data, and PNG outputs.
+          - Copies 'water.gro' and 'atommass.dat' from the master data directory.
+          - Copies .itp files from the master ITP directory to the system topology directory.
+        """
+        logger.info("Preparing files and directories")
+        self.prodir.mkdir(parents=True, exist_ok=True)
+        self.nucdir.mkdir(parents=True, exist_ok=True)
+        self.topdir.mkdir(parents=True, exist_ok=True)
+        self.mapdir.mkdir(parents=True, exist_ok=True)
+        self.cgdir.mkdir(parents=True, exist_ok=True)
+        self.datdir.mkdir(parents=True, exist_ok=True)
+        self.pngdir.mkdir(parents=True, exist_ok=True)
+        # Copy water.gro and atommass.dat from master data directory
+        shutil.copy(self.MDATDIR / "water.gro", self.root)
+        shutil.copy(self.MDATDIR / "atommass.dat", self.root)
+        # Copy .itp files from master ITP directory
+        for file in self.MITPDIR.iterdir():
+            if file.name.endswith(".itp"):
+                outpath = self.topdir / file.name
+                shutil.copy(file, outpath)
 
     def sort_input_pdb(self, in_pdb="inpdb.pdb"):
         """Sorts and renames atoms and chains in the input PDB file.
