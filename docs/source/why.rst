@@ -10,8 +10,6 @@ Then reForge is the right tool. If offers a (*almost*) pain-free setup for Marti
      :alt: reForge Ribosome
      :scale: 50 %
 
-- Kind of like here (https://www.nature.com/articles/s41467-024-53098-4)
-
 
 Python-Based
 ------------
