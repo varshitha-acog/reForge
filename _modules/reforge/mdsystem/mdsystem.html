@@ -521,7 +521,7 @@
 
 <div class="viewcode-block" id="MDSystem.get_td_averages">
 <a class="viewcode-back" href="../../../reforge.mdsystem.html#reforge.mdsystem.mdsystem.MDSystem.get_td_averages">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_td_averages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_td_averages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculates time-dependent averages from a set of numpy files.</span>
 
 <span class="sd">        Parameters</span>
@@ -533,7 +533,7 @@
 <span class="sd">            numpy.ndarray: The time-dependent average.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Getting time-dependent averages&quot;</span><span class="p">)</span>
-        <span class="n">files</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">pull_files</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mddir</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">pull_files</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mddir</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">loop</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Processing </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">average</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -545,7 +545,8 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">arrays</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">]</span>
             <span class="n">average</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">arrays</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datdir</span> <span class="o">/</span> <span class="n">fname</span><span class="p">,</span> <span class="n">average</span><span class="p">)</span>
+        <span class="n">out_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datdir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pattern</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">_av.npy&quot;</span>     
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="n">average</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Done!&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">average</span></div>
 </div>

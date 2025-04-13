@@ -343,7 +343,7 @@
 
 <div class="viewcode-block" id="format_posres_section">
 <a class="viewcode-back" href="../../reforge.html#reforge.itpio.format_posres_section">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">format_posres_section</span><span class="p">(</span><span class="n">atoms</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">],</span> <span class="n">posres_fc</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> 
+<span class="k">def</span><span class="w"> </span><span class="nf">format_posres_section</span><span class="p">(</span><span class="n">atoms</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">],</span> <span class="n">posres_fc</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> 
                           <span class="n">selection</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Format the position restraints section.</span>
 
@@ -352,9 +352,9 @@
 <span class="sd">    atoms : List[Tuple]</span>
 <span class="sd">        List of atom records.</span>
 <span class="sd">    posres_fc : float, optional</span>
-<span class="sd">        Force constant for restraints. Default is 1000.</span>
+<span class="sd">        Force constant for restraints. Default is 500.</span>
 <span class="sd">    selection : List[str], optional</span>
-<span class="sd">        Atom names to select. Defaults to [&quot;BB1&quot;, &quot;BB3&quot;, &quot;SC1&quot;] if not provided.</span>
+<span class="sd">        Atom names to select. Defaults to [&quot;BB1&quot;, &quot;BB2&quot;, &quot;BB3&quot;, &quot;SC1&quot;] if not provided.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -362,7 +362,7 @@
 <span class="sd">        A list of formatted lines.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">selection</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">selection</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;BB1&quot;</span><span class="p">,</span> <span class="s2">&quot;BB3&quot;</span><span class="p">,</span> <span class="s2">&quot;SC1&quot;</span><span class="p">]</span>
+        <span class="n">selection</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;BB1&quot;</span><span class="p">,</span> <span class="s2">&quot;BB2&quot;</span><span class="p">,</span> <span class="s2">&quot;BB3&quot;</span><span class="p">,</span> <span class="s2">&quot;SC1&quot;</span><span class="p">]</span>
     <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">#ifdef POSRES</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="sa">f</span><span class="s2">&quot;#define POSRES_FC </span><span class="si">{</span><span class="n">posres_fc</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>

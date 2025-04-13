@@ -196,8 +196,7 @@
 <div class="viewcode-block" id="calc_and_save_covmats">
 <a class="viewcode-back" href="../../reforge.html#reforge.mdm.calc_and_save_covmats">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">calc_and_save_covmats</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">outdir</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">outtag</span><span class="o">=</span><span class="s2">&quot;covmat&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate and save covariance matrices by splitting a trajectory into</span>
-<span class="sd">    segments.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate and save covariance matrices by splitting a trajectory into segments.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -226,6 +225,41 @@
 
 
 
+<div class="viewcode-block" id="calc_and_save_rmsf">
+<a class="viewcode-back" href="../../reforge.html#reforge.mdm.calc_and_save_rmsf">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_and_save_rmsf</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">outdir</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">outtag</span><span class="o">=</span><span class="s2">&quot;rmsf&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate and save RMSF by splitting a trajectory into segments.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    positions : np.ndarray</span>
+<span class="sd">        Array of positions with shape (n_coords, n_frames).</span>
+<span class="sd">    outdir : str</span>
+<span class="sd">        Directory where the RMSF data will be saved.</span>
+<span class="sd">    n : int, optional</span>
+<span class="sd">        Number of segments to split the trajectory into (default is 1).</span>
+<span class="sd">    outtag : str, optional</span>
+<span class="sd">        Base tag for output file names (default is &#39;rmsf&#39;).</span>
+<span class="sd">    dtype : data-type, optional</span>
+<span class="sd">        Desired data type for covariance computation (default is np.float32).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">trajs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">traj</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">trajs</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Processing segment </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+        <span class="n">rmsf_comps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">rmsf_comps_reshaped</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">rmsf_comps</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rmsf_comps</span><span class="p">)</span><span class="o">//</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="n">rmsf_sq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rmsf_comps_reshaped</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">rmsf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">rmsf_sq</span><span class="p">)</span>
+        <span class="n">outfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">outtag</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">.npy&quot;</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">outfile</span><span class="p">,</span> <span class="n">rmsf</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Saved RMSF to </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">outfile</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Done!&quot;</span><span class="p">)</span></div>
+
+
 <span class="c1">##############################################################</span>
 <span class="c1">## DFI / DCI Calculations</span>
 <span class="c1">##############################################################</span>
@@ -250,6 +284,16 @@
     <span class="n">covmat</span> <span class="o">=</span> <span class="n">covmat</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">pertmat</span> <span class="o">=</span> <span class="n">rcmath</span><span class="o">.</span><span class="n">perturbation_matrix</span><span class="p">(</span><span class="n">covmat</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">pertmat</span></div>
+
+
+
+<div class="viewcode-block" id="perturbation_matrix_iso">
+<a class="viewcode-back" href="../../reforge.html#reforge.mdm.perturbation_matrix_iso">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">perturbation_matrix_iso</span><span class="p">(</span><span class="n">covmat</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the perturbation matrix from a covariance matrix&quot;&quot;&quot;</span>
+    <span class="n">covmat</span> <span class="o">=</span> <span class="n">covmat</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">pertmat</span> <span class="o">=</span> <span class="n">rcmath</span><span class="o">.</span><span class="n">perturbation_matrix_iso</span><span class="p">(</span><span class="n">covmat</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pertmat</span>    </div>
 
 
 
@@ -313,7 +357,7 @@
 <span class="sd">    np.ndarray</span>
 <span class="sd">        The DCI matrix.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">dci_val</span> <span class="o">=</span> <span class="n">pert_mat</span> <span class="o">*</span> <span class="n">pert_mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pert_mat</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">dci_val</span> <span class="o">=</span> <span class="n">pert_mat</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">pert_mat</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">asym</span><span class="p">:</span>
         <span class="n">dci_val</span> <span class="o">=</span> <span class="n">dci_val</span> <span class="o">-</span> <span class="n">dci_val</span><span class="o">.</span><span class="n">T</span>
     <span class="k">return</span> <span class="n">dci_val</span></div>
@@ -402,7 +446,7 @@
 
 <div class="viewcode-block" id="hessian">
 <a class="viewcode-back" href="../../reforge.html#reforge.mdm.hessian">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">hessian</span><span class="p">(</span><span class="n">vecs</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">spring_constant</span><span class="p">,</span> <span class="n">dd</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">hessian</span><span class="p">(</span><span class="n">vecs</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">spring_constant</span><span class="o">=</span><span class="mf">1e3</span><span class="p">,</span> <span class="n">dd</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the Hessian matrix using an elastic network model.</span>
 
 <span class="sd">    Parameters</span>

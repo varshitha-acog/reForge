@@ -127,7 +127,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#reforge.mdm.ccf"><code class="docutils literal notranslate"><span class="pre">ccf()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.mdm.covariance_matrix"><code class="docutils literal notranslate"><span class="pre">covariance_matrix()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.mdm.calc_and_save_covmats"><code class="docutils literal notranslate"><span class="pre">calc_and_save_covmats()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reforge.mdm.calc_and_save_rmsf"><code class="docutils literal notranslate"><span class="pre">calc_and_save_rmsf()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.mdm.perturbation_matrix"><code class="docutils literal notranslate"><span class="pre">perturbation_matrix()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reforge.mdm.perturbation_matrix_iso"><code class="docutils literal notranslate"><span class="pre">perturbation_matrix_iso()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.mdm.td_perturbation_matrix"><code class="docutils literal notranslate"><span class="pre">td_perturbation_matrix()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.mdm.dfi"><code class="docutils literal notranslate"><span class="pre">dfi()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#reforge.mdm.dci"><code class="docutils literal notranslate"><span class="pre">dci()</span></code></a></li>
@@ -274,6 +276,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="reforge.forge.html#reforge.forge.forcefields.Martini30RNA"><code class="docutils literal notranslate"><span class="pre">Martini30RNA</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="reforge.forge.html#reforge.forge.forcefields.Martini30RNA.resnames"><code class="docutils literal notranslate"><span class="pre">Martini30RNA.resnames</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="reforge.forge.html#reforge.forge.forcefields.Martini30RNA.alt_resnames"><code class="docutils literal notranslate"><span class="pre">Martini30RNA.alt_resnames</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="reforge.forge.html#reforge.forge.forcefields.Martini30RNA.bb_mapping"><code class="docutils literal notranslate"><span class="pre">Martini30RNA.bb_mapping</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="reforge.forge.html#reforge.forge.forcefields.Martini30RNA.a_mapping"><code class="docutils literal notranslate"><span class="pre">Martini30RNA.a_mapping</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="reforge.forge.html#reforge.forge.forcefields.Martini30RNA.c_mapping"><code class="docutils literal notranslate"><span class="pre">Martini30RNA.c_mapping</span></code></a></li>
@@ -545,6 +548,7 @@
 <li class="toctree-l4"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.gmxmd.GmxRun.get_rmsd_by_chain"><code class="docutils literal notranslate"><span class="pre">GmxRun.get_rmsd_by_chain()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.mdsystem.html#reforge.mdsystem.gmxmd.sort_for_gmx"><code class="docutils literal notranslate"><span class="pre">sort_for_gmx()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="reforge.mdsystem.html#module-reforge.mdsystem.mdsystem">reforge.mdsystem.mdsystem module</a><ul>
@@ -635,9 +639,12 @@
 <li class="toctree-l3"><a class="reference internal" href="reforge.rfgmath.html#reforge.rfgmath.rcmath.calculate_hessian"><code class="docutils literal notranslate"><span class="pre">calculate_hessian()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="reforge.rfgmath.html#reforge.rfgmath.rcmath.covmat"><code class="docutils literal notranslate"><span class="pre">covmat()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="reforge.rfgmath.html#reforge.rfgmath.rcmath.hessian"><code class="docutils literal notranslate"><span class="pre">hessian()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.rfgmath.html#reforge.rfgmath.rcmath.pcovmat"><code class="docutils literal notranslate"><span class="pre">pcovmat()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="reforge.rfgmath.html#reforge.rfgmath.rcmath.perturbation_matrix"><code class="docutils literal notranslate"><span class="pre">perturbation_matrix()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="reforge.rfgmath.html#reforge.rfgmath.rcmath.perturbation_matrix_iso"><code class="docutils literal notranslate"><span class="pre">perturbation_matrix_iso()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.rfgmath.html#reforge.rfgmath.rcmath.perturbation_matrix_iso_par"><code class="docutils literal notranslate"><span class="pre">perturbation_matrix_iso_par()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="reforge.rfgmath.html#reforge.rfgmath.rcmath.perturbation_matrix_old"><code class="docutils literal notranslate"><span class="pre">perturbation_matrix_old()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reforge.rfgmath.html#reforge.rfgmath.rcmath.perturbation_matrix_par"><code class="docutils literal notranslate"><span class="pre">perturbation_matrix_par()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="reforge.rfgmath.html#reforge.rfgmath.rcmath.td_perturbation_matrix"><code class="docutils literal notranslate"><span class="pre">td_perturbation_matrix()</span></code></a></li>
 </ul>
 </li>
@@ -1749,14 +1756,14 @@ parameters is a tuple of numbers (first as int, rest as floats), and comment is 
 
 <dl class="py function">
 <dt class="sig sig-object py" id="reforge.itpio.format_posres_section">
-<span class="sig-prename descclassname"><span class="pre">reforge.itpio.</span></span><span class="sig-name descname"><span class="pre">format_posres_section</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">atoms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posres_fc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/reforge/itpio.html#format_posres_section"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.itpio.format_posres_section" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">reforge.itpio.</span></span><span class="sig-name descname"><span class="pre">format_posres_section</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">atoms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posres_fc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/reforge/itpio.html#format_posres_section"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.itpio.format_posres_section" title="Link to this definition"></a></dt>
 <dd><p>Format the position restraints section.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>atoms</strong> (<em>List[Tuple]</em>) – List of atom records.</p></li>
-<li><p><strong>posres_fc</strong> (<em>float, optional</em>) – Force constant for restraints. Default is 1000.</p></li>
-<li><p><strong>selection</strong> (<em>List[str], optional</em>) – Atom names to select. Defaults to [“BB1”, “BB3”, “SC1”] if not provided.</p></li>
+<li><p><strong>posres_fc</strong> (<em>float, optional</em>) – Force constant for restraints. Default is 500.</p></li>
+<li><p><strong>selection</strong> (<em>List[str], optional</em>) – Atom names to select. Defaults to [“BB1”, “BB2”, “BB3”, “SC1”] if not provided.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1947,8 +1954,7 @@ based on the specified mode:</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="reforge.mdm.calc_and_save_covmats">
 <span class="sig-prename descclassname"><span class="pre">reforge.mdm.</span></span><span class="sig-name descname"><span class="pre">calc_and_save_covmats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">positions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outtag='covmat'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/mdm.html#calc_and_save_covmats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.mdm.calc_and_save_covmats" title="Link to this definition"></a></dt>
-<dd><p>Calculate and save covariance matrices by splitting a trajectory into
-segments.</p>
+<dd><p>Calculate and save covariance matrices by splitting a trajectory into segments.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1956,6 +1962,26 @@ segments.</p>
 <li><p><strong>outdir</strong> (<em>str</em>) – Directory where the covariance matrices will be saved.</p></li>
 <li><p><strong>n</strong> (<em>int, optional</em>) – Number of segments to split the trajectory into (default is 1).</p></li>
 <li><p><strong>outtag</strong> (<em>str, optional</em>) – Base tag for output file names (default is ‘covmat’).</p></li>
+<li><p><strong>dtype</strong> (<em>data-type, optional</em>) – Desired data type for covariance computation (default is np.float32).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reforge.mdm.calc_and_save_rmsf">
+<span class="sig-prename descclassname"><span class="pre">reforge.mdm.</span></span><span class="sig-name descname"><span class="pre">calc_and_save_rmsf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">positions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outtag='rmsf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float64'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/mdm.html#calc_and_save_rmsf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.mdm.calc_and_save_rmsf" title="Link to this definition"></a></dt>
+<dd><p>Calculate and save RMSF by splitting a trajectory into segments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>positions</strong> (<em>np.ndarray</em>) – Array of positions with shape (n_coords, n_frames).</p></li>
+<li><p><strong>outdir</strong> (<em>str</em>) – Directory where the RMSF data will be saved.</p></li>
+<li><p><strong>n</strong> (<em>int, optional</em>) – Number of segments to split the trajectory into (default is 1).</p></li>
+<li><p><strong>outtag</strong> (<em>str, optional</em>) – Base tag for output file names (default is ‘rmsf’).</p></li>
 <li><p><strong>dtype</strong> (<em>data-type, optional</em>) – Desired data type for covariance computation (default is np.float32).</p></li>
 </ul>
 </dd>
@@ -1983,6 +2009,12 @@ segments.</p>
 <dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reforge.mdm.perturbation_matrix_iso">
+<span class="sig-prename descclassname"><span class="pre">reforge.mdm.</span></span><span class="sig-name descname"><span class="pre">perturbation_matrix_iso</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">covmat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float64'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/mdm.html#perturbation_matrix_iso"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.mdm.perturbation_matrix_iso" title="Link to this definition"></a></dt>
+<dd><p>Compute the perturbation matrix from a covariance matrix</p>
 </dd></dl>
 
 <dl class="py function">
@@ -2088,7 +2120,7 @@ Defaults to a list containing an empty list.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="reforge.mdm.hessian">
-<span class="sig-prename descclassname"><span class="pre">reforge.mdm.</span></span><span class="sig-name descname"><span class="pre">hessian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vecs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spring_constant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/mdm.html#hessian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.mdm.hessian" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">reforge.mdm.</span></span><span class="sig-name descname"><span class="pre">hessian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vecs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spring_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/reforge/mdm.html#hessian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#reforge.mdm.hessian" title="Link to this definition"></a></dt>
 <dd><p>Compute the Hessian matrix using an elastic network model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
