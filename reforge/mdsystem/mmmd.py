@@ -53,7 +53,7 @@ class MmSystem(MDSystem):
         **kwargs : dict, optional
             Additional keyword arguments for the cleaning routine.
         """
-        print("Cleaning the PDB", file=sys.stderr)
+        logger.info("Cleaning the PDB")
         pdbtools.clean_pdb(pdb_file, self.inpdb, **kwargs)
 
     @staticmethod
@@ -254,7 +254,24 @@ class MmRun(MDRun):
         self.save_state(simulation_obj, "em")
         logger.info("Minimization complete.")
 
-    def eq(self, simulation_obj, nsteps=10000, nlog=10000, **kwargs):
+    def get_std_reporters(self, append, prefix='md', nout=1000, nlog=10000, nchk=10000, **kwargs):
+        kwargs.setdefault("step", True)
+        kwargs.setdefault("time", True)
+        kwargs.setdefault("potentialEnergy", True)
+        kwargs.setdefault("temperature", True)
+        kwargs.setdefault("density", False)
+        dcd_file = os.path.join(self.rundir, f"{prefix}.dcd")
+        log_file = os.path.join(self.rundir, f"{prefix}.log")
+        xml_file = os.path.join(self.rundir, f"{prefix}.xml")
+        pdb_file = os.path.join(self.rundir, f"{prefix}.pdb")
+        dcd_reporter = app.DCDReporter(dcd_file, nout, append=append)
+        log_reporter = app.StateDataReporter(log_file, nlog, append=append, **kwargs)
+        xml_reporter = app.CheckpointReporter(xml_file, nchk, writeState=True)
+        # If PDBReporter is not used, remove the assignment to avoid unused variable warnings.
+        reporters = [dcd_reporter, log_reporter, xml_reporter]
+        return reporters
+
+    def eq(self, simulation_obj, nsteps=10000, nout=10000, nlog=10000, nchk=10000):
         """Run equilibration simulation.
 
         Parameters
@@ -272,19 +289,17 @@ class MmRun(MDRun):
         -----
         Loads the minimized state, runs equilibration, and saves the equilibrated state.
         """
-        print("Starting equilibration...")
-        kwargs.setdefault("step", True)
-        kwargs.setdefault("potentialEnergy", True)
-        kwargs.setdefault("temperature", True)
-        kwargs.setdefault("density", True)
+        logger.info("Starting equilibration...")
+        
         em_xml = os.path.join(self.rundir, "em.xml")
-        log_file = os.path.join(self.rundir, "eq.log")
-        reporter = app.StateDataReporter(log_file, nlog, **kwargs)
         simulation_obj.loadState(em_xml)
-        simulation_obj.reporters.append(reporter)
+        reporters = self.get_std_reporters(append=False, nout=nout, nlog=nlog, nchk=nchk, density=True)
+        simulation_obj.reporters = []
+        simulation_obj.reporters.extend(reporters)
         simulation_obj.step(nsteps)
         self.save_state(simulation_obj, "eq")
-        print("Equilibration complete.")
+        simulation_obj.reporters.clear()
+        logger.info("Equilibration complete.")
 
     def md(self, simulation_obj, nsteps=100000, nout=1000, nlog=10000, nchk=10000, **kwargs):
         """Run production MD simulation.
@@ -308,27 +323,29 @@ class MmRun(MDRun):
         -----
         Loads the equilibrated state, runs production, and saves the final simulation state.
         """
-        print("Production run...")
-        kwargs.setdefault("step", True)
-        kwargs.setdefault("time", True)
-        kwargs.setdefault("potentialEnergy", True)
-        kwargs.setdefault("temperature", True)
-        kwargs.setdefault("density", False)
+        logger.info("Production run...")
+        
         eq_xml = os.path.join(self.rundir, "eq.xml")
-        trj_file = os.path.join(self.rundir, "md.dcd")
-        log_file = os.path.join(self.rundir, "md.log")
-        xml_file = os.path.join(self.rundir, "md.xml")
         pdb_file = os.path.join(self.rundir, "md.pdb")
-        trj_reporter = app.DCDReporter(trj_file, nout, append=False)
-        log_reporter = app.StateDataReporter(log_file, nlog, **kwargs)
-        xml_reporter = app.CheckpointReporter(xml_file, nchk, writeState=True)
-        # If PDBReporter is not used, remove the assignment to avoid unused variable warnings.
-        reporters = [trj_reporter, log_reporter, xml_reporter]
         simulation_obj.loadState(eq_xml)
+        reporters = self.get_std_reporters(append=False, nout=nout, nlog=nlog, nchk=nchk)
+        simulation_obj.reporters = []
         simulation_obj.reporters.extend(reporters)
         simulation_obj.step(nsteps)
         self.save_state(simulation_obj, "md")
-        print("Production complete.")
+        logger.info("Production complete.")
+
+    def extend(self, simulation_obj, nsteps=100000, nout=1000, nlog=10000, nchk=10000, **kwargs):
+        """Extend production MD simulation"""
+        logger.info("Extending run...")
+        xml_file = os.path.join(self.rundir, "md.xml")
+        simulation_obj.loadState(xml_file)
+        reporters = self.get_std_reporters(append=True, nout=nout, nlog=nlog, nchk=nchk)
+        simulation_obj.reporters = []
+        simulation_obj.reporters.extend(reporters)
+        simulation_obj.step(nsteps)
+        self.save_state(simulation_obj, "md")
+        logger.info("Production complete.")
 
 
 ################################################################################
