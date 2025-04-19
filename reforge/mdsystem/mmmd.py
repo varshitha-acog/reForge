@@ -261,17 +261,19 @@ class MmRun(MDRun):
         kwargs.setdefault("temperature", True)
         kwargs.setdefault("density", False)
         dcd_file = os.path.join(self.rundir, f"{prefix}.dcd")
+        xtc_file = os.path.join(self.rundir, f"{prefix}.xtc")
         log_file = os.path.join(self.rundir, f"{prefix}.log")
         xml_file = os.path.join(self.rundir, f"{prefix}.xml")
         pdb_file = os.path.join(self.rundir, f"{prefix}.pdb")
-        dcd_reporter = app.DCDReporter(dcd_file, nout, append=append)
+        dcd_reporter = app.DCDReporter(dcd_file, nout, append=append, enforcePeriodicBox=True)
+        xtc_reporter = app.XTCReporter(xtc_file, nout, append=append, enforcePeriodicBox=True)
         log_reporter = app.StateDataReporter(log_file, nlog, append=append, **kwargs)
         xml_reporter = app.CheckpointReporter(xml_file, nchk, writeState=True)
         # If PDBReporter is not used, remove the assignment to avoid unused variable warnings.
-        reporters = [dcd_reporter, log_reporter, xml_reporter]
+        reporters = [dcd_reporter, xtc_reporter, log_reporter, xml_reporter]
         return reporters
 
-    def eq(self, simulation_obj, nsteps=10000, nout=10000, nlog=10000, nchk=10000):
+    def eq(self, simulation_obj, nsteps=10000, nout=10000, nlog=10000, nchk=10000, **kwargs):
         """Run equilibration simulation.
 
         Parameters
@@ -293,7 +295,7 @@ class MmRun(MDRun):
         
         em_xml = os.path.join(self.rundir, "em.xml")
         simulation_obj.loadState(em_xml)
-        reporters = self.get_std_reporters(append=False, nout=nout, nlog=nlog, nchk=nchk, density=True)
+        reporters = self.get_std_reporters(append=False, nout=nout, nlog=nlog, nchk=nchk, density=True, **kwargs)
         simulation_obj.reporters = []
         simulation_obj.reporters.extend(reporters)
         simulation_obj.step(nsteps)
@@ -328,7 +330,7 @@ class MmRun(MDRun):
         eq_xml = os.path.join(self.rundir, "eq.xml")
         pdb_file = os.path.join(self.rundir, "md.pdb")
         simulation_obj.loadState(eq_xml)
-        reporters = self.get_std_reporters(append=False, nout=nout, nlog=nlog, nchk=nchk)
+        reporters = self.get_std_reporters(append=False, nout=nout, nlog=nlog, nchk=nchk, **kwargs)
         simulation_obj.reporters = []
         simulation_obj.reporters.extend(reporters)
         simulation_obj.step(nsteps)
@@ -340,7 +342,7 @@ class MmRun(MDRun):
         logger.info("Extending run...")
         xml_file = os.path.join(self.rundir, "md.xml")
         simulation_obj.loadState(xml_file)
-        reporters = self.get_std_reporters(append=True, nout=nout, nlog=nlog, nchk=nchk)
+        reporters = self.get_std_reporters(append=True, nout=nout, nlog=nlog, nchk=nchk, **kwargs)
         simulation_obj.reporters = []
         simulation_obj.reporters.extend(reporters)
         simulation_obj.step(nsteps)
