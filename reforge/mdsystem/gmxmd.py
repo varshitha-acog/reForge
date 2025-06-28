@@ -336,7 +336,7 @@ class GmxRun(MDRun):
                 - n: Index file.
                 - o: Output TPR file ("em.tpr").
         """
-        kwargs.setdefault("f", self.mdpdir / "em_cg.mdp")
+        kwargs.setdefault("f", self.mdpdir / "em.mdp")
         kwargs.setdefault("c", self.sysgro)
         kwargs.setdefault("r", self.sysgro)
         kwargs.setdefault("p", self.systop)
@@ -357,7 +357,7 @@ class GmxRun(MDRun):
                 - n: Index file.
                 - o: Output TPR file ("hu.tpr").
         """
-        kwargs.setdefault("f", self.mdpdir / "hu_cg.mdp")
+        kwargs.setdefault("f", self.mdpdir / "hu.mdp")
         kwargs.setdefault("c", "em.gro")
         kwargs.setdefault("r", "em.gro")
         kwargs.setdefault("p", self.systop)
@@ -378,7 +378,7 @@ class GmxRun(MDRun):
                 - n: Index file.
                 - o: Output TPR file ("eq.tpr").
         """
-        kwargs.setdefault("f", self.mdpdir / "eq_cg.mdp")
+        kwargs.setdefault("f", self.mdpdir / "eq.mdp")
         kwargs.setdefault("c", "hu.gro")
         kwargs.setdefault("r", "hu.gro")
         kwargs.setdefault("p", self.systop)
@@ -399,7 +399,7 @@ class GmxRun(MDRun):
                 - n: Index file.
                 - o: Output TPR file ("md.tpr").
         """
-        kwargs.setdefault("f", self.mdpdir / "md_cg.mdp")
+        kwargs.setdefault("f", self.mdpdir / "md.mdp")
         kwargs.setdefault("c", "eq.gro")
         kwargs.setdefault("r", "eq.gro")
         kwargs.setdefault("p", self.systop)
