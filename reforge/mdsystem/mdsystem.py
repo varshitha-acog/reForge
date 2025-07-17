@@ -422,7 +422,7 @@ class MDSystem:
         np.save(file_mean, mean)
         np.save(file_err, sem)
 
-    def get_td_averages(self, pattern, loop=True):
+    def get_td_averages(self, pattern):
         """Calculates time-dependent averages from a set of numpy files.
 
         Parameters
@@ -433,23 +433,31 @@ class MDSystem:
         Returns:
             numpy.ndarray: The time-dependent average.
         """
+        def slicer(shape): # Slice object to crop arrays to min_shape
+            return tuple(slice(0, s) for s in shape)
+
         logger.info("Getting time-dependent averages")
         files = io.pull_files(self.mddir, pattern)
-        if loop:
+        if files:
             logger.info("Processing %s", files[0])
             average = np.load(files[0])
+            min_shape = average.shape
+            count = 1
             for f in files[1:]:
                 logger.info("Processing %s", f)
                 arr = np.load(f)
-                average += arr
-            average /= len(files)
+                min_shape = tuple(min(s1, s2) for s1, s2 in zip(min_shape, arr.shape))
+                s = slicer(min_shape)
+                average[s] += arr[s]  # ← in-place addition
+                count += 1
+            average = average[s] 
+            average /= count
+            out_file = self.datdir / f"{pattern.split('*')[0]}_av.npy"     
+            np.save(out_file, average)
+            logger.info("Done!")
+            return average
         else:
-            arrays = [np.load(f) for f in files]
-            average = np.average(arrays, axis=0)
-        out_file = self.datdir / f"{pattern.split('*')[0]}_av.npy"     
-        np.save(out_file, average)
-        logger.info("Done!")
-        return average
+            logger.info('Could not find files matching given pattern: %s \nMaybe you forgot "*"', pattern)
 
 
 class MDRun(MDSystem):
