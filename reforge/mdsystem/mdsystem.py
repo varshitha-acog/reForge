@@ -457,7 +457,7 @@ class MDSystem:
             logger.info("Done!")
             return average
         else:
-            logger.info('Could not find files matching given pattern: %s \nMaybe you forgot "*"', pattern)
+            logger.info('Could not find files matching given pattern: %s. Maybe you forgot "*"?', pattern)
 
 
 class MDRun(MDSystem):
