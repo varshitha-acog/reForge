@@ -526,7 +526,8 @@ class MDRun(MDSystem):
             outtag (str, optional): Output file tag for perturbation matrices.
         """
         with cd(self.covdir):
-            cov_files = [p.name for p in sorted(self.covdir.iterdir()) if p.name.startswith(intag)]
+            cov_files = [p.name for p in self.covdir.iterdir() if p.name.startswith(intag)]
+            cov_files = sorted(cov_files)
             for cov_file in cov_files:
                 logger.info("  Processing covariance matrix %s", cov_file)
                 covmat = np.load(self.covdir / cov_file)
@@ -546,7 +547,8 @@ class MDRun(MDSystem):
             outtag (str, optional): Output file tag for DFI values.
         """
         with cd(self.covdir):
-            pert_files = [p.name for p in sorted(self.covdir.iterdir()) if p.name.startswith(intag)]
+            pert_files = [p.name for p in self.covdir.iterdir() if p.name.startswith(intag)]
+            pert_files = sorted(pert_files)
             for pert_file in pert_files:
                 logger.info("  Processing perturbation matrix %s", pert_file)
                 pertmat = np.load(self.covdir / pert_file)
@@ -568,7 +570,8 @@ class MDRun(MDSystem):
             asym (bool, optional): If True, calculates asymmetric DCI.
         """
         with cd(self.covdir):
-            pert_files = [p.name for p in sorted(self.covdir.iterdir()) if p.name.startswith(intag)]
+            pert_files = [p.name for p in self.covdir.iterdir() if p.name.startswith(intag)]
+            pert_files = sorted(pert_files)
             for pert_file in pert_files:
                 logger.info("  Processing perturbation matrix %s", pert_file)
                 pertmat = np.load(self.covdir / pert_file)
