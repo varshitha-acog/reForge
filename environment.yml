@@ -2,7 +2,7 @@ name: reforge
 channels:
   - conda-forge  
 dependencies:
-  - python=3.10.0
+  - python=3.7
   - cython=3.0.12
   - cupy=13.3.0
   - mdanalysis=2.8.0
