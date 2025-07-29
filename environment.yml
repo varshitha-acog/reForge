@@ -11,7 +11,7 @@ dependencies:
   - numpy=2.2.3
   - openmm=8.2.0
   - requests
-  - setuptools>=61.0.0
+  - setuptools
   - selenium
   - selenium-manager
   - pandas=2.2.3
