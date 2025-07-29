@@ -1,22 +1,22 @@
 name: reforge
 channels:
   - conda-forge
-  - defaults
 dependencies:
-  - python=3.10
-  - cython=3.0.12
-  - cupy=13.3.0
-  - mdanalysis=2.8.0
-  - matplotlib=3.10.0
-  - memory_profiler=0.61.0
-  - numpy=2.2.3
-  - openmm=8.2.0
+  - python
+  - cython
+  - cupy
+  - mdanalysis
+  - matplotlib
+  - memory_profiler
+  - numpy 
+  - openmm
   - requests
+  - setuptools
   - selenium
   - selenium-manager
-  - pandas=2.2.3
+  - pandas
   - packaging
   - pdbfixer
   - pytest
-  - vermouth=0.13
-  - webdriver-manager
+  - vermouth
+  - webdriver-manager 
