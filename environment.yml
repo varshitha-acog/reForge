@@ -8,10 +8,10 @@ dependencies:
   - mdanalysis=2.8.0
   - matplotlib=3.10.0
   - memory_profiler=0.61.0
-  - numpy=2.2.3
+  - numpy=1.23.0
   - openmm=8.2.0
   - requests
-  - setuptools>=61.1.0
+  - setuptools>=62.0.0
   - selenium
   - selenium-manager
   - pandas=2.2.3
