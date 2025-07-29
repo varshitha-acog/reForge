@@ -1,8 +1,9 @@
 name: reforge
 channels:
-  - conda-forge  
+  - conda-forge
+  - defaults
 dependencies:
-  - python=3.12.0
+  - python  # Or python=3.7, depending on what you need
   - cython=3.0.12
   - cupy=13.3.0
   - mdanalysis=2.8.0
@@ -11,7 +12,7 @@ dependencies:
   - numpy=1.23.0
   - openmm=8.2.0
   - requests
-  - setuptools
+  - setuptools  # No version specified, letting Conda resolve the right version
   - selenium
   - selenium-manager
   - pandas=2.2.3
@@ -19,4 +20,4 @@ dependencies:
   - pdbfixer
   - pytest
   - vermouth=0.13
-  - webdriver-manager 
+  - webdriver-manager
