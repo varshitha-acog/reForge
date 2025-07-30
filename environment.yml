@@ -5,6 +5,7 @@ dependencies:
   - python
   - cython
   - cupy
+  - gromacs
   - mdanalysis
   - matplotlib
   - memory_profiler
